@@ -1,0 +1,177 @@
+/* src/pages/Login/Login.css */
+
+@font-face {
+  font-family: "Helvetica";
+  src: url("../../assets/fonts/helvetica/Helvetica.ttf") format("opentype");
+  font-weight: bold;
+  font-style: bold;
+}
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: "Helvetica";
+  margin: 10px;
+}
+
+.top-section {
+  height: 50vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  border-radius: 28px;
+  row-gap: 3rem;
+}
+
+.bottom-section {
+  flex: 1;
+  background-color: #f5fcfa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.logo {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  height: fit-content;
+}
+
+.logo img {
+  height: 60px;
+  /* object-fit: contain; */
+}
+
+.welcome-text {
+  text-align: center;
+  color: white;
+  row-gap: 2rem;
+}
+
+.welcome {
+  font-size: 2.5rem;
+  margin: 0 1rem;
+}
+
+.welcome-text h2 {
+  font-size: 1.5rem;
+  font-weight: normal;
+}
+
+.login-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+  margin-top: -100px; /* Pull the card up into the top section */
+  margin-bottom: 2rem;
+}
+
+.login-card h2 {
+  color: #2b5741;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+.signin-btn {
+  background-color: #45857b;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.signin-btn:hover {
+  background-color: #3a726a;
+}
+
+footer {
+  width: 100%;
+  padding: 1rem 2rem;
+  color: #666;
+  margin-top: auto;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-right {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-right a {
+  color: #666;
+  text-decoration: none;
+}
+
+.footer-right a:hover {
+  color: #2b5741;
+}
+
+@media (max-width: 768px) {
+  .top-section {
+    height: 40vh;
+  }
+
+  .login-card {
+    margin-top: -50px;
+    padding: 1.5rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
