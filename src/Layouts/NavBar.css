@@ -1,0 +1,183 @@
+/* @font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+.navBarContainer {
+  font-family: "inter";
+  width: 20vw;
+  min-height: 100vh;
+  background-color: #0b584d;
+  border-radius: 0 10% 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+}
+
+.titleLogo {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  margin: 0;
+  margin-right: 10%;
+}
+
+.title {
+  font-size: 38px;
+  color: #ffffff;
+}
+
+.line {
+  width: 90%;
+  height: 1px;
+  margin: auto;
+  background-color: #ffffff;
+}
+
+.navItems {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.navItemActive {
+  margin-bottom: 1.5rem;
+}
+ */
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+.navBarContainer {
+  font-family: "Inter";
+  width: 20vw;
+  min-height: 100vh;
+  background-color: #0b584d;
+  border-radius: 0 10% 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+  position: relative;
+}
+
+.titleLogo {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.titleLogo:hover {
+  opacity: 0.9;
+}
+
+.logo {
+  margin: 0;
+  margin-right: 5%;
+  width: 80px;
+  height: 80px;
+}
+
+.title {
+  font-size: 38px;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+}
+
+.line {
+  width: 90%;
+  height: 1px;
+  margin: auto;
+  background-color: #ffffff;
+  opacity: 0.2;
+}
+
+.navItems {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.navItem,
+.navItemActive {
+  text-decoration: none;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.navItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navItemActive {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+.bottomNav {
+  padding: 1rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navLink,
+.navLinkActive {
+  text-decoration: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover,
+.logoutButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navLinkActive {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+.navLink span,
+.logoutButton span {
+  margin-left: 0.75rem;
+  font-weight: 500;
+}
+
+.logoutButton {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter";
+  font-size: 1rem;
+}
