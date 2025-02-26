@@ -1,0 +1,44 @@
+/* Header Container */
+.header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 12px 24px;
+    height: 7%;
+    width: 100%;
+}
+
+.spacer{
+    width: 15%;
+}
+
+.rest{
+    width: 85%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+  
+  /* Title Styling */
+.header-title{
+    font-size: 1rem;
+    font-weight: 600;
+    color: #5a5a5a;
+}
+
+.sub-title{
+    color: var(--button-color);
+}
+
+.sub-sub-title{
+    color: var(--button-color);
+    font-size: 0.9rem;
+}
+
+.settings-icon{
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+}
