@@ -1,0 +1,12 @@
+/* src/styles/variables.css */
+:root {
+    --primary-color: #084C74;
+    --secondary-color: #ffffff;
+    --background-color: #ffffff;
+    --button-color: #063754;
+    --text-color: #333;
+    --success-color: #28A745;
+    --warning-color: #FFC107;
+    --danger-color: #DC3545;
+}
+  

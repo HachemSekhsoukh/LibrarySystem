@@ -5,8 +5,8 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
-import Login from "./Pages/login/login";
-import TestingSetting from "./Pages/Settings/Settings";
+import Login from "./Pages/login";
+import TestingSetting from "./Pages/Settings";
 import PagesLayout from "./Layouts/PagesLayout";
 import "./App.css";
 
