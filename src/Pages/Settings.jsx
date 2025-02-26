@@ -1,7 +1,7 @@
 import { useState } from "react";
-import "./Settings.css";
+import "../../src/CSS/Settings.css";
 // import photoProfile from "../../../assets/images/profile.png";
-import photoProfile from "../../../public/assets/images/profile.png";
+import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const TestingSetting = () => {
@@ -23,7 +23,7 @@ const TestingSetting = () => {
 
   return (
     <div className="settings-container">
-      <h1>SETTINGS</h1>
+      <h1>Settings</h1>
 
       <div className="tabs">
         <button

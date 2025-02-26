@@ -1,7 +1,6 @@
 import { useState } from "react";
-import "./Login.css";
-import logo from "/assets/images/logo1.png";
-import bgLogin from "../../../public/assets/images/bg-login.png";
+import "../../src/CSS/login.css";
+import bgLogin from "../../public/assets/images/bg-login.png";
 
 const Login = () => {
   const [accountName, setAccountName] = useState("");
@@ -42,13 +41,10 @@ const Login = () => {
         className="top-section"
         style={{ backgroundImage: `url(${bgLogin})` }}
       >
-        <div className="logo">
-          <img src={logo} alt="الوكالة الوطنية للمقاول الذاتي" />
-        </div>
 
         <div className="welcome-text">
           <h1 className="welcome">Welcome!</h1>
-          <h2>WAKALAT CHABAB W RIYADHA</h2>
+          <h2>This is ENSIA Library Management System</h2>
         </div>
       </div>
 
@@ -92,7 +88,7 @@ const Login = () => {
         <footer>
           <div className="footer-content">
             <div className="footer-left">
-              © 2025, Made with ❤️ by Wazir Team
+              © 2025, Made with ❤️ by Dr. Djouamaa Team
             </div>
             <div className="footer-right">
               <a href="#">Contact us</a>

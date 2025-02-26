@@ -14,8 +14,7 @@ function NavBar() {
     <div className="navBarContainer">
       {/* Logo and Title */}
       <div className="titleLogo" onClick={() => navigate("/")}>
-        <img src="/assets/images/logo.png" alt="logo" className="logo" />
-        <p className="title">Anae</p>
+        <img src="/assets/images/logo.png" alt="logo" className="logo"/>
       </div>
 
       {/* Divider Line */}
