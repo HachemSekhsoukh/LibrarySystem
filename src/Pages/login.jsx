@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "../../src/CSS/login.css";
+import logo from "/assets/images/logo.png";
 import bgLogin from "../../public/assets/images/bg-login.png";
 
 const Login = () => {
@@ -41,6 +42,10 @@ const Login = () => {
         className="top-section"
         style={{ backgroundImage: `url(${bgLogin})` }}
       >
+
+        <div className="logo">
+            <img src={logo} alt="الوكالة الوطنية للمقاول الذاتي" />
+        </div>
 
         <div className="welcome-text">
           <h1 className="welcome">Welcome!</h1>
