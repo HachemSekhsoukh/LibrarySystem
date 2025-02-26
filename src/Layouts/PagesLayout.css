@@ -1,5 +1,8 @@
+@import "src/styles/colors.css";
 .pageLayoutContainer {
+  background-color: var(--background-color);
   display: flex;
+  flex-direction: column;
   height: 120vh;
   width: 100%;
   /* overflow-y: hidden; */
@@ -11,6 +14,10 @@
   height: 100vh;
   left: 0;
   top: 0;
+}
+
+.spacer{
+  height: 7%;
 }
 
 .header{

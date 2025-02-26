@@ -9,8 +9,9 @@
 }
 
 .settings-container {
-  width: 100%;
-  margin: 0 auto;
+  border-radius: 10px;
+  background-color: white;
+  width: 95%;
   font-weight: bold;
   font-style: bold;
   font-family: "Inter";

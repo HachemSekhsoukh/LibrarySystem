@@ -12,6 +12,7 @@ function PagesLayout() {
       <div className="navbar">
         <NavBar />
       </div>
+      <div className="spacer"></div>
       <div className="content">
         <Outlet />
       </div>
