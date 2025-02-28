@@ -135,7 +135,17 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.icon-box{
+.icon-box-active{
+  background-color: var(--primary-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 7px;
+  margin-right: 15px;
+}
+
+.icon-box-inactive{
   background-color: var(--button-color);
   display: flex;
   justify-content: center;
@@ -144,6 +154,8 @@
   padding: 7px;
   margin-right: 15px;
 }
+
+
 
 .navItemActive {
   background-color: rgba(0, 0, 0, 0.2);
@@ -180,7 +192,7 @@
 }
 
 .navLinkActive {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--button-color);
   font-weight: 600;
 }
 

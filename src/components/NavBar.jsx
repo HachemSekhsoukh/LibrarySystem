@@ -62,7 +62,7 @@ function NavBar() {
                     isActive ? "navItemActive" : "navItem"
                   }
                 >
-                  <div className="icon-box">
+                  <div className="icon-box-inactive">
                     <img src={subItem.icon} alt={subItem.label} className="navIcon" />
                   </div>
                   <span>{subItem.label}</span>
@@ -77,7 +77,7 @@ function NavBar() {
                 isActive ? "navItemActive" : "navItem"
               }
             >
-            <div className="icon-box">
+            <div className="icon-box-inactive">
                     <img src={item.icon} alt={item.label} className="navIcon" />
             </div>
               <span>{item.label}</span>
@@ -93,7 +93,10 @@ function NavBar() {
           to="/settings"
           className={({ isActive }) => (isActive ? "navLinkActive" : "navLink")}
         >
-          <Settings size={20} />
+          <div className="icon-box-active">
+            <Settings size={20} />
+          </div>
+          
           <span>Settings</span>
         </NavLink>
         <button onClick={handleLogout} className="logoutButton">
