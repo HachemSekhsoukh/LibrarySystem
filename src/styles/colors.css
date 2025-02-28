@@ -1,8 +1,9 @@
-/* src/styles/variables.css */
+/* src/styles/colors.css */
 :root {
     --primary-color: #084C74;
     --secondary-color: #ffffff;
     --background-color: #F2F4F5;
+    --white-color: white;
     --button-color: #063754;
     --text-color: #333;
     --success-color: #28A745;

@@ -1,4 +1,4 @@
-@import "src/styles/colors.css";
+@import "../styles/colors.css";
 
 @font-face {
   font-family: "Inter";
@@ -8,8 +8,13 @@
   font-style: normal;
 }
 
+#title{
+  color: var(--button-color);
+  margin-bottom: 2%;
+}
+
 .settings-container {
-  border-radius: 10px;
+  border-radius: 25px;
   background-color: white;
   width: 95%;
   font-weight: bold;
