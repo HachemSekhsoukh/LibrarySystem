@@ -10,6 +10,31 @@ function NavBar() {
     navigate("/login"); // Redirect to login
   };
 
+  const navItems = [
+      { label: "Dashboard", path: "/dashboard" , icon: "/assets/images/home-icon.png"},
+      {
+        label: "Circulation",
+        subItems: [
+          { label: "Readers", path: "/circulation/readers", icon: "/assets/images/home-icon.png" },
+          { label: "Exemplaires", path: "/circulation/exemplaires", icon: "/assets/images/home-icon.png" },
+          { label: "PEB", path: "/circulation/peb", icon: "/assets/images/home-icon.png" },
+          { label: "Administration", path: "/circulation/admin", icon: "/assets/images/home-icon.png" },
+        ],
+      },
+      {
+        label: "Catalogage",
+        subItems: [
+          { label: "Catalogage", path: "/catalogage/catalogage", icon: "/assets/images/home-icon.png" },
+          { label: "Administration", path: "/catalogage/admin", icon: "/assets/images/home-icon.png" },
+        ],
+      },
+      {
+        label: "Administration",
+        subItems: [{ label: "Administration", path: "/administration/admin", icon: "/assets/images/home-icon.png" }],
+      },
+  ];
+  
+
   return (
     <div className="navBarContainer">
       {/* Logo and Title */}
@@ -22,14 +47,45 @@ function NavBar() {
 
       {/* Navigation Items */}
       <nav className="navItems">
-       
-        {/* <NavLink
-          to="/settings"
-          className={({ isActive }) => (isActive ? "navItemActive" : "navItem")}
-        >
-          Settings
-        </NavLink> */}
+        {navItems.map((item, index) =>
+          item.subItems ? (
+            <div key={index} className="navSection">
+              {/* <div className="icon-box">
+                    <img src={subItem.icon} alt={subItem.label} className="navIcon" />
+              </div> */}
+              <span className="navSectionTitle">{item.label} :</span>
+              {item.subItems.map((subItem, subIndex) => (
+                <NavLink
+                  key={subIndex}
+                  to={subItem.path}
+                  className={({ isActive }) =>
+                    isActive ? "navItemActive" : "navItem"
+                  }
+                >
+                  <div className="icon-box">
+                    <img src={subItem.icon} alt={subItem.label} className="navIcon" />
+                  </div>
+                  <span>{subItem.label}</span>
+                </NavLink>
+              ))}
+            </div>
+          ) : (
+            <NavLink
+              key={index}
+              to={item.path}
+              className={({ isActive }) =>
+                isActive ? "navItemActive" : "navItem"
+              }
+            >
+            <div className="icon-box">
+                    <img src={item.icon} alt={item.label} className="navIcon" />
+            </div>
+              <span>{item.label}</span>
+            </NavLink>
+          )
+        )}
       </nav>
+
 
       {/* Bottom Settings and Logout */}
       <div className="bottomNav">
