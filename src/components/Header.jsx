@@ -1,12 +1,12 @@
 import "../CSS/header.css";
-const Header = () => {
+const Header = ({ title, subtitle }) => {
   return (
     <header className="header">
       <div className="spacer"></div>
       <div className="rest">
         <div className="header-title">
-          ENSIA / <span className="sub-title">Settings</span><br></br>
-          <span className="sub-sub-title">Settings</span>
+          ENSIA / <span className="sub-title">{title}</span><br></br>
+          <span className="sub-sub-title">{subtitle}</span>
         </div>
           
         <img src="/assets/images/settings-icon.png" className="settings-icon"></img>
