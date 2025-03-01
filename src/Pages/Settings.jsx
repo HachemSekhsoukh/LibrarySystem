@@ -4,7 +4,7 @@ import "../../src/CSS/Settings.css";
 import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const TestingSetting = () => {
+const Settings = () => {
   const [activeTab, setActiveTab] = useState("edit-profile");
   // Add state for password visibility
   const [showPassword, setShowPassword] = useState({
@@ -178,4 +178,4 @@ const TestingSetting = () => {
   );
 };
 
-export default TestingSetting;
+export default Settings;

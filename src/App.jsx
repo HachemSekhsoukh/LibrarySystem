@@ -6,7 +6,9 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Login from "./Pages/login";
-import TestingSetting from "./Pages/Settings";
+import Settings from "./Pages/Settings";
+import Dashboard from "./Pages/dashboard";
+import Readers from "./Pages/readers";
 import PagesLayout from "./Layouts/PagesLayout";
 import "./App.css";
 
@@ -18,7 +20,9 @@ const router = createBrowserRouter(
 
       {/* Pages requiring the layout (after login) */}
       <Route element={<PagesLayout />}>
-        <Route path="/settings" element={<TestingSetting />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/circulation/readers" element={<Readers />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
     </>
