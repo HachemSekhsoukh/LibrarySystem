@@ -91,16 +91,16 @@ function NavBar() {
       <div className="bottomNav">
         <NavLink
           to="/settings"
-          className={({ isActive }) => (isActive ? "navLinkActive" : "navLink")}
+          className={({ isActive }) => (isActive ? "navItemActive" : "navItem")}
         >
-          <div className="icon-box-active">
+          <div className="icon-box-inactive">
             <Settings size={20} />
           </div>
           
           <span>Settings</span>
         </NavLink>
         <button onClick={handleLogout} className="logoutButton">
-          <LogOut size={20} />
+          <LogOut className="logout-icon" size={21} />
           <span>Logout</span>
         </button>
       </div>

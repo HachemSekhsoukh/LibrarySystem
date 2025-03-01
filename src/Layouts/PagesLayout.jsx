@@ -9,6 +9,8 @@ function PagesLayout() {
   // Define titles and subtitles for each route
   const pageTitles = {
     "/settings": { title: "Settings", subtitle: "Manage your preferences" },
+    "/dashboard": { title: "Dashboard", subtitle: "Dashboard" },
+    "/circulation/readers": { title: "Circulation", subtitle: "Readers" },
   };
   
 
