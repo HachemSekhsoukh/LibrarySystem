@@ -10,7 +10,13 @@ function PagesLayout() {
   const pageTitles = {
     "/settings": { title: "Settings", subtitle: "Manage your preferences" },
     "/dashboard": { title: "Dashboard", subtitle: "Dashboard" },
+    "/administration": { title: "Administration", subtitle: "Administration" },
     "/circulation/readers": { title: "Circulation", subtitle: "Readers" },
+    "/circulation/exemplaires": { title: "Circulation", subtitle: "Exemplaires" },
+    "/circulation/peb": { title: "Circulation", subtitle: "PEB" },
+    "/circulation/administration": { title: "Circulation", subtitle: "Administration" },
+    "/catalogage/catalogage": { title: "Catalogage", subtitle: "Catalogage" },
+    "/catalogage/administration": { title: "Catalogage", subtitle: "Administration" },
   };
   
 
