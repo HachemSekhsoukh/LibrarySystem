@@ -12,25 +12,22 @@ function NavBar() {
 
   const navItems = [
       { label: "Dashboard", path: "/dashboard" , icon: "/assets/images/home-icon.png"},
+      { label: "Administration", path: "/administration" , icon: "/assets/images/home-icon.png"},
       {
         label: "Circulation",
         subItems: [
           { label: "Readers", path: "/circulation/readers", icon: "/assets/images/home-icon.png" },
           { label: "Exemplaires", path: "/circulation/exemplaires", icon: "/assets/images/home-icon.png" },
           { label: "PEB", path: "/circulation/peb", icon: "/assets/images/home-icon.png" },
-          { label: "Administration", path: "/circulation/admin", icon: "/assets/images/home-icon.png" },
+          { label: "Administration", path: "/circulation/administration", icon: "/assets/images/home-icon.png" },
         ],
       },
       {
         label: "Catalogage",
         subItems: [
           { label: "Catalogage", path: "/catalogage/catalogage", icon: "/assets/images/home-icon.png" },
-          { label: "Administration", path: "/catalogage/admin", icon: "/assets/images/home-icon.png" },
+          { label: "Administration", path: "/catalogage/administration", icon: "/assets/images/home-icon.png" },
         ],
-      },
-      {
-        label: "Administration",
-        subItems: [{ label: "Administration", path: "/administration/admin", icon: "/assets/images/home-icon.png" }],
       },
   ];
   
