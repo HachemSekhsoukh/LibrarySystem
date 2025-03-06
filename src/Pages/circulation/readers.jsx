@@ -1,8 +1,10 @@
 import React from "react";
-import Table from "../components/Table";
-import "../CSS/readers.css";
+import Table from "../../components/Table";
+import "../../CSS/readers.css";
+import Button from '../../components/Button';
 
 const Readers = () => {
+  //dummy data
   const columns = [
     { label: "ID", key: "id" },
     { label: "Family Name", key: "familyName" },
@@ -36,9 +38,15 @@ const Readers = () => {
 
   return (
     <div className="readers-page">
-        <div className="table-container">
-        <Table columns={columns} data={data} showActions={true} />
-        </div>  
+        <div className="container">
+          <div id="table">
+          <Table columns={columns} data={data} showActions={true} />
+          </div>
+          <div className="bottom-buttons">
+            <Button onClick = {() => {}} label={"Import Readers"}></Button>
+            <Button onClick = {() => {}} label={"Add New Reader"}></Button>
+          </div>
+        </div>
     </div>
   );
 };

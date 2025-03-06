@@ -2,10 +2,11 @@
 :root {
     --primary-color: #084C74;
     --secondary-color: #ffffff;
-    --background-color: #F2F4F5;
+    --background-color: #dee5f0;
     --table-header-color: #084c7414;
     --white-color: white;
     --button-color: #063754;
+    --button-color-light: #245c7c;
     --text-color: #333;
     --success-color: #28A745;
     --warning-color: #FFC107;
