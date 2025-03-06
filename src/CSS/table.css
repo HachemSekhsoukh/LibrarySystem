@@ -1,11 +1,14 @@
 /* Container Styling */
-.container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
   /* Table Wrapper */
   .table-container {
     overflow-x: auto;
+    overflow-y: auto;
+    height: 100%;
+    width: 98%;
+  }
+
+  .inner-table-container{
+    height: 85%;
   }
   
   /* Table Styling */
@@ -19,12 +22,55 @@
   
   .custom-table th,
   .custom-table td {
-    border-bottom: 1px solid #ddd;
+    
     padding: 10px;
     font-weight: lighter;
     font-size: 0.94rem;
     text-align: left;
   }
+
+  .page-index{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .index{
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    margin: 0.3rem;
+    background-color: var(--table-header-color);
+    border-radius: 10px;
+    font-weight: lighter;
+    font-size: larger;
+  }
+
+  .page-index-button{
+    border-radius: 10px;
+    padding: 8px;
+    background-color: transparent;
+    border: none;
+    font-size: large;
+    font-weight: bold;
+    color: var(--primary-color);
+  }
+
+  .page-index-button:hover{
+    background-color: var(--table-header-color);
+    cursor: pointer;
+  }
+
+  .custom-table tr{
+    border-bottom: 1px solid #ddd;
+  }
+
+  .table-header tr{
+    border-bottom: none;
+  }
+
   
   .custom-table th {
     background-color: var(--table-header-color);

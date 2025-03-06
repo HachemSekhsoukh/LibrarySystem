@@ -8,13 +8,13 @@ import {
 import Login from "./Pages/login";
 import Settings from "./Pages/Settings";
 import Dashboard from "./Pages/dashboard";
-import Readers from "./Pages/readers";
-import Exemplaires from "./Pages/exemplaires";
+import Readers from "./Pages/circulation/readers";
+import Exemplaires from "./Pages/circulation/exemplaires";
 import Administration from "./Pages/administration";
-import Peb from "./Pages/peb";
-import CirculationAdministration from "./Pages/circulation-administration";
-import Catalogage from "./Pages/catalogage";
-import CatalogageAdministration from "./Pages/catalogage-administration";
+import Peb from "./Pages/circulation/peb";
+import CirculationAdministration from "./Pages/circulation/administration";
+import Catalogage from "./Pages/catalogage/catalogage";
+import CatalogageAdministration from "./Pages/catalogage/administration";
 import PagesLayout from "./Layouts/PagesLayout";
 import "./App.css";
 

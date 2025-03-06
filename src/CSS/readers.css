@@ -1,9 +1,29 @@
-.table-container{
+.container{
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    align-items: center;
     border-radius: 25px;
     background-color: white;
     width: 95%;
     font-weight: bold;
     font-style: bold;
     font-family: "Inter";
-    padding: 1.5rem;
+    padding-top: 0.3rem;
+}
+
+.bottom-buttons{
+    width: 95%;
+    margin-top: 0;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
+}
+
+#table{
+    width: 98%;
+    height: 90%;
 }
