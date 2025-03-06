@@ -1,0 +1,9 @@
+.table-container{
+    border-radius: 25px;
+    background-color: white;
+    width: 95%;
+    font-weight: bold;
+    font-style: bold;
+    font-family: "Inter";
+    padding: 1.5rem;
+}

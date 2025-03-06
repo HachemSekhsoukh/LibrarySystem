@@ -1,0 +1,77 @@
+/* Container Styling */
+.container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  /* Table Wrapper */
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  /* Table Styling */
+  .custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    border-radius: 10px; /* Rounded corners */
+    overflow: hidden; /* Ensures corners are rounded */
+  }
+  
+  .custom-table th,
+  .custom-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    font-weight: lighter;
+    font-size: 0.94rem;
+    text-align: left;
+  }
+  
+  .custom-table th {
+    background-color: var(--table-header-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+  }
+  .splitter{
+    width: 0.5%;
+    background-color: rgb(6, 90, 163);
+  }
+
+  .edit-delete{
+    display: flex;
+    flex-direction: row;
+    border: 1px solid rgb(6, 90, 163);
+    border-radius: 5px;
+    overflow: hidden; /* Ensures corners are rounded */
+  }
+  
+  /* Action Buttons */
+  .edit-btn,
+  .delete-btn {
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .edit-btn {
+    background-color: #083e7416;
+    width: 49.75%;
+    color: white;
+  }
+  
+  .delete-btn {
+    background-color: #083e7416;
+    width: 49.75%;
+    color: white;
+  }
+  
+  .edit-btn:hover {
+    background-color: #083e74a9;
+  }
+  
+  .delete-btn:hover {
+    background-color: #083e74a9;
+  }
+  
