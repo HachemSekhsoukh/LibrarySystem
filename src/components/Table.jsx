@@ -1,6 +1,7 @@
 import React from "react";
 import "../CSS/table.css"; // Import table styles
 
+
 const Table = ({ columns, data, showActions = false }) => {
   return (
     <div className="table-container">
@@ -23,9 +24,13 @@ const Table = ({ columns, data, showActions = false }) => {
                 {showActions && (
                   <td>
                   <div className="edit-delete">
-                      <button className="edit-btn">✏️</button>
-                      <div className="splitter"></div>
-                      <button className="delete-btn">🗑️</button>
+                       <button className="edit-btn">
+                          <img src="../../public/assets/images/pencil-write.png" alt="Edit" />
+                        </button>
+                        <div className="splitter"></div>
+                        <button className="delete-btn">
+                          <img src="../../public/assets/images/bin.png" alt="Delete" />
+                      </button>
                   </div>
                   </td>
                 )}

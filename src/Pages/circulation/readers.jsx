@@ -43,8 +43,8 @@ const Readers = () => {
           <Table columns={columns} data={data} showActions={true} />
           </div>
           <div className="bottom-buttons">
-            <Button onClick = {() => {}} label={"Import Readers"}></Button>
-            <Button onClick = {() => {}} label={"Add New Reader"}></Button>
+            <Button onClick = {() => {}} label={"Import Readers"} lightBackgrnd={true}></Button>
+            <Button onClick = {() => {}} label={"Add New Reader"} lightBackgrnd={false}></Button>
           </div>
         </div>
     </div>
