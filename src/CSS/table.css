@@ -10,6 +10,12 @@
   .inner-table-container{
     height: 85%;
   }
+
+  .edit-delete img{
+    height: 45%;
+    margin: 0;
+    padding: 0;
+  }
   
   /* Table Styling */
   .custom-table {
@@ -22,10 +28,9 @@
   
   .custom-table th,
   .custom-table td {
-    
     padding: 10px;
     font-weight: lighter;
-    font-size: 0.94rem;
+    font-size: 0.9rem;
     text-align: left;
   }
 
@@ -87,7 +92,7 @@
     display: flex;
     flex-direction: row;
     border: 1px solid rgb(6, 90, 163);
-    border-radius: 5px;
+    border-radius: 10px;
     overflow: hidden; /* Ensures corners are rounded */
   }
   
@@ -95,7 +100,7 @@
   .edit-btn,
   .delete-btn {
     border: none;
-    padding: 5px 10px;
+    padding: 0px 2px;
     cursor: pointer;
     margin: 0;
     font-size: 14px;
