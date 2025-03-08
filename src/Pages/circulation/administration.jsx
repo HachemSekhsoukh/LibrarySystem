@@ -1,7 +1,9 @@
 
 const CirculationAdministration = () => {
   return (
-    <></>
+    <div className= "circulation-administration-page">
+        
+    </div>
   );
 };
 
