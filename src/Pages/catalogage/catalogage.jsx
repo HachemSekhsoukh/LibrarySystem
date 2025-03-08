@@ -3,6 +3,10 @@ import Table from "../../components/Table";
 import Button from '../../components/Button';
 import Popup from "../../components/Popup";
 import { TextField, MenuItem, Grid } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const Catalogage = () => {
   const [openPopup, setOpenPopup] = useState(false);
@@ -56,8 +60,20 @@ const Catalogage = () => {
             <Table columns={columns} data={data} showActions={true} />
             </div>
             <div className="bottom-buttons">
-              <Button onClick = {() => {}} label={"Import Books"} lightBackgrnd={true}></Button>
-              <Button onClick = {() => setOpenPopup(true)} label={"Add New Book"} lightBackgrnd={false}></Button>
+              <Button 
+                onClick={() => {}} 
+                label="Import Books" 
+                lightBackgrnd={true} 
+                icon={<FileUploadIcon />}
+                size="large"
+              />
+              <Button 
+                onClick={() => setOpenPopup(true)} 
+                label="Add New Book" 
+                lightBackgrnd={false}
+                icon={<AddIcon />}
+                size="large"
+              />
             </div>
           </div>
           <Popup title="Add Book" openPopup={openPopup} setOpenPopup={setOpenPopup}>
@@ -129,9 +145,21 @@ const Catalogage = () => {
         </Grid>
 
         {/* Buttons */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        <Button onClick = {() => setOpenPopup(false)} label={"Cancel"} lightBackgrnd={true}></Button>
-        <Button onClick = {() => setOpenPopup(false)} label={"Add"} lightBackgrnd={false}></Button>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", gap: "10px" }}>
+          <Button 
+            onClick={() => setOpenPopup(false)} 
+            label="Cancel" 
+            lightBackgrnd={true}
+            icon={<CancelIcon />}
+            size="medium"
+          />
+          <Button 
+            onClick={handleSubmit} 
+            label="Add" 
+            lightBackgrnd={false}
+            icon={<SaveIcon />}
+            size="medium"
+          />
         </div>
       </Popup>
       </div>
