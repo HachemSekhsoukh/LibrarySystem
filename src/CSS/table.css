@@ -94,16 +94,20 @@
     border: 1px solid rgb(6, 90, 163);
     border-radius: 10px;
     overflow: hidden; /* Ensures corners are rounded */
+    height: 36px;
   }
   
   /* Action Buttons */
   .edit-btn,
   .delete-btn {
     border: none;
-    padding: 0px 2px;
+    padding: 5px 10px;
     cursor: pointer;
     margin: 0;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .edit-btn {
@@ -123,6 +127,6 @@
   }
   
   .delete-btn:hover {
-    background-color: #083e74a9;
+    background-color: rgba(211, 47, 47, 0.2);
   }
   

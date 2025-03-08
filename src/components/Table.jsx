@@ -1,6 +1,7 @@
 import React from "react";
 import "../CSS/table.css"; // Import table styles
-
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Table = ({ columns, data, showActions = false }) => {
   return (
@@ -25,11 +26,11 @@ const Table = ({ columns, data, showActions = false }) => {
                   <td>
                   <div className="edit-delete">
                        <button className="edit-btn">
-                          <img src="../../public/assets/images/pencil-write.png" alt="Edit" />
+                          <EditIcon style={{ fontSize: '20px', color: '#065AA3' }} />
                         </button>
                         <div className="splitter"></div>
                         <button className="delete-btn">
-                          <img src="../../public/assets/images/bin.png" alt="Delete" />
+                          <DeleteIcon style={{ fontSize: '20px', color: '#D32F2F' }} />
                       </button>
                   </div>
                   </td>

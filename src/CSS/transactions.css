@@ -1,0 +1,210 @@
+.transactions-page {
+  padding: 20px;
+}
+
+.container {
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: baseline;
+  align-items: center;
+  border-radius: 25px;
+  background-color: white;
+  width: 100%;
+  margin-top: 1rem;
+  font-weight: bold;
+  font-style: bold;
+  font-family: "Inter";
+  padding-top: 0.3rem;
+}
+
+.bottom-buttons {
+  width: 95%;
+  margin-top: 0;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  gap: 10px;
+}
+
+#table {
+  width: 98%;
+  height: 90%;
+}
+
+/* Common Dialog Button Styles */
+.dialog-button-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.dialog-cancel-button,
+.dialog-save-button {
+  padding: 12px 0;
+  width: 180px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  color: white;
+}
+
+.dialog-cancel-button {
+  background-color: #3f7d9c;
+}
+
+.dialog-save-button {
+  background-color: #063754;
+}
+
+.dialog-cancel-button:hover {
+  background-color: #346b87;
+}
+
+.dialog-save-button:hover {
+  background-color: #052c45;
+}
+
+/* Add Transaction Dialog Styles - Scoped to transaction form only */
+.add-transaction-form {
+  padding: 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.add-transaction-form .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.add-transaction-form .form-field label {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.add-transaction-form .dropdown-field {
+  background-color: #fff;
+  border-radius: 12px !important;
+}
+
+/* Autocomplete specific styles */
+.add-transaction-form .dropdown-field .MuiOutlinedInput-root {
+  border-radius: 12px;
+  height: 48px;
+}
+
+.add-transaction-form .dropdown-field .MuiAutocomplete-inputRoot {
+  padding: 0 !important;
+}
+
+.add-transaction-form .dropdown-field .MuiAutocomplete-input {
+  padding: 0 14px !important;
+  height: 48px !important;
+}
+
+.add-transaction-form .dropdown-field .MuiOutlinedInput-notchedOutline,
+.add-transaction-form .text-field .MuiOutlinedInput-notchedOutline {
+  border-color: #e0e0e0;
+  border-width: 1px;
+}
+
+.add-transaction-form .text-field {
+  background-color: #fff;
+  border-radius: 12px;
+}
+
+.add-transaction-form .text-field input {
+  height: 48px;
+  padding: 0 14px;
+}
+
+.add-transaction-form .dialog-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.add-transaction-form .cancel-button,
+.add-transaction-form .save-button {
+  padding: 12px 0;
+  width: 180px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.add-transaction-form .cancel-button {
+  background-color: #3f7d9c;
+  color: white;
+}
+
+.add-transaction-form .save-button {
+  background-color: #063754;
+  color: white;
+}
+
+.add-transaction-form .cancel-button:hover {
+  background-color: #346b87;
+}
+
+.add-transaction-form .save-button:hover {
+  background-color: #052c45;
+}
+
+/* Transaction-specific dialog styling */
+.transaction-dialog .MuiDialogTitle-root {
+  background-color: white;
+  color: #063754;
+  font-size: 24px;
+  font-weight: 600;
+  padding: 24px 24px 16px;
+  text-align: left;
+  border-bottom: none !important;
+}
+
+.transaction-dialog .MuiDialogTitle-root h6 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #063754;
+}
+
+.transaction-dialog .MuiDialogContent-root {
+  padding: 0 !important;
+  overflow-y: visible;
+}
+
+.transaction-dialog .MuiDialogContent-dividers {
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+.transaction-dialog .MuiDialog-paper {
+  border-radius: 12px !important;
+  width: 500px !important;
+  max-width: 90vw;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: visible;
+}
+
+.add-transaction-form .MuiSelect-select {
+  height: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 14px !important;
+} 
