@@ -1,2 +1,4 @@
 Flask
 supabase
+flask-cors
+python-dotenv
