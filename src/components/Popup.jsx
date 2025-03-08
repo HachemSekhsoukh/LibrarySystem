@@ -1,23 +1,17 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography } from "@mui/material";
-import Button from "./Button"; // Adjust the path if needed
+import "../CSS/popup.css";
 
 export default function Popup(props) {
     const { title, children, openPopup, setOpenPopup } = props;
 
     return (
-        <Dialog open={openPopup} maxWidth="md">
+        <Dialog open={openPopup} maxWidth="md" PaperProps={{className: "dialog-paper" }}>
             <DialogTitle>
-                <div style={{ display: 'flex' }}>
-                    <Typography variant="h6" component="div" style={{ flexGrow: 1 }}>
+                <div className="dialog-title">
+                    <Typography variant="h6" component="div" className="dialog-title-text">
                         {title}
                     </Typography>
-                    <Button
-                        color="secondary"
-                        onClick={() => setOpenPopup(false)}
-                    >
-                        Close
-                    </Button>
                 </div>
             </DialogTitle>
             <DialogContent dividers>

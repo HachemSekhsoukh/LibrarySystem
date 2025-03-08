@@ -130,16 +130,8 @@ const Catalogage = () => {
 
         {/* Buttons */}
         <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-          <Button
-            variant="contained"
-            onClick={() => setOpenPopup(false)}
-            style={{ marginRight: "10px" }}
-          >
-            Cancel
-          </Button>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Save
-          </Button>
+        <Button onClick = {() => setOpenPopup(false)} label={"Cancel"} lightBackgrnd={true}></Button>
+        <Button onClick = {() => setOpenPopup(false)} label={"Add"} lightBackgrnd={false}></Button>
         </div>
       </Popup>
       </div>

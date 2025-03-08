@@ -1,0 +1,15 @@
+.dialog-paper {
+    border-radius: 30px !important;
+}
+
+.dialog-title {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.dialog-title-text {
+    text-align: center;
+    font-weight: bolder !important;
+    color: #004466;
+}
