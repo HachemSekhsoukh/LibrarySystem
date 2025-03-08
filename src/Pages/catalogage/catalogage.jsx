@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Table from "../../components/Table";
 import Button from '../../components/Button';
 import Popup from "../../components/Popup";
+import "../../CSS/form.css";
 import { TextField, MenuItem, Grid } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
@@ -77,91 +78,84 @@ const Catalogage = () => {
             </div>
           </div>
           <Popup title="Add Book" openPopup={openPopup} setOpenPopup={setOpenPopup}>
-        <Grid container spacing={2}>
-          {/* Document Type */}
-          <Grid item xs={6}>
-            <TextField
-              select
-              fullWidth
-              label="Document Type"
-              name="type"
-              value={bookData.type}
-              onChange={handleChange}
-              variant="outlined"
-            >
-              <MenuItem value="Book">Book</MenuItem>
-              <MenuItem value="Journal">Journal</MenuItem>
-              <MenuItem value="Magazine">Magazine</MenuItem>
-            </TextField>
-          </Grid>
+          <Grid container spacing={2}>
+                    {/* Document Type */}
+                    <Grid item xs={6}>
+                        <TextField
+                            select
+                            label="Document Type"
+                            name="type"
+                            value={bookData.type}
+                            onChange={handleChange}
+                            variant="outlined"
+                            className="text-field"
+                            InputLabelProps={{ shrink: true }}
+                        >
+                            <MenuItem value="Book">Book</MenuItem>
+                            <MenuItem value="Research">Research Paper</MenuItem>
+                        </TextField>
+                    </Grid>
 
-          {/* Author */}
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Author"
-              name="author"
-              value={bookData.author}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
+                    {/* Author */}
+                    <Grid item xs={6}>
+                        <TextField
+                            label="Author"
+                            name="author"
+                            value={bookData.author}
+                            onChange={handleChange}
+                            variant="outlined"
+                            className="text-field"
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </Grid>
 
-          {/* Title */}
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Title"
-              name="title"
-              value={bookData.title}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
+                    {/* Title */}
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Title"
+                            name="title"
+                            value={bookData.title}
+                            onChange={handleChange}
+                            variant="outlined"
+                            className="text-field"
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </Grid>
 
-          {/* ISBN */}
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="ISBN"
-              name="isbn"
-              value={bookData.isbn}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
+                    {/* ISBN */}
+                    <Grid item xs={6}>
+                        <TextField
+                            label="ISBN"
+                            name="isbn"
+                            value={bookData.isbn}
+                            onChange={handleChange}
+                            variant="outlined"
+                            className="text-field"
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </Grid>
 
-          {/* ISSN */}
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="ISSN"
-              name="issn"
-              value={bookData.issn}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </Grid>
-        </Grid>
+                    {/* ISSN */}
+                    <Grid item xs={6}>
+                        <TextField
+                            label="ISSN"
+                            name="issn"
+                            value={bookData.issn}
+                            onChange={handleChange}
+                            variant="outlined"
+                            className="text-field"
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </Grid>
+                </Grid>
 
-        {/* Buttons */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", gap: "10px" }}>
-          <Button 
-            onClick={() => setOpenPopup(false)} 
-            label="Cancel" 
-            lightBackgrnd={true}
-            icon={<CancelIcon />}
-            size="medium"
-          />
-          <Button 
-            onClick={handleSubmit} 
-            label="Add" 
-            lightBackgrnd={false}
-            icon={<SaveIcon />}
-            size="medium"
-          />
-        </div>
-      </Popup>
+
+                {/* Buttons */}
+                <div className="form-buttons">
+                    <Button onClick={() => setOpenPopup(false)} label="Cancel" lightBackgrnd={true} />
+                    <Button onClick={() => setOpenPopup(false)} label="Add" lightBackgrnd={false} />
+                </div>
+          </Popup>
       </div>
     );
   };
