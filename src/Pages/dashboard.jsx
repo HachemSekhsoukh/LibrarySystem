@@ -83,7 +83,7 @@ const Dashboard = () => {
         <div className="container-title">
           <h2>Recent Transactions</h2>
         </div>
-          <Table columns={columns} data={data} showActions={false} />
+          <Table columns={columns} data={data} showActions={true} />
           <div className="bottom-buttons">
             <Button onClick = {() => {}} label={"Add Transaction"} lightBackgrnd={false}></Button>
           </div>

@@ -4,6 +4,10 @@ import Button from '../../components/Button';
 import Popup from "../../components/Popup";
 import "../../CSS/form.css";
 import { TextField, MenuItem, Grid } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const Catalogage = () => {
   const [openPopup, setOpenPopup] = useState(false);
@@ -57,8 +61,20 @@ const Catalogage = () => {
             <Table columns={columns} data={data} showActions={true} />
             </div>
             <div className="bottom-buttons">
-              <Button onClick = {() => {}} label={"Import Books"} lightBackgrnd={true}></Button>
-              <Button onClick = {() => setOpenPopup(true)} label={"Add New Book"} lightBackgrnd={false}></Button>
+              <Button 
+                onClick={() => {}} 
+                label="Import Books" 
+                lightBackgrnd={true} 
+                icon={<FileUploadIcon />}
+                size="large"
+              />
+              <Button 
+                onClick={() => setOpenPopup(true)} 
+                label="Add New Book" 
+                lightBackgrnd={false}
+                icon={<AddIcon />}
+                size="large"
+              />
             </div>
           </div>
           <Popup title="Add Book" openPopup={openPopup} setOpenPopup={setOpenPopup}>
@@ -132,6 +148,7 @@ const Catalogage = () => {
                         />
                     </Grid>
                 </Grid>
+
 
                 {/* Buttons */}
                 <div className="form-buttons">
