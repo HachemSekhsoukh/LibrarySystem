@@ -1,4 +1,4 @@
-import "../CSS/header.css";
+import "../CSS/components/header.css";
 const Header = ({ title, subtitle }) => {
   return (
     <header className="header">

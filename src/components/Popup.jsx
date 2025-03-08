@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography } from "@mui/material";
-import "../CSS/popup.css";
+import "../CSS/components/popup.css";
 
 export default function Popup(props) {
     const { title, children, openPopup, setOpenPopup, className = '' } = props;

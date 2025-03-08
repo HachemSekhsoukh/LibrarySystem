@@ -1,5 +1,5 @@
 import React from 'react';
-import "../CSS/button.css";
+import "../CSS/components/button.css";
 
 function Button({ onClick, label, lightBackgrnd, icon, size = "medium" }) {
   // Size classes for different button sizes

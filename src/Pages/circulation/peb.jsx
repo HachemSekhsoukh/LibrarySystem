@@ -1,4 +1,4 @@
-import "../../CSS/peb.css";
+import "../../CSS/circulation/peb.css";
 
 const PEB = () => {
   return (
