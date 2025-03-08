@@ -11,7 +11,7 @@ import {
   Alert
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
-import "../../CSS/transactions.css";
+import "../../CSS/circulation/transactions.css";
 
 const Exemplaires = () => {
   const [openPopup, setOpenPopup] = useState(false);
