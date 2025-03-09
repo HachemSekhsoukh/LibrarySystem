@@ -9,4 +9,4 @@ def home():
     return "Hello from Flask!"
 
 # Import routes to register them with the app
-from app import routes
+from app.routes import *  # This imports all route modules
