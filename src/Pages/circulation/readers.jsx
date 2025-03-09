@@ -40,7 +40,7 @@ const Readers = () => {
     <div className="readers-page">
         <div className="container">
           <div id="table">
-          <Table columns={columns} data={data} showActions={true} />
+          <Table columns={columns} data={data} showActions={true} title={"Readers"}/>
           </div>
           <div className="bottom-buttons">
             <Button onClick = {() => {}} label={"Import Readers"} lightBackgrnd={true}></Button>
