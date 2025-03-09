@@ -1,6 +1,7 @@
 import "../../src/CSS/dashboard.css";
 import Table from "../components/Table";
 import Button from '../components/Button';
+import StatCard from '../components/StatCard';
 
 const Dashboard = () => {
 
@@ -72,11 +73,11 @@ const Dashboard = () => {
   return (
     <div className="dashboard-page">
       <div className="stat-cards-container">
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
+          <StatCard title={"Readers"} number={10} subtitle={"Total Number of Readers"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Books Available"} number={10} subtitle={"Total Number of Books Available"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Books Borrowed"} number={10} subtitle={"Number of Books Currently Borrowed"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Monthly Borrows"} number={10} subtitle={"Total Number of Borrows This Month"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Overdue Books"} number={10} subtitle={"Total Number of Overdue Books"} image={"../../public/assets/images/Group.png"}></StatCard>
       </div>
 
       <div className="recent-transactions-container">
