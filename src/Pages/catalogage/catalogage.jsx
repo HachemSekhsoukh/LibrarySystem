@@ -15,6 +15,7 @@ import AddResourceForm from "./resource_form";
 const Catalogage = () => {
   const API_BASE_URL = "https://librarysoftwarebackend.vercel.app/";
   const [openPopup, setOpenPopup] = useState(false);
+  const [resources, setResources] = useState([]);
   const [bookData, setBookData] = useState({
     type: "Book",
     title: "",
@@ -31,6 +32,13 @@ const Catalogage = () => {
       .then(data => {
         setResourceTypes(data);
       })
+      .catch(error => console.error("API Error:", error));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}api/resources`)
+      .then(res => res.json())
+      .then(data => setResources(data))
       .catch(error => console.error("API Error:", error));
   }, []);
   
@@ -88,30 +96,11 @@ const Catalogage = () => {
     { label: "ISBN", key: "isbn" },
   ];
 
-  const data = [
-    {
-      id: "222235346620",
-      title: "GUERGOUR",
-      author: "Youcef",
-      status: "Available",
-      isbn: "978-2-1234-5680-3",
-      type: "Book",
-    },
-    {
-      id: "222235346620",
-      title: "GUERGOUR",
-      author: "Youcef",
-      status: "Available",
-      isbn: "978-2-1234-5680-3",
-      type: "Book",
-    },
-  ];
-
   return (
     <div className="books-page">
       <div className="container">
         <div id="table">
-          <Table columns={columns} data={data} showActions={true} />
+          <Table columns={columns} data={resources} showActions={true} />
         </div>
         <div className="bottom-buttons">
           <Button
