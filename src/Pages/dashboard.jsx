@@ -80,20 +80,14 @@ const Dashboard = () => {
       </div>
 
       <div className="recent-transactions-container">
-        <div className="container-title">
-          <h2>Recent Transactions</h2>
-        </div>
-          <Table columns={columns} data={data} showActions={true} />
+          <Table columns={columns} data={data} showActions={true} title={"Recent Transactions"} />
           <div className="bottom-buttons">
             <Button onClick = {() => {}} label={"Add Transaction"} lightBackgrnd={false}></Button>
           </div>
       </div>
 
       <div className="recent-transactions-container">
-        <div className="container-title">
-            <h2>Most Borrowed Books</h2>
-          </div>
-          <Table columns={columns2} data={data2} showActions={false} />
+          <Table columns={columns2} data={data2} showActions={false} title={"Most Borrowed Books"} />
       </div>
     </div>
   );

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import DataTable from "react-data-table-component";
 import "../CSS/components/table.css"; // Keep original styles
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Table = ({ columns, data, showActions = false }) => {
+const Table = ({ columns, data, showActions = false , title}) => {
+  const [searchText, setSearchText] = useState("");
+
   // Convert columns to DataTable format
   const formattedColumns = columns.map((col) => ({
     name: col.label,
@@ -32,6 +34,13 @@ const Table = ({ columns, data, showActions = false }) => {
       button: true,
     });
   }
+
+  // Filter data based on search text
+  const filteredData = data.filter((row) =>
+    Object.values(row).some((value) =>
+      value.toString().toLowerCase().includes(searchText.toLowerCase())
+    )
+  );
 
   // Custom styling to match your original design
   const customStyles = {
@@ -70,9 +79,24 @@ const Table = ({ columns, data, showActions = false }) => {
   return (
     <div className="table-container">
       <div className="inner-table-container">
+        {/* Search Input */}
+        <div className="search-title">
+          <h2>{title}</h2>
+          <div className="search-bar">
+            <p>Search: </p>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="search-input"
+            />
+          </div>
+        </div>
+        
         <DataTable
           columns={formattedColumns}
-          data={data}
+          data={filteredData} // Use filtered data for the table
           customStyles={customStyles}
           pagination
           highlightOnHover
@@ -84,3 +108,4 @@ const Table = ({ columns, data, showActions = false }) => {
 };
 
 export default Table;
+
