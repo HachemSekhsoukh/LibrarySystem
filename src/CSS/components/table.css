@@ -92,9 +92,10 @@
     display: flex;
     flex-direction: row;
     border: 1px solid rgb(6, 90, 163);
-    border-radius: 10px;
+    border-radius: 7px;
     overflow: hidden; /* Ensures corners are rounded */
-    height: 36px;
+    height: 55%;
+    width: 80%;
   }
   
   /* Action Buttons */
