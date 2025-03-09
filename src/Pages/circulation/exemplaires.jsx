@@ -14,7 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/transactions.css";
 
 const Exemplaires = () => {
-  const API_BASE_URL = "http://localhost:5000/";
+  const API_BASE_URL = "https://librarysoftwarebackend.vercel.app/";
   const [openPopup, setOpenPopup] = useState(false);
   const [transactionData, setTransactionData] = useState({
     borrowerName: "",
