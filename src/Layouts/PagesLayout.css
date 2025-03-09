@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   justify-content: baseline;
-  height: 110vh;
+  height: 100vh;
   width: 100%;
   /* overflow-y: hidden; */
 }
@@ -27,7 +27,14 @@
 }
 
 .content {
+  padding: 10px;
+  overflow: auto;
   width: 80%;
   margin-left: 17.5%;
+  scrollbar-width: none;
   /* overflow-y: auto; */
+}
+
+.container::-webkit-scrollbar {
+  display: none; /* Hides scrollbar in WebKit browsers */
 }
