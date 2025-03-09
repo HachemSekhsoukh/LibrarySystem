@@ -11,7 +11,9 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AddResourceForm from "./resource_form";
 
+
 const Catalogage = () => {
+  const API_BASE_URL = "http://localhost:5000/";
   const [openPopup, setOpenPopup] = useState(false);
   const [bookData, setBookData] = useState({
     type: "Book",
@@ -24,7 +26,7 @@ const Catalogage = () => {
   const [resourceTypes, setResourceTypes] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/resource-types")  // Ensure full URL with http://
+    fetch(`${API_BASE_URL}api/resource-types`)  // Ensure full URL with http://
       .then(res => res.json())
       .then(data => {
         setResourceTypes(data);
@@ -56,7 +58,7 @@ const Catalogage = () => {
         r_type: bookData.type,
       };
   
-      const response = await fetch("http://localhost:5000/api/resources", { // Ensure correct API URL
+      const response = await fetch(`${API_BASE_URL}api/resources`, { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formattedData),
