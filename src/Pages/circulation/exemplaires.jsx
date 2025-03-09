@@ -14,6 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
 
 const Exemplaires = () => {
+  const API_BASE_URL = "http://localhost:5000/";
   const [openPopup, setOpenPopup] = useState(false);
   const [transactionData, setTransactionData] = useState({
     borrowerName: "",
@@ -37,7 +38,7 @@ const Exemplaires = () => {
     const fetchReaders = async () => {
       setLoadingReaders(true);
       try {
-        const response = await fetch('http://localhost:5000/api/readers');
+        const response = await fetch(`${API_BASE_URL}api/readers`);
         if (!response.ok) {
           throw new Error('Failed to fetch readers');
         }
@@ -66,7 +67,7 @@ const Exemplaires = () => {
     const fetchResources = async () => {
       setLoadingResources(true);
       try {
-        const response = await fetch('http://localhost:5000/api/resources');
+        const response = await fetch(`${API_BASE_URL}api/resources`);
         if (!response.ok) {
           throw new Error('Failed to fetch resources');
         }
@@ -156,7 +157,7 @@ const Exemplaires = () => {
       };
 
       // Send data to backend
-      const response = await fetch('http://localhost:5000/api/transactions', {
+      const response = await fetch(`${API_BASE_URL}api/transactions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
