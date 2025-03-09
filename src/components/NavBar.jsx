@@ -1,4 +1,4 @@
-import "../CSS/NavBar.css";
+import "../CSS/components/NavBar.css";
 import { Settings, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 

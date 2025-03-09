@@ -1,5 +1,5 @@
 import React from "react";
-import "../CSS/table.css"; // Import table styles
+import "../CSS/components/table.css"; // Import table styles
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 

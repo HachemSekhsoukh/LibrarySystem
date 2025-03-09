@@ -1,6 +1,6 @@
 import React from "react";
 import Table from "../../components/Table";
-import "../../CSS/readers.css";
+import "../../CSS/circulation/readers.css";
 import Button from '../../components/Button';
 
 const Readers = () => {

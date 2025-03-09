@@ -50,7 +50,7 @@
 }
  */
 
-@import "../styles/colors.css";
+@import "../../styles/colors.css";
 
 @font-face {
   font-family: "Inter";

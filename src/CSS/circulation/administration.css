@@ -1,0 +1,10 @@
+.under-construction-image{
+    height: 65vh;
+    width: 65vh;
+}
+
+.circulation-administration-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
