@@ -21,6 +21,9 @@ const Exemplaires = () => {
     transactionType: "Borrow",
     documentTitle: ""
   });
+  const [transactions, setTransactions] = useState([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [transactionError, setTransactionError] = useState(null);
   const [readers, setReaders] = useState([]);
   const [resources, setResources] = useState([]);
   const [loadingReaders, setLoadingReaders] = useState(false);
@@ -60,6 +63,29 @@ const Exemplaires = () => {
     };
 
     fetchReaders();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      setLoadingTransactions(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}api/transactions`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch transactions");
+        }
+        const data = await response.json();
+        setTransactions(data);
+        setTransactionError(null);
+      } catch (err) {
+        console.error("Error fetching transactions:", err);
+        setTransactionError("Failed to load transactions. Please try again.");
+      } finally {
+        setLoadingTransactions(false);
+      }
+    };
+
+    fetchTransactions();
   }, []);
 
   // Fetch resources from API
@@ -203,29 +229,6 @@ const Exemplaires = () => {
     { label: "Type", key: "type" },
     { label: "Date", key: "date" },
   ];
-  const data = [
-    {
-      id: 1,
-      title: "JavaScript Basics",
-      borrower_name: "Alice Johnson",
-      type: "Book",
-      date: "2024-03-08",
-    },
-    {
-      id: 2,
-      title: "Advanced React",
-      borrower_name: "Bob Smith",
-      type: "E-book",
-      date: "2024-03-07",
-    },
-    {
-      id: 3,
-      title: "Node.js Mastery",
-      borrower_name: "Charlie Brown",
-      type: "Book",
-      date: "2024-03-06",
-    },
-  ];
   return (
     <>
     <div className="container">
@@ -233,7 +236,7 @@ const Exemplaires = () => {
           <h2>Recent Transactions</h2>
         </div>
     <div id='table'>
-    <Table columns={columns} data={data} showActions={true} />
+    <Table columns={columns} data={transactions} showActions={true} />
     </div>
     <div className="bottom-buttons">
       <Button 

@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from app import app
-from app.database import get_readers, get_resources, create_reservation, add_resource, get_resource_types
+from app.database import get_readers, get_resources, create_reservation, add_resource, get_resource_types, get_transactions
 import datetime
 
 @app.route('/api/readers', methods=['GET'])
@@ -10,6 +10,14 @@ def readers():
     """
     reader_list = get_readers()
     return jsonify(reader_list)
+
+@app.route('/api/transactions', methods=['GET'])
+def transactions():
+    """
+    API endpoint to retrieve all reservations (transactions)
+    """
+    transaction_list = get_transactions()
+    return jsonify(transaction_list)
 
 
 @app.route('/api/resources', methods=['GET'])

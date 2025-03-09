@@ -40,6 +40,34 @@ def get_readers():
     except Exception as e:
         print(f"Error fetching readers: {e}")
         return []
+    
+def get_transactions():
+    """
+    Retrieve all reservations (transactions) from the database, 
+    joining with User and Resource tables for borrower name and book title.
+    """
+    try:
+        response = supabase.from_("Reservation").select(
+            "res_id, res_status, "
+            "User(u_id, u_name), "
+            "Resource(r_id, r_title)"
+        ).execute()
+
+        if not response.data:
+            return []
+
+        transactions = [{
+            'id': transaction['res_id'],
+            'borrower_name': transaction['User']['u_name'],  # Using email as identifier
+            'title': transaction['Resource']['r_title'],
+            'type': "Reservation",  # Assuming all are reservations
+            'date': "N/A"  # Add actual date if available
+        } for transaction in response.data]
+
+        return transactions
+    except Exception as e:
+        print(f"Error fetching transactions: {e}")
+        return []
 
 
 def get_resources():
