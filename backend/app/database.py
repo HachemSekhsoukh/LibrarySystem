@@ -3,6 +3,7 @@ from supabase import create_client
 from dotenv import load_dotenv
 import datetime
 
+
 # Load environment variables
 load_dotenv()
 
@@ -40,25 +41,80 @@ def get_readers():
         print(f"Error fetching readers: {e}")
         return []
 
+
 def get_resources():
     """
-    Retrieve all resources (books) from the database
+    Retrieve all resources (books) from the database.
     """
     try:
-        response = supabase.from_("Resource").select("r_id, r_title, r_author, r_ISBN").execute()
-        
-        # Transform the response to a simpler format
+        response = supabase.from_("Resource").select(
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_edition, r_editionDate, r_editionPlace, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type"
+        ).execute()
+
         resources = [{
             'id': resource['r_id'],
+            'inventoryNum': resource['r_inventoryNum'],
             'title': resource['r_title'],
             'author': resource['r_author'],
-            'isbn': resource['r_ISBN']
+            'editor': resource['r_editor'],
+            'edition': resource['r_edition'],
+            'editionDate': resource['r_editionDate'],
+            'editionPlace': resource['r_editionPlace'],
+            'isbn': resource['r_ISBN'],
+            'price': resource['r_price'],
+            'cote': resource['r_cote'],
+            'receivingDate': resource['r_receivingDate'],
+            'status': resource['r_status'],
+            'observation': resource['r_observation'],
+            'type': resource['r_type']
         } for resource in response.data]
-        
+
         return resources
     except Exception as e:
         print(f"Error fetching resources: {e}")
         return []
+
+def get_resource_types():
+    """
+    Retrieve all resource types from the database.
+    """
+    try:
+        response = supabase.from_("Resource_type").select("rt_id, rt_name").execute()
+
+        resource_types = [{
+            'id': resource_type['rt_id'],
+            'name': resource_type['rt_name']
+        } for resource_type in response.data]
+
+        return resource_types
+    except Exception as e:
+        print(f"Error fetching resource types: {e}")
+        return []
+
+def add_resource(resource_data):
+    """
+    Add a new resource (book) to the database.
+    :param resource_data: Dictionary containing resource details.
+    """
+    try:
+        response = supabase.from_("Resource").insert(resource_data).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'resource': response.data[0]
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Failed to add resource'
+            }
+    except Exception as e:
+        print(f"Error adding resource: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
 
 def create_transaction(reader_id, book_id, transaction_type='Borrow'):
     """
