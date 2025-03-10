@@ -9,7 +9,7 @@
   justify-content: baseline;
   align-items: center;
   border-radius: 25px;
-  background-color: white;
+  background-color: var(--secondary-background-color);
   width: 100%;
   margin-top: 1rem;
   font-weight: bold;
@@ -169,7 +169,7 @@
 
 /* Transaction-specific dialog styling */
 .transaction-dialog .MuiDialogTitle-root {
-  background-color: white;
+  background-color: var(--secondary-background-color);
   color: #063754;
   font-size: 24px;
   font-weight: 600;

@@ -5,7 +5,7 @@
     justify-content: baseline;
     align-items: center;
     border-radius: 25px;
-    background-color: white;
+    background-color: var(--secondary-background-color);
     width: 100%;
     margin-top: 1rem;
     font-weight: bold;

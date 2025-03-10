@@ -15,7 +15,7 @@
 
 .settings-container {
   border-radius: 25px;
-  background-color: white;
+  background-color: var(--secondary-background-color);
   width: 95%;
   font-weight: bold;
   font-style: bold;
@@ -117,7 +117,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   font-size: 14px;
-  background: white;
+  background: var(--secondary-background-color);
 }
 
 .button-container {
