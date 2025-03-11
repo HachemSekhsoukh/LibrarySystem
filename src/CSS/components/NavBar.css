@@ -70,13 +70,17 @@
   box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.75);
   position: relative;
 }
+.divider-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 .titleLogo {
   padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   transition: opacity 0.2s ease;
 }
 
@@ -88,6 +92,14 @@
   margin: 0;
   width: 60%;
   height: 50%;
+}
+
+.nav-bar-divider {
+  border: none;
+  width: 80%;
+  display: block;
+  height: 2px;
+  background: linear-gradient(to right, transparent, white, transparent);
 }
 
 .title {

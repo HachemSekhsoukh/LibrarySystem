@@ -100,7 +100,7 @@ const Catalogage = () => {
     <div className="books-page">
       <div className="container">
         <div id="table">
-          <Table columns={columns} data={resources} showActions={true} />
+          <Table columns={columns} data={resources} showActions={true} title={"Books"} />
         </div>
         <div className="bottom-buttons">
           <Button

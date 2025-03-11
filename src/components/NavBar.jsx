@@ -35,12 +35,15 @@ function NavBar() {
   return (
     <div className="navBarContainer">
       {/* Logo and Title */}
-      <div className="titleLogo" onClick={() => navigate("/")}>
+      <div className="titleLogo">
         <img src="/assets/images/logo.png" alt="logo" className="logo"/>
       </div>
 
       {/* Divider Line */}
-      <div className="line"></div>
+      <div className="divider-container">
+        <hr className="nav-bar-divider" />
+      </div>
+      
 
       {/* Navigation Items */}
       <nav className="navItems">

@@ -1,6 +1,7 @@
 import "../../src/CSS/dashboard.css";
 import Table from "../components/Table";
 import Button from '../components/Button';
+import StatCard from '../components/StatCard';
 
 const Dashboard = () => {
 
@@ -72,28 +73,22 @@ const Dashboard = () => {
   return (
     <div className="dashboard-page">
       <div className="stat-cards-container">
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
-          <div className="stat-card"></div>
+          <StatCard title={"Readers"} number={10} subtitle={"Total Number of Readers"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Books Available"} number={10} subtitle={"Total Number of Books Available"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Books Borrowed"} number={10} subtitle={"Number of Books Currently Borrowed"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Monthly Borrows"} number={10} subtitle={"Total Number of Borrows This Month"} image={"../../public/assets/images/Group.png"}></StatCard>
+          <StatCard title={"Overdue Books"} number={10} subtitle={"Total Number of Overdue Books"} image={"../../public/assets/images/Group.png"}></StatCard>
       </div>
 
       <div className="recent-transactions-container">
-        <div className="container-title">
-          <h2>Recent Transactions</h2>
-        </div>
-          <Table columns={columns} data={data} showActions={true} />
+          <Table columns={columns} data={data} showActions={true} title={"Recent Transactions"} />
           <div className="bottom-buttons">
             <Button onClick = {() => {}} label={"Add Transaction"} lightBackgrnd={false}></Button>
           </div>
       </div>
 
       <div className="recent-transactions-container">
-        <div className="container-title">
-            <h2>Most Borrowed Books</h2>
-          </div>
-          <Table columns={columns2} data={data2} showActions={false} />
+          <Table columns={columns2} data={data2} showActions={false} title={"Most Borrowed Books"} />
       </div>
     </div>
   );

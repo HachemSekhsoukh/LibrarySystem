@@ -232,11 +232,8 @@ const Exemplaires = () => {
   return (
     <>
     <div className="container">
-      <div className="container-title">
-          <h2>Recent Transactions</h2>
-        </div>
     <div id='table'>
-    <Table columns={columns} data={transactions} showActions={true} />
+    <Table columns={columns} data={transactions} showActions={true} title={"Recent Transactions"}/>
     </div>
     <div className="bottom-buttons">
       <Button 
