@@ -16,12 +16,16 @@ import CirculationAdministration from "./Pages/circulation/administration";
 import Catalogage from "./Pages/catalogage/catalogage";
 import CatalogageAdministration from "./Pages/catalogage/administration";
 import PagesLayout from "./Layouts/PagesLayout";
+import LibraryHome from "./components/LibraryHome";
+import BookDetail from "./components/BookDetail";
 import "./App.css";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/library" replace />} />
+      <Route path="/library" element={<LibraryHome />} />
+      <Route path="/book/:id" element={<BookDetail />} />
       <Route path="/login" element={<Login />} />
 
       {/* Pages requiring the layout (after login) */}
@@ -37,7 +41,7 @@ const router = createBrowserRouter(
           <Route path="/catalogage/catalogage" element={<Catalogage />} />
           <Route path="/catalogage/administration" element={<CatalogageAdministration />} />
       </Route>
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/library" replace />} />
     </>
   )
 );
