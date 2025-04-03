@@ -22,7 +22,7 @@ def add_resource_endpoint():
     data = request.json
 
     # Validate required fields
-    required_fields = ["r_inventoryNum", "r_title", "r_author", "r_editor", "r_edition", "r_editionDate", "r_editionPlace", "r_ISBN", "r_price", "r_cote", "r_receivingDate", "r_status", "r_observation", "r_type"]
+    required_fields = ["r_inventoryNum", "r_title", "r_author", "r_editor", "r_ISBN", "r_price", "r_cote", "r_receivingDate", "r_status", "r_observation", "r_type"]
     
     missing_fields = [field for field in required_fields if field not in data]
     

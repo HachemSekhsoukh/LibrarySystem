@@ -76,46 +76,6 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                 />
             </Grid>
 
-            {/* Edition */}
-            <Grid item xs={6}>
-                <TextField
-                    label="Edition"
-                    name="edition"
-                    value={bookData.edition}
-                    onChange={handleChange}
-                    variant="outlined"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                />
-            </Grid>
-
-            {/* Edition Date */}
-            <Grid item xs={6}>
-                <TextField
-                    label="Edition Date"
-                    name="editionDate"
-                    type="date"
-                    value={bookData.editionDate}
-                    onChange={handleChange}
-                    variant="outlined"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                />
-            </Grid>
-
-            {/* Edition Place */}
-            <Grid item xs={6}>
-                <TextField
-                    label="Edition Place"
-                    name="editionPlace"
-                    value={bookData.editionPlace}
-                    onChange={handleChange}
-                    variant="outlined"
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                />
-            </Grid>
-
             {/* ISBN */}
             <Grid item xs={6}>
                 <TextField
