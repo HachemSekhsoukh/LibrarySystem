@@ -4,7 +4,7 @@ import Button from '../../components/Button';
 import Popup from "../../components/Popup";
 import "../../CSS/form.css";
 import "./resource_form";
-import { TextField, MenuItem, Grid } from "@mui/material";
+import { TextField, MenuItem, Grid, Snackbar, Alert } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import SaveIcon from '@mui/icons-material/Save';
@@ -20,10 +20,17 @@ const Catalogage = () => {
     type: "Book",
     title: "",
     author: "",
+    editor: "",
     isbn: "",
     issn: "",
+    inventoryNum: "",
+    price: "",
+    cote: "",
+    receivingDate: "",
+    status: 1,
+    observation: ""
   });
-
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [resourceTypes, setResourceTypes] = useState([]);
 
   useEffect(() => {
@@ -36,23 +43,44 @@ const Catalogage = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}api/resources`)
-      .then(res => res.json())
-      .then(data => setResources(data))
-      .catch(error => console.error("API Error:", error));
+    fetchResources();
   }, []);
   
+  const fetchResources = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}api/resources`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch resources");
+      }
+      const data = await response.json();
+      setResources(data);
+    } catch (error) {
+      console.error("API Error:", error);
+      setSnackbar({ open: true, message: "Error fetching resources", severity: "error" });
+    }
+  };
 
   const handleChange = (e) => {
     setBookData({ ...bookData, [e.target.name]: e.target.value });
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   const handleAddResource = async () => {
     try {
+      // Validate required fields
+      if (!bookData.title || !bookData.author || !bookData.inventoryNum) {
+        setSnackbar({ open: true, message: "Title, author, and inventory number are required", severity: "error" });
+        return;
+      }
+
       const formattedData = {
         r_inventoryNum: bookData.inventoryNum,
         r_title: bookData.title,
         r_author: bookData.author,
+        r_editor: bookData.editor,
         r_ISBN: bookData.isbn,
         r_price: bookData.price,
         r_cote: bookData.cote,
@@ -69,19 +97,38 @@ const Catalogage = () => {
       });
   
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}`);
       }
   
       const result = await response.json();
-      alert("Resource added successfully!");
+      setSnackbar({ open: true, message: "Resource added successfully!", severity: "success" });
       setOpenPopup(false);
+      
+      // Reset form data
+      setBookData({
+        type: "Book",
+        title: "",
+        author: "",
+        editor: "",
+        isbn: "",
+        issn: "",
+        inventoryNum: "",
+        price: "",
+        cote: "",
+        receivingDate: "",
+        status: 1,
+        observation: ""
+      });
+      
+      // Refresh the resources list
+      fetchResources();
     } catch (error) {
-      alert(`Failed to add resource: ${error.message}`);
+      console.error("Error adding resource:", error);
+      setSnackbar({ open: true, message: `Failed to add resource: ${error.message}`, severity: "error" });
     }
   };
   
-
 
   const columns = [
     { label: "ID", key: "id" },
@@ -123,6 +170,10 @@ const Catalogage = () => {
           <Button onClick={handleAddResource} label="Add" lightBackgrnd={false} />
         </div>
       </Popup>
+
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>{snackbar.message}</Alert>
+      </Snackbar>
     </div>
   );
 };
