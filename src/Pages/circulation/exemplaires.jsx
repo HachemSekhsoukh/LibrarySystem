@@ -192,7 +192,8 @@ const Exemplaires = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create transaction');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create transaction');
       }
 
       const result = await response.json();
@@ -201,7 +202,7 @@ const Exemplaires = () => {
       // Show success message
       setSnackbar({
         open: true,
-        message: 'Reservation saved successfully!',
+        message: 'Transaction saved successfully!',
         severity: 'success'
       });
 
@@ -212,11 +213,32 @@ const Exemplaires = () => {
         documentTitle: ""
       });
       setOpenPopup(false);
+      
+      // Refresh the transactions list
+      const fetchTransactions = async () => {
+        setLoadingTransactions(true);
+        try {
+          const response = await fetch(`${API_BASE_URL}api/transactions`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch transactions");
+          }
+          const data = await response.json();
+          setTransactions(data);
+          setTransactionError(null);
+        } catch (err) {
+          console.error("Error fetching transactions:", err);
+          setTransactionError("Failed to load transactions. Please try again.");
+        } finally {
+          setLoadingTransactions(false);
+        }
+      };
+      
+      fetchTransactions();
     } catch (err) {
       console.error('Error creating transaction:', err);
       setSnackbar({
         open: true,
-        message: 'Failed to create reservation. Please try again.',
+        message: `Failed to create transaction: ${err.message}`,
         severity: 'error'
       });
     }
