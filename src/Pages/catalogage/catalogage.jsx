@@ -13,7 +13,7 @@ import AddResourceForm from "./resource_form";
 
 
 const Catalogage = () => {
-  const API_BASE_URL = "https://librarysoftwarebackend.vercel.app/";
+  const API_BASE_URL = "http://127.0.0.1:5000/";
   const [openPopup, setOpenPopup] = useState(false);
   const [resources, setResources] = useState([]);
   const [bookData, setBookData] = useState({
@@ -53,10 +53,6 @@ const Catalogage = () => {
         r_inventoryNum: bookData.inventoryNum,
         r_title: bookData.title,
         r_author: bookData.author,
-        r_editor: bookData.editor,
-        r_edition: bookData.edition,
-        r_editionDate: bookData.editionDate,
-        r_editionPlace: bookData.editionPlace,
         r_ISBN: bookData.isbn,
         r_price: bookData.price,
         r_cote: bookData.cote,

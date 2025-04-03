@@ -17,30 +17,94 @@ def get_readers():
     Retrieve all users with user_type 'reader' from the database by joining User and User_type tables
     """
     try:
-        # First, get the user_type ID for 'reader'
-        type_response = supabase.from_("User_type").select("ut_id").eq("ut_name", "reader").execute()
-        
-        if not type_response.data:
-            print("Reader user type not found")
-            return []
-            
-        reader_type_id = type_response.data[0]['ut_id']
         
         # Then get all users with that user_type
-        user_response = supabase.from_("User").select("u_id, u_name, u_email").eq("u_type", reader_type_id).execute()
+        user_response = supabase.from_("User").select("u_id, u_name, u_email, u_birthDate, u_phone, u_type").execute()
         
         # Transform the response to a simpler format
         readers = [{
             'id': user['u_id'],
             'name': user['u_name'],
-            'email': user['u_email']
+            'email': user['u_email'],
+            'birthDate': user['u_birthDate'],
+            'phone': user['u_phone'],
+            'type': user['u_type']
         } for user in user_response.data]
         
         return readers
     except Exception as e:
         print(f"Error fetching readers: {e}")
         return []
-    
+
+def get_user_types():
+    try:
+        
+        # Then get all users with that user_type
+        user_response = supabase.from_("User_type").select("ut_id, ut_name, ut_borrow").execute()
+        
+        # Transform the response to a simpler format
+        types = [{
+            'id': user_type['ut_id'],
+            'name': user_type['ut_name'],
+            'borrow': user_type['ut_name'],
+        } for user_type in user_response.data]
+        
+        return types
+    except Exception as e:
+        print(f"Error fetching readers: {e}")
+        return []
+
+def add_reader(reader_data):
+    """
+    Add a new reader to the database.
+    :param reader_data: Dictionary containing reader details.
+    """
+    try:
+        # Check if u_type is already an ID or needs to be looked up
+        if isinstance(reader_data.get('u_type'), dict) and 'id' in reader_data['u_type']:
+            # If u_type is an object with an id property, use that ID
+            reader_type_id = reader_data['u_type']['id']
+        elif isinstance(reader_data.get('u_type'), (int, str)):
+            # If u_type is already an ID (int or string), use it directly
+            reader_type_id = reader_data['u_type']
+        else:
+            return {'success': False, 'error': "Invalid user type provided"}
+
+        # Add user with the reader type
+        reader_data['u_type'] = reader_type_id  # Assign reader type ID
+        
+        # Remove any password field if it exists (should be handled by auth)
+        if 'u_password' in reader_data:
+            del reader_data['u_password']
+            
+        response = supabase.from_("User").insert(reader_data).execute()
+
+        if response.data:
+            return {'success': True, 'reader': response.data[0]}
+        else:
+            return {'success': False, 'error': 'Failed to add reader'}
+    except Exception as e:
+        print(f"Error adding reader: {e}")
+        return {'success': False, 'error': str(e)}
+
+
+def delete_reader(reader_id):
+    """
+    Delete a reader from the database by their user ID.
+    :param reader_id: The ID of the reader to delete.
+    """
+    try:
+        response = supabase.from_("User").delete().eq("u_id", reader_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Reader deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Reader not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting reader: {e}")
+        return {'success': False, 'error': str(e)}
+
+
 def get_transactions():
     """
     Retrieve all reservations (transactions) from the database, 
@@ -76,7 +140,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_edition, r_editionDate, r_editionPlace, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type"
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type"
         ).execute()
 
         resources = [{
@@ -85,9 +149,6 @@ def get_resources():
             'title': resource['r_title'],
             'author': resource['r_author'],
             'editor': resource['r_editor'],
-            'edition': resource['r_edition'],
-            'editionDate': resource['r_editionDate'],
-            'editionPlace': resource['r_editionPlace'],
             'isbn': resource['r_ISBN'],
             'price': resource['r_price'],
             'cote': resource['r_cote'],
