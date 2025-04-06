@@ -409,9 +409,9 @@ const LibraryHome = () => {
             <p className="library-info">Explore a collection of +2000 books in ENSIA's Library.</p>
           </div>
           
-          <form className="search-bar" onSubmit={handleSearchSubmit}>
-            <div className="search-input">
-              <FaSearch className="search-icon" />
+          <form className="search-bar1" onSubmit={handleSearchSubmit}>
+            <div className="search-input1">
+              <FaSearch className="search-icon1" />
               <input
                 type="text"
                 placeholder="Search by Title, Author or ISBN ..." 
