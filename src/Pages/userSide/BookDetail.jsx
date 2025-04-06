@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaArrowLeft, FaBookmark, FaCalendarAlt, FaUserAlt } from 'react-icons/fa';
 import '../../styles/BookDetail.css';
-import BookSection from '../../components/BookSection';
+import { fetchResourceById, fetchPopularResources } from '../../utils/api';
 
 // Mock data - in a real app, this would come from an API
 const bookDetails = {
@@ -132,14 +132,117 @@ const bookDetails = {
   }
 };
 
+const SimilarBookCard = ({ book }) => {
+  // Extract data properties with fallbacks
+  const id = book.id || 1;
+  const title = book.title || 'Unknown Title';
+  const author = book.author || 'Unknown Author';
+  const observation = book.observation || 'Easy to study Mathematical problems';
+  
+  // Always use static cover image based on book ID
+  const getStaticCover = () => {
+    const covers = [
+      '/assets/books/blue_cpp.png',
+      '/assets/books/yellow_cpp.png',
+      '/assets/books/cpp_stevens.jpg'
+    ];
+    return covers[id % covers.length];
+  };
+  
+  return (
+    <Link to={`/book/${id}`} className="similar-book-link">
+      <div className="similar-book-card">
+        <div className="similar-book-cover">
+          <img src={getStaticCover()} alt={title} />
+        </div>
+        <div className="similar-book-info">
+          <p className="author">{author}</p>
+          <p className="category">
+            <span>{title}</span>
+            {observation ? (observation.length > 40 ? observation.slice(0, 40) + '...' : observation) : ''}
+          </p>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
 const BookDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [book, setBook] = useState(null);
+  const [similarBooks, setSimilarBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // In a real app, you would fetch the book details from an API
-  const book = bookDetails[id];
+  // Use useEffect to fetch the book data when the component mounts
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch the book data from the API
+        const bookData = await fetchResourceById(id);
+        
+        if (!bookData) {
+          console.error(`No book found with ID ${id}`);
+          setError('Book not found');
+          setIsLoading(false);
+          return;
+        }
+        
+        setBook(bookData);
+        console.log('Fetched book data:', bookData);
+        
+        // Fetch similar books (using popular books as a substitute for now)
+        try {
+          const similar = await fetchPopularResources(5);
+          // Filter out the current book from similar books
+          const filteredSimilar = similar.filter(b => 
+            (b.id !== bookData.id) && (b.r_id !== bookData.id)
+          );
+          
+          if (filteredSimilar && filteredSimilar.length > 0) {
+            setSimilarBooks(filteredSimilar);
+            console.log(`Fetched ${filteredSimilar.length} similar books from database`);
+          } else {
+            // Only fall back to mock data if no similar books are found
+            console.warn('No similar books found in database, using fallback data');
+            const mockSimilar = bookDetails[1].similarBooks.map(bookId => bookDetails[bookId]);
+            setSimilarBooks(mockSimilar);
+          }
+        } catch (similarError) {
+          console.error('Error fetching similar books:', similarError);
+          const mockSimilar = bookDetails[1].similarBooks.map(bookId => bookDetails[bookId]);
+          setSimilarBooks(mockSimilar);
+        }
+      } catch (err) {
+        console.error('Error fetching book:', err);
+        setError('Failed to load book');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchBook();
+  }, [id]);
   
-  if (!book) {
+  if (isLoading) {
+    return (
+      <div className="book-detail-page">
+        <header className="nav-header">
+          <div className="logo">
+            <img src="/imageslogo.png" alt="ENSIA Logo" />
+          </div>
+        </header>
+        <div className="loading-container">
+          <p>Loading book details...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (error || !book) {
     return (
       <div className="book-detail-container">
         <div className="back-button" onClick={() => navigate('/library')}>
@@ -153,11 +256,29 @@ const BookDetail = () => {
     );
   }
   
+  // Extract data with fallbacks
+  const title = book.title || 'Unknown Title';
+  const author = book.author || 'Unknown Author';
+  const editor = book.editor || 'Unknown Editor';
+  const observation = book.observation || 'No description available.';
+  const cote = book.cote || 'N/A';
+  
+  // Always use static cover image based on book ID
+  const getStaticCoverImage = () => {
+    const id = book.id || 1;
+    const coverImages = [
+      '/assets/books/blue_cpp.png',
+      '/assets/books/yellow_cpp.png',
+      '/assets/books/cpp_stevens.jpg'
+    ];
+    return coverImages[id % coverImages.length];
+  };
+  
   return (
     <div className="book-detail-page">
       <header className="nav-header">
         <div className="logo">
-          <img src="public/assets/images/logo.png" alt="ENSIA Logo" />
+          <img src="/imageslogo.png" alt="ENSIA Logo" />
         </div>
         <nav className="main-nav">
           <ul>
@@ -179,37 +300,41 @@ const BookDetail = () => {
         </div>
 
         <div className="page-title-container">
-          <h1 className="page-title">Hazi - Whispers of the Forgotten</h1>
+          <h1 className="page-title">{author} - {title}</h1>
         </div>
 
         <div className="book-detail-container">
           <div className="book-detail-content">
             <div className="book-detail-left">
-              <img src="/assets/books/cpp_stevens.jpg" alt={book.title} className="book-cover-large" />
+              <img 
+                src={getStaticCoverImage()} 
+                alt={title} 
+                className="book-cover-large" 
+              />
             </div>
             
             <div className="book-detail-right">
               <div className="book-breadcrumb">
-                {book.category} / {book.subcategory}
+                Editor: {editor} / Cote: {cote}
               </div>
               
-              <h1 className="book-title">{book.title}</h1>
-              <h3 className="book-author">{book.author}</h3>
-              
-
+              <h1 className="book-title">{title}</h1>
+              <h3 className="book-author">{author}</h3>
             </div>
           </div>
         </div>
         
         <div className="book-description-container">
-          <p className="book-description">{book.description}</p>
+          <p className="book-description">{observation}</p>
           <button className="book-now-button">Book Now</button>
         </div>
         
         <div className="similar-books-section">
-          
+          <h2 className="section-title">Similar Books</h2>
           <div className="similar-books-grid">
-            <BookSection title="Similar Books" books={book.similarBooks.map((bookId) => bookDetails[bookId])} showViewAll={false} />
+            {similarBooks.map((similarBook, index) => (
+              <SimilarBookCard key={index} book={similarBook} />
+            ))}
           </div>
         </div>
       </div>
