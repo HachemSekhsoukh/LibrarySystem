@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FaSearch, FaArrowRight, FaCircle, FaTimes } from 'react-icons/fa';
 import { useSpring, animated } from 'react-spring';
-import '../../styles/LibraryHome.css';
+import '../../CSS/LibraryHome.css';
 import { fetchLatestResources, fetchPopularResources, searchResources } from '../../utils/api';
 
 // Book data for fallback (will be replaced by API data)
