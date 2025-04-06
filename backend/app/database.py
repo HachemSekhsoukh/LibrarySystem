@@ -46,13 +46,29 @@ def get_user_types():
         types = [{
             'id': user_type['ut_id'],
             'name': user_type['ut_name'],
-            'borrow': user_type['ut_name'],
+            'borrow': user_type['ut_borrow'],
         } for user_type in user_response.data]
         
         return types
     except Exception as e:
         print(f"Error fetching readers: {e}")
         return []
+
+def add_user_type(user_type_data):
+    """
+    Add a new user type to the database.
+    :param user_type_data: Dictionary containing user type details.
+    """
+    try:
+        response = supabase.from_("User_type").insert(user_type_data).execute()
+
+        if response.data:
+            return {'success': True, 'user_type': response.data[0]}
+        else:
+            return {'success': False, 'error': 'Failed to add user type'}
+    except Exception as e:
+        print(f"Error adding user type: {e}")
+        return {'success': False, 'error': str(e)}
 
 def add_reader(reader_data):
     """
@@ -179,6 +195,23 @@ def get_resource_types():
     except Exception as e:
         print(f"Error fetching resource types: {e}")
         return []
+
+
+def add_resource_type(resource_type_data):
+    """
+    Add a new resource type to the database.
+    :param resource_type_data: Dictionary containing resource type details.
+    """
+    try:
+        response = supabase.from_("Resource_type").insert(resource_type_data).execute()
+
+        if response.data:
+            return {'success': True, 'resource_type': response.data[0]}
+        else:
+            return {'success': False, 'error': 'Failed to add resource type'}
+    except Exception as e:
+        print(f"Error adding resource type: {e}")
+        return {'success': False, 'error': str(e)}
 
 def add_resource(resource_data):
     """
