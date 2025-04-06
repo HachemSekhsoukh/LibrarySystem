@@ -4,6 +4,8 @@ import { FaSearch, FaArrowRight, FaCircle, FaTimes } from 'react-icons/fa';
 import { useSpring, animated } from 'react-spring';
 import '../../styles/LibraryHome.css';
 import { fetchLatestResources, fetchPopularResources, searchResources } from '../../utils/api';
+import BookCard from '../../components/BookCard'
+import BookSection from '../../components/BookSection'
 
 // Book data for fallback (will be replaced by API data)
 const bookData = [
@@ -36,42 +38,6 @@ const bookData = [
 // Make sure we're using the right image
 bookData[0].coverImage = '/assets/books/blue_cpp.png';
 
-const BookCard = ({ book }) => {
-  // Extract data from the API structure
-  const id = book.id;
-  const title = book.title || 'Unknown Title';
-  const author = book.author || 'Unknown Author';
-  const observation = book.observation || 'Easy to study Mathematical problems';
-  
-  // Always use static cover image based on book ID
-  const getStaticCoverImage = () => {
-    const coverImages = [
-      '/assets/books/blue_cpp.png',
-      '/assets/books/yellow_cpp.png',
-      '/assets/books/cpp_stevens.jpg'
-    ];
-    return coverImages[id % coverImages.length];
-  };
-  
-  console.log('Book data in card:', book);
-  
-  return (
-    <Link to={`/book/${id}`} className="book-card-link">
-      <div className="book-card">
-        <div className="book-cover">
-          <img src={getStaticCoverImage()} alt={title} />
-        </div>
-        <div className="book-info">
-          <p className="author">{author}</p>
-          <p className="category">
-            <span>{title}</span>
-            {observation}
-          </p>
-        </div>
-      </div>
-    </Link>
-  );
-};
 
 const DebugSection = ({ data, title }) => {
   if (!data || data.length === 0) return null;
@@ -89,31 +55,7 @@ const DebugSection = ({ data, title }) => {
   );
 };
 
-const BookSection = ({ title, books = [] }) => {
-  // Ensure we always have 5 books even if fewer are provided
-  const displayBooks = [...books];
-  while (displayBooks.length < 5) {
-    displayBooks.push(bookData[displayBooks.length % bookData.length]);
-  }
 
-  console.log(`BookSection "${title}" - Books to display:`, displayBooks);
-
-  return (
-    <div className="book-section">
-      <div className="section-header">
-        <h2>{title}</h2>
-        <a href="#" className="view-all">
-          view all <FaArrowRight />
-        </a>
-      </div>
-      <div className="books-grid">
-        {displayBooks.slice(0, 5).map((book, i) => (
-          <BookCard key={i} book={book} />
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const BookShowcase = ({ books = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(1);
