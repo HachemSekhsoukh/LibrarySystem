@@ -157,7 +157,7 @@ const BookDetail = () => {
     <div className="book-detail-page">
       <header className="nav-header">
         <div className="logo">
-          <img src="/imageslogo.png" alt="ENSIA Logo" />
+          <img src="public/assets/images/logo.png" alt="ENSIA Logo" />
         </div>
         <nav className="main-nav">
           <ul>
