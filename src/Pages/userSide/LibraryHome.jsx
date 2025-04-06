@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaSearch, FaArrowRight, FaCircle } from 'react-icons/fa';
 import { useSpring, animated } from 'react-spring';
-import '../styles/LibraryHome.css';
+import '../../styles/LibraryHome.css';
+import BookSection from '../../components/BookSection';
 
 // Book data - normally this would come from an API
 const bookData = [
@@ -35,45 +36,7 @@ const bookData = [
 // Make sure we're using the right image
 bookData[0].coverImage = '/assets/books/blue_cpp.png';
 
-const BookCard = ({ book }) => {
-  return (
-    <Link to={`/book/${book.id}`} className="book-card-link">
-      <div className="book-card">
-        <div className="book-cover">
-          <img src={book.coverImage} alt={book.title} />
-        </div>
-        <div className="book-info">
-          <p className="author">Mohammed HAZI</p>
-          <p className="category">
-            <span>Aalyse Numérique 1</span>
-            Easy to study Mathematical problems
-          </p>
-        </div>
-      </div>
-    </Link>
-  );
-};
 
-const BookSection = ({ title, books }) => {
-  return (
-    <div className="book-section">
-      <div className="section-header">
-        <h2>{title}</h2>
-        <a href="#" className="view-all">
-          view all <FaArrowRight />
-        </a>
-      </div>
-      <div className="books-grid">
-        {Array(5).fill().map((_, i) => (
-          <BookCard key={i} book={{
-            id: i + 1,
-            coverImage: '/assets/books/blue_cpp.png'
-          }} />
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const BookShowcase = ({ books }) => {
   const [currentIndex, setCurrentIndex] = useState(1);

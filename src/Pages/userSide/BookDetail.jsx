@@ -1,7 +1,8 @@
 import React from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaArrowLeft, FaBookmark, FaCalendarAlt, FaUserAlt } from 'react-icons/fa';
-import '../styles/BookDetail.css';
+import '../../styles/BookDetail.css';
+import BookSection from '../../components/BookSection';
 
 // Mock data - in a real app, this would come from an API
 const bookDetails = {
@@ -131,25 +132,6 @@ const bookDetails = {
   }
 };
 
-const SimilarBookCard = ({ book }) => {
-  return (
-    <Link to={`/book/${book.id}`} className="similar-book-link">
-      <div className="similar-book-card">
-        <div className="similar-book-cover">
-          <img src="/assets/books/blue_cpp.png" alt={book.title} />
-        </div>
-        <div className="similar-book-info">
-          <p className="author">Mohammed HAZI</p>
-          <p className="category">
-            <span>Aalyse Numérique 1</span>
-            Easy to study Mathematical problems
-          </p>
-        </div>
-      </div>
-    </Link>
-  );
-};
-
 const BookDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -225,11 +207,9 @@ const BookDetail = () => {
         </div>
         
         <div className="similar-books-section">
-          <h2 className="section-title">Similar Books</h2>
+          
           <div className="similar-books-grid">
-            {book.similarBooks.map((bookId, index) => (
-              <SimilarBookCard key={index} book={bookDetails[bookId]} />
-            ))}
+            <BookSection title="Similar Books" books={book.similarBooks.map((bookId) => bookDetails[bookId])} showViewAll={false} />
           </div>
         </div>
       </div>

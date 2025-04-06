@@ -16,9 +16,10 @@ import CirculationAdministration from "./Pages/circulation/administration";
 import Catalogage from "./Pages/catalogage/catalogage";
 import CatalogageAdministration from "./Pages/catalogage/administration";
 import PagesLayout from "./Layouts/PagesLayout";
-import LibraryHome from "./components/LibraryHome";
-import BookDetail from "./components/BookDetail";
+import LibraryHome from "./Pages/userSide/LibraryHome";
+import BookDetail from "./Pages/userSide/BookDetail";
 import "./App.css";
+import ViewAll from "./Pages/userSide/viewAll";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
       <Route path="/library" element={<LibraryHome />} />
       <Route path="/book/:id" element={<BookDetail />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/view-all" element={<ViewAll />} />
 
       {/* Pages requiring the layout (after login) */}
       <Route element={<PagesLayout />}>
