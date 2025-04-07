@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import BookSection from "../../components/BookSection";
-import "../../styles/LibraryHome.css";
+import "../../CSS/LibraryHome.css";
 import { FaSearch } from "react-icons/fa";
 import bookData from "./LibraryHome";
 import { useParams, useNavigate, Link } from 'react-router-dom';
