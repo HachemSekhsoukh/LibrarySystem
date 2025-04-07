@@ -9,6 +9,9 @@
 }
 
 .library-home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-height: 100vh;
   background-color: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -77,8 +80,8 @@
   background: linear-gradient(135deg, #002850 0%, #004b8d 50%, #0077cc 100%);
   padding: 40px;
   color: white;
-  width: 1758px;
-  height: 600px;
+  width: 94vw;
+  height: 67vh;
   margin: 20px auto;
   position: relative;
   border-radius: 16px;
@@ -272,6 +275,7 @@
 
 /* Book Sections */
 .book-section {
+  width: 90vw;
   margin-bottom: 60px;
 }
 
@@ -318,22 +322,22 @@
 }
 
 .books-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 30px;
-  justify-items: center;
+  display: flex;
+  justify-content: space-evenly
 }
 
 /* Book Card */
 .book-card {
-  background: white;
+  background: rgb(244, 244, 244);
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s ease;
-  height: auto;
+  height: 80%;
+  max-width: 85%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .book-card:hover {
@@ -346,20 +350,17 @@
 }
 
 .book-cover {
-  width: 262px;
-  height: 328px;
+  width: 100%;
+  height: 80%;
   overflow: hidden;
   background-color: #f0f0f0;
   border-radius: 8px;
-  position: relative;
-  margin-top: 10px;
 }
 
 .book-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 40%;
 }
 
 .book-info {
