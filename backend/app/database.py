@@ -128,20 +128,25 @@ def get_transactions():
     """
     try:
         response = supabase.from_("Reservation").select(
-            "res_id, res_status, "
+            "res_id, res_status, res_date,"
             "User(u_id, u_name), "
             "Resource(r_id, r_title)"
         ).execute()
 
         if not response.data:
             return []
-
+        
+        status_map = {
+            1:"Borrow",  # You can adjust these status codes based on your needs
+            2:"Return",
+            3:"Renew"
+        }
         transactions = [{
             'id': transaction['res_id'],
             'borrower_name': transaction['User']['u_name'],  # Using email as identifier
             'title': transaction['Resource']['r_title'],
-            'type': "Reservation",  # Assuming all are reservations
-            'date': "N/A"  # Add actual date if available
+            'type': status_map.get(transaction['res_status']),  # Assuming all are reservations
+            'date': transaction['res_date']  # Add actual date if available
         } for transaction in response.data]
 
         return transactions
@@ -184,11 +189,12 @@ def get_resource_types():
     Retrieve all resource types from the database.
     """
     try:
-        response = supabase.from_("Resource_type").select("rt_id, rt_name").execute()
+        response = supabase.from_("Resource_type").select("rt_id, rt_name, rt_borrow").execute()
 
         resource_types = [{
             'id': resource_type['rt_id'],
-            'name': resource_type['rt_name']
+            'name': resource_type['rt_name'],
+            'borrow': resource_type['rt_borrow']
         } for resource_type in response.data]
 
         return resource_types
