@@ -61,7 +61,7 @@ const CirculationAdministration = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/user-types`, {
+      const response = await fetch(`${API_BASE_URL}api/add-user-types`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newReaderType),
