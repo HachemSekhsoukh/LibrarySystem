@@ -250,3 +250,25 @@ export const logoutUser = async () => {
     return null;
   }
 };
+
+export const getUserInfo = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Needed for HttpOnly cookies
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch user info');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('User info fetch error:', error);
+    return null;
+  }
+};
