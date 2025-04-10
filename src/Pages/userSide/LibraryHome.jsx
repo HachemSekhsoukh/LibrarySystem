@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FaSearch, FaArrowRight, FaCircle, FaTimes } from 'react-icons/fa';
 import { useSpring, animated } from 'react-spring';
-import '../../styles/LibraryHome.css';
+import "../../styles/LibraryHome.css";
 import { fetchLatestResources, fetchPopularResources, searchResources } from '../../utils/api';
 import BookCard from '../../components/BookCard'
 import BookSection from '../../components/BookSection'
@@ -220,7 +220,7 @@ const LibraryHome = () => {
   const [latestBooks, setLatestBooks] = useState([]);
   const [popularBooks, setPopularBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [debugMode, setDebugMode] = useState(true); // Enable debug mode by default
+  const [debugMode, setDebugMode] = useState(false); // Enable debug mode by default
 
   useEffect(() => {
     const fetchBooks = async () => {

@@ -326,3 +326,62 @@ def create_reservation(user_id, resource_id, transaction_type):
             'success': False,
             'error': str(e)
         } 
+    
+def login(email, password):
+    """
+    Log in a staff user by verifying credentials from the Staff table.
+    """
+    try:
+        response = supabase.from_("Staff").select("*").eq("s_email", email).eq("s_password", password).execute()
+
+        if response.data and len(response.data) > 0:
+            staff = response.data[0]
+            return {
+                'success': True,
+                'user': {
+                    'id': staff['s_id'],
+                    'email': staff['s_email'],
+                    'name': staff.get('s_name')
+                }
+            }
+        else:
+            return {'success': False, 'error': 'Invalid email or password'}
+    except Exception as e:
+        print(f"Error logging in: {e}")
+        return {'success': False, 'error': str(e)}
+
+def sign_up(email, password, name=None):
+    """
+    Register a new staff user by inserting into the Staff table.
+    """
+    try:
+        # Check if user already exists
+        existing = supabase.from_("Staff").select("s_id").eq("s_email", email).execute()
+        if existing.data and len(existing.data) > 0:
+            return {'success': False, 'error': 'Email already exists'}
+
+        # Insert new user
+        new_user = {
+            's_email': email,
+            's_password': password
+        }
+
+        if name:
+            new_user['s_name'] = name
+
+        response = supabase.from_("Staff").insert(new_user).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'user': {
+                    'id': response.data[0]['s_id'],
+                    'email': response.data[0]['s_email']
+                }
+            }
+        else:
+            return {'success': False, 'error': 'Failed to sign up'}
+    except Exception as e:
+        print(f"Error signing up: {e}")
+        return {'success': False, 'error': str(e)}
+

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaArrowLeft, FaBookmark, FaCalendarAlt, FaUserAlt } from 'react-icons/fa';
+import "../../styles/LibraryHome.css";
 import '../../styles/BookDetail.css';
 import { fetchResourceById, fetchPopularResources } from '../../utils/api';
 import BookSection from '../../components/BookSection';

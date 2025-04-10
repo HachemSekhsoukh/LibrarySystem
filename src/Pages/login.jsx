@@ -1,40 +1,50 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../src/CSS/login.css";
 import logo from "/assets/images/logo.png";
 import bgLogin from "../../public/assets/images/bg-login.png";
+import { loginUser } from  '../utils/api';
+
 
 const Login = () => {
-  const [accountName, setAccountName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Reset previous errors
+  
     const newErrors = {};
-
-    // Validate Name field
-    if (!accountName.trim()) {
-      newErrors.accountName = "Account Name is required";
-    }
-
-    // Validate Password field
-    if (!password) {
-      newErrors.password = "Password is required";
-    }
-
-    // If there are errors, update state and do not submit form
+  
+    // Basic validation
+    if (!email.trim()) newErrors.email = "Email is required";
+    if (!password) newErrors.password = "Password is required";
+  
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
-    // If validation passes, you can perform further actions (e.g., call an API)
-    console.log("Form submitted", { accountName, password });
-    // Optionally, clear errors after successful submission
-    setErrors({});
+  
+    try {
+      // Attempt to login with the email and password
+      const data = await loginUser(email, password);
+  
+      // Check if login was successful
+      if (data && data.success) {
+        // The JWT token is automatically handled by the HTTP-only cookie,
+        navigate("/dashboard");
+      } else {
+        // Display error message returned from backend
+        setErrors({ password: data?.error || "Login failed" });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrors({ password: "Something went wrong. Please try again." });
+    }
   };
+  
+    
 
   return (
     <div className="login-container">
@@ -42,9 +52,8 @@ const Login = () => {
         className="top-section"
         style={{ backgroundImage: `url(${bgLogin})` }}
       >
-
         <div className="logo">
-            <img src={logo} alt="الوكالة الوطنية للمقاول الذاتي" />
+          <img src={logo} alt="الوكالة الوطنية للمقاول الذاتي" />
         </div>
 
         <div className="welcome-text">
@@ -59,15 +68,15 @@ const Login = () => {
 
           <form className="login-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Name</label>
+              <label>Email</label>
               <input
-                type="text"
-                placeholder="Enter Account Name"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
+                type="email"
+                placeholder="Enter Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              {errors.accountName && (
-                <p className="error-message">{errors.accountName}</p>
+              {errors.email && (
+                <p className="error-message">{errors.email}</p>
               )}
             </div>
 
