@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import BookSection from "../../components/BookSection";
-import "../../CSS/LibraryHome.css";
+import "../../styles/LibraryHome.css";
 import { FaSearch } from "react-icons/fa";
 import bookData from "./LibraryHome";
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -59,7 +59,7 @@ const ViewAll = () => {
 
       <main className="main-content">
         <BookSection
-          title="ALL Books"
+          title="All Books"
           books={bookData}
           showViewAll={false}
           number={15}

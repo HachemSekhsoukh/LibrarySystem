@@ -1,8 +1,20 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+
+# Allow CORS for only specific origin (your React app)
+CORS(app, supports_credentials=True)
+
+# Set the JWT secret key from the environment variable
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+jwt = JWTManager(app)
 
 @app.route("/")
 def home():
