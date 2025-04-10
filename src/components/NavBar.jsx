@@ -1,14 +1,22 @@
 import "../CSS/components/NavBar.css";
 import { Settings, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { logoutUser } from  '../utils/api';
 
 function NavBar() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // Clear token or user data
-    navigate("/login"); // Redirect to login
+  // Inside your component or wherever the logout function is needed
+  const handleLogout = async () => {
+    const data = await logoutUser();
+    if (data) {
+      // Redirect or show a message based on logout success
+      navigate("/login"); // Redirect to login page after successful logout
+    } else {
+      console.log("Logout failed!");
+    }
   };
+
 
   const navItems = [
       { label: "Dashboard", path: "/dashboard" , icon: "/assets/images/home-icon.png"},

@@ -2,9 +2,16 @@ import "../../src/CSS/dashboard.css";
 import Table from "../components/Table";
 import Button from '../components/Button';
 import StatCard from '../components/StatCard';
+import Cookies from 'js-cookie';
 
 const Dashboard = () => {
+  const token = Cookies.get('jwt_token');
 
+  if (token) {
+    console.log('JWT Token from Cookie:', token);
+  } else {
+    console.log('No token found in cookies');
+  }
   //dummy data
   const columns = [
     { label: "ID", key: "id" },
