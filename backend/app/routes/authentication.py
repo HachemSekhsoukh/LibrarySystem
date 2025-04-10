@@ -1,7 +1,8 @@
+from datetime import timedelta
 from flask import jsonify, request, make_response
 from app import app
-from app.database import sign_up, login
-from flask_jwt_extended import create_access_token
+from app.database import sign_up, login, get_user_by_email
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/signup', methods=['POST'])
 def api_sign_up():
@@ -27,20 +28,19 @@ def api_login():
 
     if result['success']:
         # Generate access token
-        access_token = create_access_token(identity=data['email'])
+        access_token = create_access_token(identity=data['email'],  expires_delta=timedelta(hours=1))  # Token expires in 1 hour)
         
         # Create the response
         response = make_response(jsonify({'success': True, 'message': 'Login successful'}))
         
         # Set the token as an HTTP-only cookie (also add secure and samesite settings for security)
         response.set_cookie(
-            'jwt_token', access_token, 
-            httponly=True, 
-            secure=True,  # Ensure this is set to True in production (over HTTPS)
-            samesite='Strict',  # Optional, set to 'Lax' or 'Strict' as needed
-            max_age=3600  # Optional: Set the token expiration time (1 hour in this case)
+            'access_token_cookie', access_token, 
+            httponly=True,
+            secure=True,  # Set to True in production (with HTTPS)
+            samesite='None',  # Or 'None' if using cross-origin with credentials
+            path='/'  # Make sure this is correct
         )
-        
         return response  # Send response with the cookie
     else:
         return jsonify({'success': False, 'error': result['error']}), 401
@@ -51,6 +51,25 @@ def logout():
     # Clear the jwt_token cookie by setting an expiration in the past
     resp.set_cookie('jwt_token', '', expires=0)
     return resp
+
+@app.route('/api/me', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    access_token = request.cookies.get('jwt_token')  # Extract token from cookies
+    
+    if not access_token:
+        return jsonify({"error": "Missing token in cookies"}), 401
+
+    user_email = get_jwt_identity()
+    user = get_user_by_email(user_email)
+    if user:
+        return jsonify({
+            'name': user['name'],
+            'email': user['email'],
+            'phone': user.get('phone'),  # Use .get in case it's optional
+            'birthdate': user.get('birthdate')  # Use .get in case it's optional
+        }), 200
+    return jsonify({'error': 'User not found'}), 404
 
 
 

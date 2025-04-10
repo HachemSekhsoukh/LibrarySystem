@@ -3,8 +3,21 @@ import "../../src/CSS/Settings.css";
 // import photoProfile from "../../../assets/images/profile.png";
 import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useUser } from '../utils/userContext';
+import React, {useEffect} from 'react';
 
 const Settings = () => {
+  const { user, setUser } = useUser(); // use context
+  
+    useEffect(() => {
+      const fetchUser = async () => {
+        const fetchedUser = await getUserInfo();
+        if (fetchedUser) {
+          setUser(fetchedUser); // persist globally
+        }
+      };
+      fetchUser();
+    }, [setUser]);
   const [activeTab, setActiveTab] = useState("edit-profile");
   // Add state for password visibility
   const [showPassword, setShowPassword] = useState({
@@ -64,20 +77,15 @@ const Settings = () => {
               </div>
 
               <div className="form-grid">
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input type="text" defaultValue="BILAL WAZIR" />
-                </div>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input type="text" defaultValue={user?.name} />
+              </div>
 
-                <div className="form-group">
-                  <label>User Name</label>
-                  <input type="text" defaultValue="BILAL" />
-                </div>
-
-                <div className="form-group">
-                  <label>Email</label>
-                  <input type="email" defaultValue="BILAL@gmail.com" />
-                </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input type="email" defaultValue={user?.email} />
+              </div>
 
                 <div className="form-group">
                   <label>Password</label>
@@ -97,7 +105,7 @@ const Settings = () => {
 
                 <div className="form-group">
                   <label>Date of Birth</label>
-                  <input type="text" defaultValue="25 January 2986" />
+                  <input type="date" defaultValue={user?.birthdate} />
                 </div>
 
                 <div className="form-group">

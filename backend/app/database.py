@@ -385,3 +385,30 @@ def sign_up(email, password, name=None):
         print(f"Error signing up: {e}")
         return {'success': False, 'error': str(e)}
 
+
+def get_user_by_email(email):
+    """
+    Fetch a user's public profile details from the Staff table using email.
+    """
+    try:
+        response = supabase \
+            .from_("Staff") \
+            .select("s_name, s_email, s_phone, s_birthdate") \
+            .eq("s_email", email) \
+            .limit(1) \
+            .execute()
+
+        if response.data and len(response.data) > 0:
+            user = response.data[0]
+            return {
+                'name': user.get('s_name'),
+                'email': user.get('s_email'),
+                'phone': user.get('s_phone'),
+                'birthdate': user.get('s_birthdate')
+            }
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Error fetching user by email: {e}")
+        return None
