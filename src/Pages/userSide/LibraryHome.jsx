@@ -220,7 +220,7 @@ const LibraryHome = () => {
   const [latestBooks, setLatestBooks] = useState([]);
   const [popularBooks, setPopularBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [debugMode, setDebugMode] = useState(false); // Enable debug mode by default
+  const [debugMode, setDebugMode] = useState(true); // Enable debug mode by default
 
   useEffect(() => {
     const fetchBooks = async () => {

@@ -59,7 +59,7 @@ const ViewAll = () => {
 
       <main className="main-content">
         <BookSection
-          title="All Books"
+          title="ALL Books"
           books={bookData}
           showViewAll={false}
           number={15}

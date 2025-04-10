@@ -22,11 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-backend/app/__pycache__/__init__.cpython-312.pyc
-backend/app/__pycache__/database.cpython-312.pyc
-backend/app/routes/__pycache__/__init__.cpython-312.pyc
-backend/app/routes/__pycache__/authentication.cpython-312.pyc
-backend/app/routes/__pycache__/readers.cpython-312.pyc
-backend/app/routes/__pycache__/resource_types.cpython-312.pyc
-backend/app/routes/__pycache__/resources.cpython-312.pyc
-backend/app/routes/__pycache__/transactions.cpython-312.pyc

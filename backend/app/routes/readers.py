@@ -49,4 +49,3 @@ def remove_reader(reader_id):
     """
     result = delete_reader(reader_id)
     return jsonify(result), (200 if result['success'] else 400)
-
