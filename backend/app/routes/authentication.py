@@ -1,7 +1,7 @@
 from datetime import timedelta
 from flask import jsonify, request, make_response
 from app import app
-from app.database import sign_up, login, get_user_by_email
+from app.database import sign_up, login, get_user_by_email, update_user_by_email
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/signup', methods=['POST'])
@@ -52,10 +52,10 @@ def logout():
     resp.set_cookie('jwt_token', '', expires=0)
     return resp
 
-@app.route('/api/me', methods=['GET'])
+@app.route('/api/user/me', methods=['GET'])
 @jwt_required()
 def get_user_info():
-    access_token = request.cookies.get('jwt_token')  # Extract token from cookies
+    access_token = request.cookies.get('access_token_cookie')  # Extract token from cookies
     
     if not access_token:
         return jsonify({"error": "Missing token in cookies"}), 401
@@ -67,10 +67,54 @@ def get_user_info():
             'name': user['name'],
             'email': user['email'],
             'phone': user.get('phone'),  # Use .get in case it's optional
-            'birthdate': user.get('birthdate')  # Use .get in case it's optional
+            'birthdate': user.get('birthdate'),  # Use .get in case it's optional
+            'address': user.get('address')  # Use .get in case it's optional
         }), 200
     return jsonify({'error': 'User not found'}), 404
 
+@app.route('/api/user/update', methods=['PUT'])
+@jwt_required()
+def update_user_info():
+    access_token = request.cookies.get('access_token_cookie')  # Extract token from cookies
+    if not access_token:
+        return jsonify({"error": "Missing token in cookies"}), 401
+
+    user_email = get_jwt_identity()
+    user = get_user_by_email(user_email)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+
+    # Allowed fields to update
+    allowed_fields = ['name', 'birthdate', 'address']
+    update_data = {}
+
+    for field in allowed_fields:
+        if field in data:
+            update_data[field] = data[field]
+
+    if not update_data:
+        return jsonify({"error": "No valid fields to update"}), 400
+
+    try:
+        # You can validate or parse values here if needed, e.g. birthdate format
+        update_user_by_email(user_email, update_data)
+
+        # After update, return the new user info
+        updated_user = get_user_by_email(user_email)
+        return jsonify({
+            'name': updated_user['name'],
+            'email': updated_user['email'],
+            'birthdate': updated_user.get('birthdate'),
+            'address': updated_user.get('address')
+        }), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to update user: {str(e)}'}), 500
 
 
 @app.route('/api/test', methods=['GET', 'OPTIONS'])
