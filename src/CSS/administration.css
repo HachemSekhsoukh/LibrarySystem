@@ -1,10 +1,118 @@
-.under-construction-image{
-    height: 65vh;
-    width: 65vh;
-}
 
 .administration-page{
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
+.loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #333;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 0.8s linear infinite;
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .add-staff-form {
+    padding: 0 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+  }
+  
+  .add-staff-form .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .add-staff-form .form-field label {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  
+  .add-staff-form .dropdown-field {
+    background-color: #fff;
+    border-radius: 12px !important;
+  }
+
+  
+  
+  /* Autocomplete specific styles */
+  .add-staff-form .dropdown-field .MuiOutlinedInput-root {
+    border-radius: 12px;
+    height: 48px;
+  }
+  
+  .add-staff-form .dropdown-field .MuiAutocomplete-inputRoot {
+    padding: 0 !important;
+  }
+  
+  .add-staff-form .dropdown-field .MuiAutocomplete-input {
+    padding: 0 14px !important;
+    height: 48px !important;
+  }
+  
+  .add-staff-form .dropdown-field .MuiOutlinedInput-notchedOutline,
+  .add-staff-form .text-field .MuiOutlinedInput-notchedOutline {
+    border-color: #e0e0e0;
+    border-width: 1px;
+  }
+  
+  .add-staff-form .text-field {
+    background-color: #fff;
+    border-radius: 12px;
+  }
+  
+  .add-staff-form .text-field input {
+    height: 48px;
+    padding: 0 14px;
+  }
+  
+  .add-staff-form .dialog-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  
+  .add-staff-form .cancel-button,
+  .add-staff-form .save-button {
+    padding: 12px 0;
+    width: 180px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+  }
+  
+  .add-staff-form .cancel-button {
+    background-color: #3f7d9c;
+    color: white;
+  }
+  
+  .add-staff-form .save-button {
+    background-color: #063754;
+    color: white;
+  }
+  
+  .add-staff-form .cancel-button:hover {
+    background-color: #346b87;
+  }
+  
+  .add-staff-form .save-button:hover {
+    background-color: #052c45;
+  }

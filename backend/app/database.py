@@ -426,6 +426,43 @@ def get_user_by_email(email):
     except Exception as e:
         print(f"Error fetching user by email: {e}")
         return None
+
+def update_user_by_email(email, fields):
+    """
+    Update a user's profile details in the Staff table using their email.
+    Only updates fields provided in the `fields` dictionary.
+    """
+    try:
+        # Map internal keys to Supabase column names
+        supabase_fields = {}
+        for key, value in fields.items():
+            if key == 'name':
+                supabase_fields['s_name'] = value
+            elif key == 'birthdate':
+                supabase_fields['s_birthdate'] = value
+            elif key == 'address':
+                supabase_fields['s_address'] = value
+            elif key == 'phone':
+                supabase_fields['s_phone'] = value  # optional
+
+        if not supabase_fields:
+            return False  # Nothing valid to update
+
+        response = supabase \
+            .from_("Staff") \
+            .update(supabase_fields) \
+            .eq("s_email", email) \
+            .execute()
+
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"Supabase update failed: {response}")
+            return False
+
+    except Exception as e:
+        print(f"Error updating user by email: {e}")
+        return False
     
 def update_user_password(user_email, new_password):
     """
@@ -496,3 +533,127 @@ def hash_all_passwords():
         supabase.from_("Staff").update({"s_password": hashed_password}).eq("s_email", user["s_email"]).execute()
 
     print("All passwords hashed.")
+
+def get_all_staff_members():
+    try:
+        response = supabase \
+        .from_("Staff") \
+        .select("s_id, s_name, s_email,s_phone,s_birthdate, s_address") \
+        .execute()
+
+        if response.data:
+            return response.data
+        return []
+    except Exception as e:
+        print(f"Error fetching staff members: {e}")
+        return []
+    
+def add_staff_member(data):
+    """
+    Add a new staff member to the Staff table.
+    Checks for existing email before inserting.
+    Expects `data` to be a dictionary with keys:
+    'email', 'password', 'name', 'phone', 'address', 'bdate', 'type'.
+    """
+    try:
+        email = data.get('email')
+        password = data.get('password')
+        name = data.get('name')
+        phone = data.get('phone')
+        address = data.get('address')
+        bdate = data.get('bdate')
+        s_type = data.get('type')
+
+        if not email or not password:
+            return {'success': False, 'error': 'Email and password are required'}
+
+        # Check if user already exists
+        existing = supabase.from_("Staff").select("s_id").eq("s_email", email).execute()
+        if existing.data and len(existing.data) > 0:
+            return {'success': False, 'error': 'Email already exists'}
+
+        # Build new staff object
+        new_staff = {
+            's_email': email,
+            's_password': password,
+            's_name': name,
+            's_phone': phone,
+            's_address': address,
+            's_birthdate': bdate,
+            's_type': s_type
+        }
+
+        # Insert into Staff table
+        response = supabase.from_("Staff").insert(new_staff).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'user': {
+                    'id': response.data[0]['s_id'],
+                    'email': response.data[0]['s_email']
+                }
+            }
+        else:
+            return {'success': False, 'error': 'Failed to add staff member'}
+
+    except Exception as e:
+        print(f"Error adding staff member: {e}")
+        return {'success': False, 'error': str(e)}
+
+def add_staff_member(data):
+    """
+    Add a new staff member to the Staff table.
+    Checks for existing email before inserting.
+    Expects `data` to be a dictionary with keys:
+    'email', 'password', 'name', 'phone', 'address', 'bdate', 'type'.
+    """
+    try:
+        email = data.get('email')
+        password = data.get('password')
+        name = data.get('name')
+        phone = data.get('phone')
+        address = data.get('address')
+        bdate = data.get('birthdate')
+        s_type = data.get('type')
+
+        if not email or not password:
+            return {'success': False, 'error': 'Email and password are required'}, 400
+
+        # Check if user already exists
+        existing = supabase.from_("Staff").select("s_id").eq("s_email", email).execute()
+        if existing.data and len(existing.data) > 0:
+            return {'success': False, 'error': 'Email already exists'}, 400
+
+        # Hash the password
+        hashed_password = generate_password_hash(password)
+
+        # Build new staff object
+        new_staff = {
+            's_email': email,
+            's_password': hashed_password,
+            's_name': name,
+            's_phone': phone,
+            's_address': address,
+            's_birthdate': bdate,
+            's_type': s_type
+        }
+
+        # Insert into Staff table
+        response = supabase.from_("Staff").insert(new_staff).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'user': {
+                    'id': response.data[0]['s_id'],
+                    'email': response.data[0]['s_email']
+                }
+            }, 201  # HTTP 201 for created
+
+        else:
+            return {'success': False, 'error': 'Failed to add staff member'}, 500
+
+    except Exception as e:
+        print(f"Error adding staff member: {e}")
+        return {'success': False, 'error': str(e)}, 500

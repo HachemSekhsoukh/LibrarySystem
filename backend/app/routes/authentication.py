@@ -1,21 +1,9 @@
 from datetime import timedelta
 from flask import jsonify, request, make_response
 from app import app
-from app.database import sign_up, login, get_user_by_email, update_user_password, get_user_password
+from app.database import sign_up, login, get_user_by_email, update_user_password, get_user_password, update_user_by_email
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
-
-@app.route('/api/signup', methods=['POST'])
-def api_sign_up():
-    data = request.get_json()
-    if not data or 'email' not in data or 'password' not in data:
-        return jsonify({'success': False, 'error': 'Email and password are required'}), 400
-
-    # You can optionally pass name if provided
-    name = data.get('name')
-    result = sign_up(data['email'], data['password'], name)
-    return jsonify(result), (200 if result['success'] else 400)
-
 
 @app.route('/api/login', methods=['POST'])
 def api_login():
@@ -145,4 +133,3 @@ def update_password():
         return jsonify({"success": "Password updated successfully."}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 500
-

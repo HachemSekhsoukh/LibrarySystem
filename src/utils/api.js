@@ -318,3 +318,54 @@ export const updateUserPassword = async (oldPassword, newPassword) => {
     return { success: false, error: "Network error. Please try again." };
   }
 };
+
+export const fetchAllStaff = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/staff`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // If you're using cookies for auth
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      return data.staff;
+    } else {
+      console.error("Failed to fetch staff:", data);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching staff:", error);
+    return [];
+  }
+}
+
+// Assuming you're using fetch to make requests
+export const addStaffMember = async (staffData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/staff/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(staffData),
+    });
+    console.log(response);
+    // Check if response is ok
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to add staff member");
+    }
+
+    // Parse and return the response data
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error adding staff member:", error);
+    return { success: false, message: error.message };
+  }
+};
