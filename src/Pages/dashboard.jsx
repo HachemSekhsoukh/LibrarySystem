@@ -85,13 +85,6 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-page">
-      {/* You can optionally show user info */}
-      {user && (
-        <div className="user-info">
-          <p><strong>Welcome:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-        </div>
-      )}
 
       <div className="stat-cards-container">
         <StatCard title={"Readers"} number={10} subtitle={"Total Number of Readers"} image={"../../public/assets/images/Group.png"} />

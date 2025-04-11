@@ -393,7 +393,7 @@ def get_user_by_email(email):
     try:
         response = supabase \
             .from_("Staff") \
-            .select("s_name, s_email, s_phone, s_birthdate") \
+            .select("s_name, s_email, s_phone, s_birthdate, s_address") \
             .eq("s_email", email) \
             .limit(1) \
             .execute()
@@ -404,7 +404,8 @@ def get_user_by_email(email):
                 'name': user.get('s_name'),
                 'email': user.get('s_email'),
                 'phone': user.get('s_phone'),
-                'birthdate': user.get('s_birthdate')
+                'birthdate': user.get('s_birthdate'),
+                'address': user.get('s_address')
             }
         else:
             return None
@@ -412,3 +413,40 @@ def get_user_by_email(email):
     except Exception as e:
         print(f"Error fetching user by email: {e}")
         return None
+    
+def update_user_by_email(email, fields):
+    """
+    Update a user's profile details in the Staff table using their email.
+    Only updates fields provided in the `fields` dictionary.
+    """
+    try:
+        # Map internal keys to Supabase column names
+        supabase_fields = {}
+        for key, value in fields.items():
+            if key == 'name':
+                supabase_fields['s_name'] = value
+            elif key == 'birthdate':
+                supabase_fields['s_birthdate'] = value
+            elif key == 'address':
+                supabase_fields['s_address'] = value
+            elif key == 'phone':
+                supabase_fields['s_phone'] = value  # optional
+
+        if not supabase_fields:
+            return False  # Nothing valid to update
+
+        response = supabase \
+            .from_("Staff") \
+            .update(supabase_fields) \
+            .eq("s_email", email) \
+            .execute()
+
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"Supabase update failed: {response}")
+            return False
+
+    except Exception as e:
+        print(f"Error updating user by email: {e}")
+        return False

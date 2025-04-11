@@ -253,7 +253,7 @@ export const logoutUser = async () => {
 
 export const getUserInfo = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/me`, {
+    const response = await fetch(`${API_BASE_URL}/user/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -269,6 +269,28 @@ export const getUserInfo = async () => {
     return data;
   } catch (error) {
     console.error('User info fetch error:', error);
+    return null;
+  }
+};
+
+export const updateUserInfo = async (updatedData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/update`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Needed for HttpOnly cookies
+      body: JSON.stringify(updatedData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update user info');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating user info:", error);
     return null;
   }
 };

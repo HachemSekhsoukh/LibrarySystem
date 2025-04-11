@@ -5,19 +5,58 @@ import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from '../utils/userContext';
 import React, {useEffect} from 'react';
+import { getUserInfo, updateUserInfo  } from  '../utils/api';
 
 const Settings = () => {
   const { user, setUser } = useUser(); // use context
-  
-    useEffect(() => {
-      const fetchUser = async () => {
-        const fetchedUser = await getUserInfo();
-        if (fetchedUser) {
-          setUser(fetchedUser); // persist globally
-        }
-      };
-      fetchUser();
-    }, [setUser]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    birthdate: "",
+    address: "",
+  });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const fetchedUser = await getUserInfo();
+      if (fetchedUser) {
+        setUser(fetchedUser);
+        setFormData({
+          name: fetchedUser.name || "",
+          email: fetchedUser.email || "",
+          birthdate: fetchedUser.birthdate || "",
+          address: fetchedUser.address || "",
+        });
+      }
+    };
+    fetchUser();
+  }, [setUser]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    const { name, email, birthdate, address } = formData;
+
+    if (!name || !email || !birthdate || !address) {
+      alert("Please fill in all fields.");
+      return;
+    }
+    setIsLoading(true); // Start loading
+    const updatedUser = await updateUserInfo(formData);
+    setIsLoading(false); // Stop loading
+      if (updatedUser) {
+        setUser(updatedUser);
+        alert("Profile updated successfully.");
+      } else {
+        alert("Failed to update profile.");
+      }
+  };
+
   const [activeTab, setActiveTab] = useState("edit-profile");
   // Add state for password visibility
   const [showPassword, setShowPassword] = useState({
@@ -35,6 +74,12 @@ const Settings = () => {
   };
 
   return (
+    <>
+    {isLoading && (
+      <div className="overlay">
+        <div className="loader"></div>
+      </div>
+    )}
     <div className = "settings-page">
         <h1 id="title">Settings</h1>
         <div className="settings-container">
@@ -79,44 +124,28 @@ const Settings = () => {
               <div className="form-grid">
               <div className="form-group">
                 <label>Full Name</label>
-                <input type="text" defaultValue={user?.name} />
+                <input type="text" name="name"  value={formData.name}  onChange={handleChange} />
               </div>
 
               <div className="form-group">
                 <label>Email</label>
-                <input type="email" defaultValue={user?.email} />
+                <input type="email" name="email" disabled style={{ backgroundColor: "#f0f0f0", cursor: "not-allowed" }}  value={formData.email}  onChange={handleChange} />
               </div>
 
                 <div className="form-group">
-                  <label>Password</label>
-                  <div className="password-wrapper">
-                    <input
-                      type={showPassword.oldPassword ? "text" : "password"}
-                      defaultValue="password is here"
-                    />
-                    <span
-                      className="toggle-password"
-                      onClick={() => togglePasswordVisibility("oldPassword")}
-                    >
-                      {showPassword.oldPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="form-group">
                   <label>Date of Birth</label>
-                  <input type="date" defaultValue={user?.birthdate} />
+                  <input type="date" name="birthdate"  value={formData.birthdate}  onChange={handleChange} />
                 </div>
 
                 <div className="form-group">
-                  <label>Present Address</label>
-                  <input type="text" defaultValue="Maalma, Algiers, DZ" />
+                  <label>Current Address</label>
+                  <input type="text" name="address"  value={formData.address}  onChange={handleChange} />
                 </div>
               </div>
             </div>
 
             <div className="button-container">
-              <button className="save-btn">Save</button>
+              <button className="save-btn" onClick={handleSaveProfile}>Save</button>
             </div>
           </div>
         )}
@@ -126,11 +155,11 @@ const Settings = () => {
             <div className="form-grid">
               <div className="security-content">
                 <div className="form-group">
-                  <label>Old Password</label>
+                  <label>Enter your current password</label>
                   <div className="password-wrapper">
                     <input
                       type={showPassword.oldPassword ? "text" : "password"}
-                      defaultValue="password is here"
+                      placeholder="Enter your current password"
                     />
                     <span
                       className="toggle-password"
@@ -146,7 +175,7 @@ const Settings = () => {
                   <div className="password-wrapper">
                     <input
                       type={showPassword.newPassword ? "text" : "password"}
-                      defaultValue="password is here"
+                     placeholder="Enter the new password"
                     />
                     <span
                       className="toggle-password"
@@ -158,11 +187,11 @@ const Settings = () => {
                 </div>
 
                 <div className="form-group">
-                  <label>Confirm Password</label>
+                  <label>Confirm new password</label>
                   <div className="password-wrapper">
                     <input
                       type={showPassword.confirmPassword ? "text" : "password"}
-                      defaultValue="password is here"
+                      placeholder="Confirm the new password"
                     />
                     <span
                       className="toggle-password"
@@ -176,12 +205,13 @@ const Settings = () => {
             </div>
 
             <div className="button-container">
-              <button className="save-btn">Save</button>
+              <button className="save-btn">Update</button>
             </div>
           </div>
         )}
       </div>
     </div>
+    </>
     
   );
 };
