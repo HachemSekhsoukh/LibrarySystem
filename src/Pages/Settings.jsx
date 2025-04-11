@@ -5,11 +5,19 @@ import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from '../utils/userContext';
 import React, {useEffect} from 'react';
-import { getUserInfo, updateUserInfo  } from  '../utils/api';
+import { getUserInfo, updateUserInfo , updateUserPassword } from  '../utils/api';
 
 const Settings = () => {
   const { user, setUser } = useUser(); // use context
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
+
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -38,6 +46,38 @@ const Settings = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleChangePassword = async () => {
+    const { oldPassword, newPassword, confirmPassword } = passwordData;
+  
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setPasswordError("Please fill in all password fields.");
+      return;
+    }
+  
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+  
+    setPasswordError(""); // Clear any previous error
+    setIsLoading(true);
+  
+    const result = await updateUserPassword(oldPassword, newPassword);
+  
+    setIsLoading(false);
+  
+    if (result && result.success) {
+      alert("Password updated successfully.");
+      setPasswordData({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } else {
+      setPasswordError("Failed to update password. Please check your current password.");
+    }
+  };  
 
   const handleSaveProfile = async () => {
     const { name, email, birthdate, address } = formData;
@@ -151,64 +191,101 @@ const Settings = () => {
         )}
 
         {activeTab === "security" && (
-          <div className="security-container">
-            <div className="form-grid">
-              <div className="security-content">
-                <div className="form-group">
-                  <label>Enter your current password</label>
-                  <div className="password-wrapper">
-                    <input
-                      type={showPassword.oldPassword ? "text" : "password"}
-                      placeholder="Enter your current password"
-                    />
-                    <span
-                      className="toggle-password"
-                      onClick={() => togglePasswordVisibility("oldPassword")}
-                    >
-                      {showPassword.oldPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
+            <div className="security-container">
+              <div className="form-grid">
+                <div className="security-content">
+                  <div className="form-group">
+                    <label>Enter your current password</label>
+                    <div className="password-wrapper">
+                      <input
+                        type={showPassword.oldPassword ? "text" : "password"}
+                        placeholder="Enter your current password"
+                        value={passwordData.oldPassword}
+                        onChange={(e) =>
+                          {
+                            setPasswordData({
+                              ...passwordData,
+                              oldPassword : e.target.value,
+                            })
+                            setPasswordError(""); // Clear error on input
+                          }
+                        }
+                      />
+                      <span
+                        className="toggle-password"
+                        onClick={() => togglePasswordVisibility("oldPassword")}
+                      >
+                        {showPassword.oldPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="form-group">
-                  <label>New Password</label>
-                  <div className="password-wrapper">
-                    <input
-                      type={showPassword.newPassword ? "text" : "password"}
-                     placeholder="Enter the new password"
-                    />
-                    <span
-                      className="toggle-password"
-                      onClick={() => togglePasswordVisibility("newPassword")}
-                    >
-                      {showPassword.newPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
+                  <div className="form-group">
+                    <label>New Password</label>
+                    <div className="password-wrapper">
+                      <input
+                        type={showPassword.newPassword ? "text" : "password"}
+                        placeholder="Enter the new password"
+                        value={passwordData.newPassword}
+                        onChange={(e) =>{
+                          setPasswordData({
+                            ...passwordData,
+                            newPassword: e.target.value,
+                          })
+                          setPasswordError(""); // Clear error on input
+                        }
+                        }
+                      />
+                      <span
+                        className="toggle-password"
+                        onClick={() => togglePasswordVisibility("newPassword")}
+                      >
+                        {showPassword.newPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="form-group">
-                  <label>Confirm new password</label>
-                  <div className="password-wrapper">
-                    <input
-                      type={showPassword.confirmPassword ? "text" : "password"}
-                      placeholder="Confirm the new password"
-                    />
-                    <span
-                      className="toggle-password"
-                      onClick={() => togglePasswordVisibility("confirmPassword")}
-                    >
-                      {showPassword.confirmPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
+                  <div className="form-group">
+                    <label>Confirm new password</label>
+                    <div className="password-wrapper">
+                      <input
+                        type={showPassword.confirmPassword ? "text" : "password"}
+                        placeholder="Confirm the new password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>{
+                          setPasswordData({
+                            ...passwordData,
+                            confirmPassword: e.target.value,
+                          })
+                          setPasswordError(""); // Clear error on input
+                        }
+                          
+                        }
+                      />
+                      <span
+                        className="toggle-password"
+                        onClick={() => togglePasswordVisibility("confirmPassword")}
+                      >
+                        {showPassword.confirmPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+              
+              {passwordError && (
+                <div style={{ color: "red", marginTop: "10px", fontSize: "0.9em" }}>
+                  {passwordError}
+                </div>
+              )}
 
-            <div className="button-container">
-              <button className="save-btn">Update</button>
+              <div className="button-container">
+                <button className="save-btn" onClick={handleChangePassword}>
+                  Update
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     </div>
     </>

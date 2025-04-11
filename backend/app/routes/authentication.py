@@ -1,7 +1,8 @@
 from datetime import timedelta
 from flask import jsonify, request, make_response
 from app import app
-from app.database import sign_up, login, get_user_by_email, update_user_by_email
+from app.database import sign_up, login, get_user_by_email, update_user_password, get_user_password
+from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/signup', methods=['POST'])
@@ -115,9 +116,33 @@ def update_user_info():
         }), 200
     except Exception as e:
         return jsonify({'error': f'Failed to update user: {str(e)}'}), 500
+    
+@app.route('/api/user/update-password', methods=['PUT'])
+@jwt_required()  # Ensure the user is authenticated
+def update_password():
+    # Get the current user's email from the JWT token
+    current_user_email = get_jwt_identity()
 
+    # Get the request data
+    data = request.get_json()
+    old_password = data.get('oldPassword')
+    new_password = data.get('newPassword')
 
-@app.route('/api/test', methods=['GET', 'OPTIONS'])
-def test():
-    return jsonify({"message": "CORS works!"})
+    # Fetch the user from the database by their email
+    user = get_user_by_email(current_user_email)
+    old_user_password = get_user_password(current_user_email)
+
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Verify that the old password matches
+    if not check_password_hash(old_user_password, old_password):
+        return jsonify({"error": "Old password is incorrect."}), 400
+
+    # Call the database function to update the password
+    try:
+        update_user_password(current_user_email, new_password)  # Call the helper function to update password
+        return jsonify({"success": "Password updated successfully."}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 500
 

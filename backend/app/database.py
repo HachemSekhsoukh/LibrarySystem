@@ -2,6 +2,7 @@ import os
 from supabase import create_client
 from dotenv import load_dotenv
 import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # Load environment variables
@@ -330,22 +331,34 @@ def create_reservation(user_id, resource_id, transaction_type):
 def login(email, password):
     """
     Log in a staff user by verifying credentials from the Staff table.
+    Uses hashed password comparison.
     """
     try:
-        response = supabase.from_("Staff").select("*").eq("s_email", email).eq("s_password", password).execute()
+        # Fetch only email and hashed password
+        response = supabase \
+            .from_("Staff") \
+            .select("s_id, s_email, s_name, s_password") \
+            .eq("s_email", email) \
+            .execute()
 
         if response.data and len(response.data) > 0:
             staff = response.data[0]
-            return {
-                'success': True,
-                'user': {
-                    'id': staff['s_id'],
-                    'email': staff['s_email'],
-                    'name': staff.get('s_name')
+            stored_hashed_password = staff["s_password"]
+
+            if check_password_hash(stored_hashed_password, password):
+                return {
+                    'success': True,
+                    'user': {
+                        'id': staff['s_id'],
+                        'email': staff['s_email'],
+                        'name': staff.get('s_name')
+                    }
                 }
-            }
+            else:
+                return {'success': False, 'error': 'Invalid email or password'}
         else:
             return {'success': False, 'error': 'Invalid email or password'}
+
     except Exception as e:
         print(f"Error logging in: {e}")
         return {'success': False, 'error': str(e)}
@@ -414,33 +427,29 @@ def get_user_by_email(email):
         print(f"Error fetching user by email: {e}")
         return None
     
-def update_user_by_email(email, fields):
+def update_user_password(user_email, new_password):
     """
-    Update a user's profile details in the Staff table using their email.
-    Only updates fields provided in the `fields` dictionary.
+    Update the user's password in the Supabase database.
     """
+
     try:
-        # Map internal keys to Supabase column names
-        supabase_fields = {}
-        for key, value in fields.items():
-            if key == 'name':
-                supabase_fields['s_name'] = value
-            elif key == 'birthdate':
-                supabase_fields['s_birthdate'] = value
-            elif key == 'address':
-                supabase_fields['s_address'] = value
-            elif key == 'phone':
-                supabase_fields['s_phone'] = value  # optional
+        # Hash the new password before storing it
+        hashed_password = generate_password_hash(new_password)
 
-        if not supabase_fields:
-            return False  # Nothing valid to update
+        # Prepare the data to update
+        update_fields = {'s_password': hashed_password}
 
+        if not update_fields:
+            return False  # No valid fields to update
+
+        # Make the update request to Supabase
         response = supabase \
             .from_("Staff") \
-            .update(supabase_fields) \
-            .eq("s_email", email) \
+            .update(update_fields) \
+            .eq("s_email", user_email) \
             .execute()
 
+        # Check the response status
         if response.status_code == 200:
             return True
         else:
@@ -448,5 +457,42 @@ def update_user_by_email(email, fields):
             return False
 
     except Exception as e:
-        print(f"Error updating user by email: {e}")
+        print(f"Error updating password for user {user_email}: {e}")
         return False
+    
+def get_user_password(email):
+    """
+    Fetch the user's password from the Supabase database using their email.
+    Returns the password if found, otherwise returns None.
+    """
+    try:
+        # Fetch the user from the "Staff" table by email
+        response = supabase \
+            .from_("Staff") \
+            .select("s_password") \
+            .eq("s_email", email) \
+            .execute()
+
+        if response.data:
+            # Return the password field (assuming it's under the alias "s_password")
+            print(response.data[0]["s_password"])
+            return response.data[0]["s_password"]
+        else:
+            print(f"User not found for email {email} or query failed.")
+            return None
+
+    except Exception as e:
+        print(f"Error fetching user password by email: {e}")
+        return None
+    
+
+def hash_all_passwords():
+    response = supabase.from_("Staff").select("s_email", "s_password").execute()
+    users = response.data
+
+    for user in users:
+        plain_password = user["s_password"]
+        hashed_password = generate_password_hash(plain_password)
+        supabase.from_("Staff").update({"s_password": hashed_password}).eq("s_email", user["s_email"]).execute()
+
+    print("All passwords hashed.")
