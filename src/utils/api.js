@@ -294,3 +294,27 @@ export const updateUserInfo = async (updatedData) => {
     return null;
   }
 };
+
+// utils/api.js
+
+export const updateUserPassword = async (oldPassword, newPassword) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/update-password`, {
+      method: "PUT",
+      credentials: "include", // Send cookies (JWT, etc.)
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        oldPassword,
+        newPassword,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Password update error:", error);
+    return { success: false, error: "Network error. Please try again." };
+  }
+};
