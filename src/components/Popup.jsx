@@ -6,7 +6,7 @@ export default function Popup(props) {
     const { title, children, openPopup, setOpenPopup, className = '' } = props;
 
     return (
-        <Dialog open={openPopup} maxWidth="md" PaperProps={{className: "dialog-paper" }}>
+        <Dialog open={openPopup} fullWidth maxWidth="md" PaperProps={{className: "dialog-paper" }}>
             <DialogTitle>
                 <div className="dialog-title">
                     <Typography variant="h6" component="div" className="dialog-title-text">

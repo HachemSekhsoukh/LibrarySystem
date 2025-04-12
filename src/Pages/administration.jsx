@@ -149,81 +149,93 @@ const Administration = () => {
         className="staff-popup"
       >
         <div className="add-staff-form">
-          <div className="form-field">
-            <label>Name</label>
-            <TextField
-              name="name"
-              value={newStaff.name}
-              onChange={handleChange}
-              variant="outlined"
-              fullWidth
-              placeholder="Enter name"
-            />
-          </div>
+        <div className="form-field-row">
+              <div className="form-field">
+                <label>Name</label>
+                <TextField
+                  className="text-field"
+                  name="name"
+                  value={newStaff.name}
+                  onChange={handleChange}
+                  variant="outlined"
+                  fullWidth
+                  placeholder="Enter name"
+                />
+              </div>
 
-          <div className="form-field">
-            <label>Email</label>
-            <TextField
-              name="email"
-              value={newStaff.email}
-              onChange={handleChange}
-              variant="outlined"
-              fullWidth
-              placeholder="Enter email"
-            />
-          </div>
+              <div className="form-field">
+                <label>Email</label>
+                <TextField
+                className="text-field"
+                  name="email"
+                  value={newStaff.email}
+                  onChange={handleChange}
+                  variant="outlined"
+                  fullWidth
+                  placeholder="Enter email"
+                />
+              </div>
+        </div>
+          
+        <div className="form-field-row">
+              <div className="form-field">
+                <label>Password</label>
+                <TextField
+                className="text-field"
+                  name="password"
+                  value={newStaff.password}
+                  onChange={handleChange}
+                  variant="outlined"
+                  fullWidth
+                  placeholder="Enter password"
+                />
+              </div>
 
-          <div className="form-field">
-            <label>Password</label>
-            <TextField
-              name="password"
-              value={newStaff.password}
-              onChange={handleChange}
-              variant="outlined"
-              fullWidth
-              placeholder="Enter password"
-            />
-          </div>
+              <div className="form-field">
+                <label>Phone Number</label>
+                <TextField
+                className="text-field"
+                  name="phone"
+                  value={newStaff.phone}
+                  onChange={handleChange}
+                  variant="outlined"
+                  fullWidth
+                  placeholder="Enter phone number"
+                />
+              </div>
+        </div>
+         
+        <div className="form-field-row">
+                <div className="form-field">
+                  <label>Address</label>
+                  <TextField
+                  className="text-field"
+                    name="address"
+                    value={newStaff.address}
+                    onChange={handleChange}
+                    variant="outlined"
+                    fullWidth
+                    placeholder="Enter address"
+                  />
+                </div>
 
-          <div className="form-field">
-            <label>Phone Number</label>
-            <TextField
-              name="phone"
-              value={newStaff.phone}
-              onChange={handleChange}
-              variant="outlined"
-              fullWidth
-              placeholder="Enter phone number"
-            />
-          </div>
-
-          <div className="form-field">
-            <label>Address</label>
-            <TextField
-              name="address"
-              value={newStaff.address}
-              onChange={handleChange}
-              variant="outlined"
-              fullWidth
-              placeholder="Enter address"
-            />
-          </div>
-
-          <div className="form-field">
-            <label>Birthdate</label>
-            <TextField
-              name="birthdate"
-              value={newStaff.birthdate}
-              onChange={handleChange}
-              variant="outlined"
-              fullWidth
-              placeholder="Enter birthdate"
-              type="date"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </div>
+                <div className="form-field">
+                  <label>Birthdate</label>
+                  <TextField
+                    className="text-field"
+                    name="birthdate"
+                    value={newStaff.birthdate}
+                    onChange={handleChange}
+                    variant="outlined"
+                    fullWidth
+                    placeholder="Enter birthdate"
+                    type="date"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                </div>
+        </div>
 
           <div className="dialog-button-container">
             <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>
