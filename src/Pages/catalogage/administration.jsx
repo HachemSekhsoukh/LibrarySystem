@@ -9,7 +9,12 @@ import {
   Autocomplete, 
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/Circulation/transactions.css";
@@ -25,6 +30,10 @@ const CatalogageAdministration = () => {
     rt_borrow: 0
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentResourceTypeId, setCurrentResourceTypeId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [resourceTypeToDelete, setResourceTypeToDelete] = useState(null);
 
   useEffect(() => {
     fetchResourceTypes();
@@ -54,6 +63,15 @@ const CatalogageAdministration = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const resetForm = () => {
+    setNewResourceType({ 
+      rt_name: "", 
+      rt_borrow: 0
+    });
+    setIsEditing(false);
+    setCurrentResourceTypeId(null);
+  };
+
   const handleAddResourceType = async () => {
     if (!newResourceType.rt_name) {
       setSnackbar({ open: true, message: "Resource type name is required", severity: "error" });
@@ -61,26 +79,89 @@ const CatalogageAdministration = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/add-resource-types`, {
-        method: "POST",
+      let response;
+      let endpoint = isEditing 
+        ? `${API_BASE_URL}api/resource-types/${currentResourceTypeId}` 
+        : `${API_BASE_URL}api/resource-types`;
+
+      let method = isEditing ? "PUT" : "POST";
+      
+      response = await fetch(endpoint, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newResourceType),
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add resource type");
+        throw new Error(errorData.error || `Failed to ${isEditing ? 'update' : 'add'} resource type`);
       }
 
-      setSnackbar({ open: true, message: "Resource type added successfully", severity: "success" });
+      const result = await response.json();
+      setSnackbar({ 
+        open: true, 
+        message: isEditing ? "Resource type updated successfully" : "Resource type added successfully", 
+        severity: "success" 
+      });
       setOpenPopup(false);
-      setNewResourceType({ rt_name: "", rt_borrow: 0 });
+      resetForm();
       
       // Refresh the resource types list
       fetchResourceTypes();
     } catch (error) {
-      console.error("Error adding resource type:", error);
-      setSnackbar({ open: true, message: error.message || "Error adding resource type", severity: "error" });
+      console.error(`Error ${isEditing ? 'updating' : 'adding'} resource type:`, error);
+      setSnackbar({ open: true, message: error.message || `Error ${isEditing ? 'updating' : 'adding'} resource type`, severity: "error" });
+    }
+  };
+
+  const handleEdit = (resourceType) => {
+    setCurrentResourceTypeId(resourceType.id);
+    setNewResourceType({
+      rt_name: resourceType.name,
+      rt_borrow: resourceType.borrow
+    });
+    setIsEditing(true);
+    setOpenPopup(true);
+  };
+
+  const handleDelete = (resourceType) => {
+    setResourceTypeToDelete(resourceType);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}api/resource-types/${resourceTypeToDelete.id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setSnackbar({
+          open: true,
+          message: "Resource type deleted successfully!",
+          severity: "success"
+        });
+        fetchResourceTypes(); // Refresh the list
+      } else {
+        throw new Error(result.error || "Failed to delete resource type");
+      }
+    } catch (error) {
+      console.error("Error deleting resource type:", error);
+      setSnackbar({
+        open: true,
+        message: `Failed to delete resource type: ${error.message}`,
+        severity: "error"
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setResourceTypeToDelete(null);
     }
   };
 
@@ -94,15 +175,32 @@ const CatalogageAdministration = () => {
     <div className="Catalogage-administration-page">
       <div className="container">
         <div id="table">
-          <Table columns={columns} data={resourceTypes} showActions={true} title={"Resource Types"} loading={loading} />
+          <Table 
+            columns={columns} 
+            data={resourceTypes} 
+            showActions={true} 
+            title={"Resource Types"} 
+            loading={loading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </div>
         <div className="bottom-buttons">
-          <Button onClick={() => setOpenPopup(true)} label="Add New Resource Type" lightBackgrnd={false} icon={<AddIcon />} size="large" />
+          <Button 
+            onClick={() => {
+              resetForm();
+              setOpenPopup(true);
+            }} 
+            label="Add New Resource Type" 
+            lightBackgrnd={false} 
+            icon={<AddIcon />} 
+            size="large" 
+          />
         </div>
       </div>
       
-      {/* Add New Resource Type Popup */}
-      <Popup title="Add New Resource Type" openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      {/* Add/Edit New Resource Type Popup */}
+      <Popup title={isEditing ? "Edit Resource Type" : "Add New Resource Type"} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <div className="add-resource-type-form">
           <div className="form-row">
             <div className="form-group">
@@ -130,11 +228,33 @@ const CatalogageAdministration = () => {
           </div>
 
           <div className="dialog-button-container">
-            <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>Cancel</button>
-            <button className="dialog-save-button" onClick={handleAddResourceType}>Save</button>
+            <button className="dialog-cancel-button" onClick={() => {
+              resetForm();
+              setOpenPopup(false);
+            }}>Cancel</button>
+            <button className="dialog-save-button" onClick={handleAddResourceType}>
+              {isEditing ? 'Update' : 'Save'}
+            </button>
           </div>
         </div>
       </Popup>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete the resource type "{resourceTypeToDelete?.name}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+        </DialogActions>
+      </Dialog>
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>{snackbar.message}</Alert>

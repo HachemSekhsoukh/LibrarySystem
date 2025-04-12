@@ -220,6 +220,49 @@ def add_resource_type(resource_type_data):
         print(f"Error adding resource type: {e}")
         return {'success': False, 'error': str(e)}
 
+def delete_resource_type(resource_type_id):
+    """
+    Delete a resource type from the database by its ID.
+    :param resource_type_id: The ID of the resource type to delete.
+    """
+    try:
+        response = supabase.from_("Resource_type").delete().eq("rt_id", resource_type_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Resource type deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Resource type not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting resource type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_resource_type(resource_type_id, resource_type_data):
+    """
+    Update a resource type in the database.
+    :param resource_type_id: The ID of the resource type to update.
+    :param resource_type_data: Dictionary containing updated resource type details.
+    """
+    try:
+        response = supabase.from_("Resource_type").update(resource_type_data).eq("rt_id", resource_type_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'resource_type': response.data[0],
+                'message': 'Resource type updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Resource type not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating resource type: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
 def add_resource(resource_data):
     """
     Add a new resource (book) to the database.

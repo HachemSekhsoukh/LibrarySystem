@@ -47,27 +47,11 @@ def add_new_resource_type():
     """
     API endpoint to add a new user type.
     Expects JSON data with 'u_type' and 'u_description'.
+    This endpoint is now deprecated. Use /api/resource-types instead.
     """
-    data = request.get_json()
-    
-    # Check if data is provided
-    if not data:
-        return jsonify({'success': False, 'error': 'No data provided'}), 400
-    
-    # Check for required fields
-    required_fields = ['rt_name', 'rt_borrow']
-    missing_fields = [field for field in required_fields if field not in data or not data[field]]
-    
-    if missing_fields:
-        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
-
-    # Add the user type
-    result = add_resource_type(data)
-    
-    if result['success']:
-        return jsonify(result), 200
-    else:
-        return jsonify(result), 400
+    # Redirect to the new endpoint for backwards compatibility
+    from app.routes.resource_types import add_resource_type_endpoint
+    return add_resource_type_endpoint()
 
 @app.route('/api/add-readers', methods=['POST'])
 def add_new_reader():
