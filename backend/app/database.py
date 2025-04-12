@@ -71,6 +71,49 @@ def add_user_type(user_type_data):
         print(f"Error adding user type: {e}")
         return {'success': False, 'error': str(e)}
 
+def delete_user_type(user_type_id):
+    """
+    Delete a user type from the database by its ID.
+    :param user_type_id: The ID of the user type to delete.
+    """
+    try:
+        response = supabase.from_("User_type").delete().eq("ut_id", user_type_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'User type deleted successfully'}
+        else:
+            return {'success': False, 'error': 'User type not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting user type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_user_type(user_type_id, user_type_data):
+    """
+    Update a user type in the database.
+    :param user_type_id: The ID of the user type to update.
+    :param user_type_data: Dictionary containing updated user type details.
+    """
+    try:
+        response = supabase.from_("User_type").update(user_type_data).eq("ut_id", user_type_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'user_type': response.data[0],
+                'message': 'User type updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'User type not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating user type: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
 def add_reader(reader_data):
     """
     Add a new reader to the database.
