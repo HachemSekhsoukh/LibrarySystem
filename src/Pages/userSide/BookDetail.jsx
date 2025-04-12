@@ -177,6 +177,8 @@ const BookDetail = () => {
   const [similarBooks, setSimilarBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [showPopup, setShowPopup] = useState(false);
   
   // Use useEffect to fetch the book data when the component mounts
   useEffect(() => {
@@ -229,6 +231,14 @@ const BookDetail = () => {
     
     fetchBook();
   }, [id]);
+
+  // Function to handle the booking process
+  const handleConfirmBooking = () => {
+    // Here you would typically handle the booking logic
+    console.log('Book confirmed:', book.title);
+    setShowPopup(false);
+    // Add additional logic for book reservation here
+  };
   
   if (isLoading) {
     return (
@@ -329,8 +339,36 @@ const BookDetail = () => {
         
         <div className="book-description-container">
           <p className="book-description">{observation}</p>
-          <button className="book-now-button">Book Now</button>
+          <button className="book-now-button" onClick={() => setShowPopup(true)}>Book Now</button>
         </div>
+        
+        {/* Booking Confirmation Popup */}
+        {showPopup && (
+          <div className="popup-overlay">
+            <div className="booking-popup">
+              <h2>Confirm Booking</h2>
+              <div className="booking-details">
+                <p><strong>Email:</strong> student@ensia.edu</p>
+                <p><strong>Book Title:</strong> {title}</p>
+                <p><strong>Book Code:</strong> {cote}</p>
+              </div>
+              <div className="popup-actions">
+                <button 
+                  className="popup-button confirm-button" 
+                  onClick={handleConfirmBooking}
+                >
+                  Confirm
+                </button>
+                <button 
+                  className="popup-button cancel-button" 
+                  onClick={() => setShowPopup(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="similar-books-section">
           <div className="similar-books-grid">
