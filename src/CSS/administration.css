@@ -21,20 +21,24 @@
   }
 
   .add-staff-form {
-    padding: 0 24px 24px;
+    padding: 0 10px 10px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    width: 100%;
+    gap: 10px;
   }
   
   .add-staff-form .form-field {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 3px;
     width: 100%;
   }
   
+  .form-field-row{
+    display: flex;
+    gap: 25px;
+    flex-direction: row;
+  }
   .add-staff-form .form-field label {
     font-size: 16px;
     color: #333;
@@ -44,7 +48,7 @@
   
   .add-staff-form .dropdown-field {
     background-color: #fff;
-    border-radius: 12px !important;
+    border-radius: 20px !important;
   }
 
   
@@ -68,16 +72,6 @@
   .add-staff-form .text-field .MuiOutlinedInput-notchedOutline {
     border-color: #e0e0e0;
     border-width: 1px;
-  }
-  
-  .add-staff-form .text-field {
-    background-color: #fff;
-    border-radius: 12px;
-  }
-  
-  .add-staff-form .text-field input {
-    height: 48px;
-    padding: 0 14px;
   }
   
   .add-staff-form .dialog-buttons {
