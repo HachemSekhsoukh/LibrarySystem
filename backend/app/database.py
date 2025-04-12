@@ -13,30 +13,36 @@ supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
 supabase = create_client(supabase_url, supabase_key)
 
-def get_readers():
+def get_readers_by_status(status=1):
     """
-    Retrieve all users with user_type 'reader' from the database by joining User and User_type tables
+    Retrieve readers with the given u_status from the database.
+    u_status: 1 for verified, 0 for pending
     """
     try:
+        user_response = (
+            supabase
+            .from_("User")
+            .select("u_id, u_name, u_email, u_birthDate, u_phone, u_type, u_status")
+            .eq("u_status", status)
+            .execute()
+        )
         
-        # Then get all users with that user_type
-        user_response = supabase.from_("User").select("u_id, u_name, u_email, u_birthDate, u_phone, u_type").execute()
-        
-        # Transform the response to a simpler format
         readers = [{
             'id': user['u_id'],
             'name': user['u_name'],
             'email': user['u_email'],
             'birthDate': user['u_birthDate'],
             'phone': user['u_phone'],
-            'type': user['u_type']
+            'type': user['u_type'],
+            'status': user['u_status']
         } for user in user_response.data]
         
         return readers
-    except Exception as e:
-        print(f"Error fetching readers: {e}")
-        return []
 
+    except Exception as e:
+        print(f"Error fetching readers with status {status}: {e}")
+        return []
+    
 def get_user_types():
     try:
         
@@ -102,6 +108,26 @@ def add_reader(reader_data):
             return {'success': False, 'error': 'Failed to add reader'}
     except Exception as e:
         print(f"Error adding reader: {e}")
+        return {'success': False, 'error': str(e)}
+    
+
+def update_reader_status_in_db(reader_id, new_status):
+    try:
+        response = (
+            supabase
+            .from_("User")
+            .update({'u_status': new_status})
+            .eq('u_id', reader_id)
+            .execute()
+        )
+        print("Supabase update response:", response)
+
+        # Only return 400 if there's a real error message
+        if hasattr(response, 'error') and response.error:
+            return {'success': False, 'error': str(response.error)}
+        
+        return {'success': True, 'message': 'Reader status updated successfully.'}
+    except Exception as e:
         return {'success': False, 'error': str(e)}
 
 
