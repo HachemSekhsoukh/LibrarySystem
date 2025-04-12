@@ -245,6 +245,49 @@ def add_resource(resource_data):
             'error': str(e)
         }
 
+def delete_resource(resource_id):
+    """
+    Delete a resource from the database by its ID.
+    :param resource_id: The ID of the resource to delete.
+    """
+    try:
+        response = supabase.from_("Resource").delete().eq("r_id", resource_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Resource deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Resource not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting resource: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_resource(resource_id, resource_data):
+    """
+    Update a resource in the database.
+    :param resource_id: The ID of the resource to update.
+    :param resource_data: Dictionary containing updated resource details.
+    """
+    try:
+        response = supabase.from_("Resource").update(resource_data).eq("r_id", resource_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'resource': response.data[0],
+                'message': 'Resource updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Resource not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating resource: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
 def create_transaction(reader_id, book_id, transaction_type='Borrow'):
     """
     Create a new transaction (exemplaire) in the database

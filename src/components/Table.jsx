@@ -4,7 +4,7 @@ import "../CSS/components/table.css"; // Keep original styles
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Table = ({ columns, data, showActions = false , title}) => {
+const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) => {
   const [searchText, setSearchText] = useState("");
 
   // Convert columns to DataTable format
@@ -20,11 +20,11 @@ const Table = ({ columns, data, showActions = false , title}) => {
       name: "Action",
       cell: (row) => (
         <div className="edit-delete">
-          <button className="edit-btn">
+          <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
             <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
           </button>
           <div className="splitter"></div>
-          <button className="delete-btn">
+          <button className="delete-btn" onClick={() => onDelete && onDelete(row)}>
             <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
           </button>
         </div>
@@ -38,7 +38,7 @@ const Table = ({ columns, data, showActions = false , title}) => {
   // Filter data based on search text
   const filteredData = data.filter((row) =>
     Object.values(row).some((value) =>
-      value.toString().toLowerCase().includes(searchText.toLowerCase())
+      value && value.toString().toLowerCase().includes(searchText.toLowerCase())
     )
   );
 
