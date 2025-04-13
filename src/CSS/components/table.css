@@ -161,3 +161,8 @@
     background-color: rgba(211, 47, 47, 0.2);
   }
   
+  /* Make sure the table cells have proper padding */
+.verify-readers-table td {
+  padding: 8px 12px;
+  vertical-align: middle;
+}
