@@ -1,7 +1,7 @@
 from flask import jsonify, request
 import supabase
 from app import app
-from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type,
+from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type
 
 @app.route('/api/readers', methods=['GET'])
 def readers():

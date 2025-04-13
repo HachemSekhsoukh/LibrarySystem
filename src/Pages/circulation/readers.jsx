@@ -195,97 +195,96 @@ const Readers = () => {
     }
   };
 
-const handleCheckboxChange = (readerId) => {
-  setSelectedReaders(prevSelected => {
-    if (prevSelected.includes(readerId)) {
-      // Remove from selection if already selected
-      return prevSelected.filter(id => id !== readerId);
-    } else {
-      // Add to selection if not selected
-      return [...prevSelected, readerId];
-    }
-  });
-};
-
-const handleSelectAll = (isSelected) => {
-  if (isSelected) {
-    // Select all readers
-    const allReaderIds = pendingReaders.map(reader => reader.id);
-    setSelectedReaders(allReaderIds);
-  } else {
-    // Deselect all readers
-    setSelectedReaders([]);
-  }
-};
-
-const handleVerifySelected = async () => {
-  if (selectedReaders.length === 0) {
-    setSnackbar({ 
-      open: true, 
-      message: "Please select at least one reader to verify", 
-      severity: "warning" 
+  const handleCheckboxChange = (readerId) => {
+    setSelectedReaders(prevSelected => {
+      if (prevSelected.includes(readerId)) {
+        // Remove from selection if already selected
+        return prevSelected.filter(id => id !== readerId);
+      } else {
+        // Add to selection if not selected
+        return [...prevSelected, readerId];
+      }
     });
-    return;
-  }
+  };
 
-  try {
-    // Verify each reader individually using PATCH
-    for (const readerId of selectedReaders) {
-      const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ status: 1 }),
+  const handleSelectAll = (isSelected) => {
+    if (isSelected) {
+      // Select all readers
+      const allReaderIds = pendingReaders.map(reader => reader.id);
+      setSelectedReaders(allReaderIds);
+    } else {
+      // Deselect all readers
+      setSelectedReaders([]);
+    }
+  };
+
+  const handleVerifySelected = async () => {
+    if (selectedReaders.length === 0) {
+      setSnackbar({ 
+        open: true, 
+        message: "Please select at least one reader to verify", 
+        severity: "warning" 
+      });
+      return;
+    }
+
+    try {
+      // Verify each reader individually using PATCH
+      for (const readerId of selectedReaders) {
+        const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ status: 1 }),
+        });
+
+        const result = await response.json();
+        console.log(response);
+
+        if (!response.ok) {
+          throw new Error(result.error || `Failed to verify reader ${readerId}`);
+        }
+      }
+
+      // Remove verified readers from pending list
+      setPendingReaders(prevReaders => 
+        prevReaders.filter(reader => !selectedReaders.includes(reader.id))
+      );
+
+      setSnackbar({ 
+        open: true, 
+        message: `Successfully verified ${selectedReaders.length} reader(s)`, 
+        severity: "success" 
       });
 
-      const result = await response.json();
-      console.log(response)
+      // Refresh the main readers list after verifying
+      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`);
+      const updatedData = await updatedResponse.json();
+      const formattedData = updatedData.map(reader => ({
+        id: reader.id,
+        name: reader.name,
+        dob: reader.birthDate,
+        email: reader.email,
+        phone: reader.phone,
+        status: reader.status,
+        type: reader.type
+      }));
+      setReaders(formattedData);
+      setSelectedReaders([]);
 
-      if (!response.ok) {
-        throw new Error(result.error || `Failed to verify reader ${readerId}`);
+      if (pendingReaders.length === selectedReaders.length) {
+        setVerifyReadersPopup(false);
       }
+    } catch (error) {
+      console.error("Error verifying readers:", error);
+      setSnackbar({ 
+        open: true, 
+        message: "Failed to verify selected readers", 
+        severity: "error" 
+      });
     }
-
-    // Remove verified readers from pending list
-    setPendingReaders(prevReaders => 
-      prevReaders.filter(reader => !selectedReaders.includes(reader.id))
-    );
-
-    setSnackbar({ 
-      open: true, 
-      message: `Successfully verified ${selectedReaders.length} reader(s)`, 
-      severity: "success" 
-    });
-
-
-    // Refresh the main readers list after verifying
-    const updatedResponse = await fetch(`${API_BASE_URL}api/readers`);
-    const updatedData = await updatedResponse.json();
-    const formattedData = updatedData.map(reader => ({
-      id: reader.id,
-      name: reader.name,
-      dob: reader.birthDate,
-      email: reader.email,
-      phone: reader.phone,
-      status: reader.status,
-      type: reader.type
-    }));
-    setReaders(formattedData);
-    setSelectedReaders([]);
-
-    if (pendingReaders.length === selectedReaders.length) {
-      setVerifyReadersPopup(false);
-    }
-  } catch (error) {
-    console.error("Error verifying readers:", error);
-    setSnackbar({ 
-      open: true, 
-      message: "Failed to verify selected readers", 
-      severity: "error" 
-    });
-  }
-};
+  };
 
   const handleRejectSelected = async () => {
     if (selectedReaders.length === 0) {
@@ -298,7 +297,7 @@ const handleVerifySelected = async () => {
     }
     
     try {
-      // Verify each reader individually using PATCH
+      // Reject each reader individually using PATCH
       for (const readerId of selectedReaders) {
         const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
           method: "PATCH",
@@ -309,14 +308,14 @@ const handleVerifySelected = async () => {
         });
   
         const result = await response.json();
-        console.log(response)
+        console.log(response);
   
         if (!response.ok) {
           throw new Error(result.error || `Failed to reject reader ${readerId}`);
         }
       }
   
-      // Remove verified readers from pending list
+      // Remove rejected readers from pending list
       setPendingReaders(prevReaders => 
         prevReaders.filter(reader => !selectedReaders.includes(reader.id))
       );
@@ -327,9 +326,20 @@ const handleVerifySelected = async () => {
         severity: "success" 
       });
   
+      // Refresh the readers list
+      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`);
+      const updatedData = await updatedResponse.json();
+      const formattedData = updatedData.map(reader => ({
+        id: reader.id,
+        name: reader.name,
+        dob: reader.birthDate,
+        email: reader.email,
+        phone: reader.phone,
+        status: reader.status,
+        type: reader.type
+      }));
       setReaders(formattedData);
   
-
       if (pendingReaders.length === selectedReaders.length) {
         setVerifyReadersPopup(false);
       }
@@ -340,6 +350,8 @@ const handleVerifySelected = async () => {
         message: "Failed to reject selected readers", 
         severity: "error" 
       });
+    }
+  };
 
   const handleEdit = (reader) => {
     setCurrentReaderId(reader.id);
@@ -542,67 +554,66 @@ const handleVerifySelected = async () => {
         </div>
       </Popup>
 
-
       {/* Verify Readers Popup */}
       <Popup
-  title="Verify New Readers"
-  openPopup={verifyReaders}
-  setOpenPopup={setVerifyReadersPopup}
-  maxWidth="md"
->
-  <div className="verify-readers-container">
-    {/* Add Close Button */}
-    <div className="popup-header">
-      <button 
-        className="close-button"
-        onClick={() => setVerifyReadersPopup(false)}
+        title="Verify New Readers"
+        openPopup={verifyReaders}
+        setOpenPopup={setVerifyReadersPopup}
+        maxWidth="md"
       >
-        &times;
-      </button>
-    </div>
-    
-    {pendingReadersLoading ? (
-      <div className="loading-message">Loading pending readers...</div>
-    ) : pendingReaders.length === 0 ? (
-      <div className="no-readers-message">No pending readers to verify</div>
-    ) : (
-      <>
-        <div className="verify-readers-table">
-          <Table
-            columns={pendingColumns}
-            data={pendingReaders}
-            showActions={false}
-            title={"Pending Readers"}
-            loading={pendingReadersLoading}
-            onRowSelect={setSelectedReaders}
-            selectedRows={selectedReaders}
-          />
-        </div>
-        <div className="verify-actions">
-          <div className="selected-count">
-            {selectedReaders.length} reader{selectedReaders.length !== 1 ? 's' : ''} selected
-          </div>
-          <div className="verify-buttons">
-            <button
-              className="reject-button"
-              onClick={handleRejectSelected}
-              disabled={selectedReaders.length === 0}
+        <div className="verify-readers-container">
+          {/* Add Close Button */}
+          <div className="popup-header">
+            <button 
+              className="close-button"
+              onClick={() => setVerifyReadersPopup(false)}
             >
-              Reject Selected
-            </button>
-            <button
-              className="verify-button"
-              onClick={handleVerifySelected}
-              disabled={selectedReaders.length === 0}
-            >
-              Verify Selected
+              &times;
             </button>
           </div>
+          
+          {pendingReadersLoading ? (
+            <div className="loading-message">Loading pending readers...</div>
+          ) : pendingReaders.length === 0 ? (
+            <div className="no-readers-message">No pending readers to verify</div>
+          ) : (
+            <>
+              <div className="verify-readers-table">
+                <Table
+                  columns={pendingColumns}
+                  data={pendingReaders}
+                  showActions={false}
+                  title={"Pending Readers"}
+                  loading={pendingReadersLoading}
+                  onRowSelect={setSelectedReaders}
+                  selectedRows={selectedReaders}
+                />
+              </div>
+              <div className="verify-actions">
+                <div className="selected-count">
+                  {selectedReaders.length} reader{selectedReaders.length !== 1 ? 's' : ''} selected
+                </div>
+                <div className="verify-buttons">
+                  <button
+                    className="reject-button"
+                    onClick={handleRejectSelected}
+                    disabled={selectedReaders.length === 0}
+                  >
+                    Reject Selected
+                  </button>
+                  <button
+                    className="verify-button"
+                    onClick={handleVerifySelected}
+                    disabled={selectedReaders.length === 0}
+                  >
+                    Verify Selected
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
-      </>
-    )}
-  </div>
-</Popup>
+      </Popup>
 
       {/* Delete Confirmation Dialog */}
       <Dialog
@@ -620,7 +631,6 @@ const handleVerifySelected = async () => {
           <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
         </DialogActions>
       </Dialog>
-
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>{snackbar.message}</Alert>

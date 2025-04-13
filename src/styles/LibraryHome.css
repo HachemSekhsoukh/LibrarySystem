@@ -104,8 +104,8 @@
 }
 
 .hero-content h1 {
-  font-size: 4rem;
-  margin-bottom: 3rem;
+  font-size: 200%;
+  margin-bottom: 5%;
   position: relative;
   display: inline-block;
   font-weight: 500;
@@ -123,15 +123,14 @@
 }
 
 .hero-content p {
-  font-size: 2rem;
+  font-size: 190%;
   line-height: 1.5;
-  margin-bottom: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
 }
 
 .book-showcase-container {
   position: absolute;
-  right: 80px;
+  right: 8%;
   top: 40%;
   transform: translateY(-50%);
   width: 700px;
@@ -145,15 +144,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 320px;
+  height: 100%;
   width: 100%;
   position: relative;
-  perspective: 1500px;
 }
 
 .showcase-book-wrapper {
   position: absolute;
-  left: 40%;
+  left: 45%;
   will-change: transform, opacity;
 }
 
@@ -218,14 +216,13 @@
 }
 
 .library-info {
-  font-size: 1.1rem;
   margin: 3rem 0 0 0;
   color: rgba(255, 255, 255, 1);
   text-align: center;
   position: absolute;
   width: 100%;
   left: 0;
-  bottom: 130px;
+  bottom: 20%;
 }
 
 /* Search Bar */
@@ -233,7 +230,7 @@
   width: 706px;
   height: 74px;
   position: absolute;
-  bottom: 50px;
+  bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
