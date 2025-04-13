@@ -667,7 +667,7 @@ def get_all_staff_members():
     try:
         response = supabase \
         .from_("Staff") \
-        .select("s_id, s_name, s_email,s_phone,s_birthdate, s_address") \
+        .select("s_id, s_name, s_email,s_phone,s_birthdate, s_address, s_type") \
         .execute()
 
         if response.data:
@@ -823,7 +823,7 @@ def add_staff_member(data):
         phone = data.get('phone')
         address = data.get('address')
         bdate = data.get('birthdate')
-        s_type = data.get('type')
+        s_type = data.get('staff_type_id')
 
         if not email or not password:
             return {'success': False, 'error': 'Email and password are required'}, 400
