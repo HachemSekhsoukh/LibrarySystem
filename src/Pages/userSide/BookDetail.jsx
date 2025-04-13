@@ -110,7 +110,7 @@ const BookDetail = () => {
   const title = book.title || 'Unknown Title';
   const author = book.author || 'Unknown Author';
   const editor = book.editor || 'Unknown Editor';
-  const observation = book.observation || 'No description available.';
+  const description = book.description || 'No description available.';
   const cote = book.cote || 'N/A';
   
   // Always use static cover image based on book ID
@@ -175,7 +175,7 @@ const BookDetail = () => {
         </div>
         
         <div className="book-description-container">
-          <p className="book-description">{observation}</p>
+          <p className="book-description">{description}</p>
           <button className="book-now-button" onClick={() => setShowPopup(true)}>Book Now</button>
         </div>
         
