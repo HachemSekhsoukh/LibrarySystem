@@ -5,6 +5,7 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
+
 import Login from "./Pages/login";
 import Settings from "./Pages/Settings";
 import Dashboard from "./Pages/dashboard";
@@ -22,9 +23,14 @@ import Categories from "./Pages/userSide/Categories";
 import "./App.css";
 import ViewAll from "./Pages/userSide/viewAll";
 
+import ProtectedRoute from "./components/ProtectedRoute"; // Import your protected route
+
+import "./App.css";
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
+      {/* Public Routes */}
       <Route path="/" element={<Navigate to="/library" replace />} />
       <Route path="/library" element={<LibraryHome />} />
       <Route path="/book/:id" element={<BookDetail />} />
@@ -32,19 +38,32 @@ const router = createBrowserRouter(
       <Route path="/view-all" element={<ViewAll />} />
       <Route path="/categories" element={<Categories />} />
 
-      {/* Pages requiring the layout (after login) */}
-      <Route element={<PagesLayout />}>
+      {/* Protected Routes (requires token) */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<PagesLayout />}>
           <Route path="/settings" element={<Settings />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/administration" element={<Administration />} />
           <Route path="/circulation/readers" element={<Readers />} />
-          <Route path="/circulation/transactions" element={<Navigate to="/circulation/exemplaires" replace />} />
+          <Route
+            path="/circulation/transactions"
+            element={<Navigate to="/circulation/exemplaires" replace />}
+          />
           <Route path="/circulation/peb" element={<Peb />} />
           <Route path="/circulation/exemplaires" element={<Exemplaires />} />
-          <Route path="/circulation/administration" element={<CirculationAdministration />} />
+          <Route
+            path="/circulation/administration"
+            element={<CirculationAdministration />}
+          />
           <Route path="/catalogage/catalogage" element={<Catalogage />} />
-          <Route path="/catalogage/administration" element={<CatalogageAdministration />} />
+          <Route
+            path="/catalogage/administration"
+            element={<CatalogageAdministration />}
+          />
+        </Route>
       </Route>
+
+      {/* Fallback route */}
       <Route path="*" element={<Navigate to="/library" replace />} />
     </>
   )

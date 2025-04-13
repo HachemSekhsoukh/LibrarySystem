@@ -17,7 +17,7 @@ def api_login():
 
     if result['success']:
         # Generate access token
-        access_token = create_access_token(identity=data['email'],  expires_delta=timedelta(hours=1))  # Token expires in 1 hour)
+        access_token = create_access_token(identity=data['email'],  expires_delta=timedelta(hours=8))  # Token expires in 1 hour)
         
         # Create the response
         response = make_response(jsonify({'success': True, 'message': 'Login successful'}))
@@ -36,9 +36,19 @@ def api_login():
     
 @app.route('/api/logout', methods=['POST'])
 def logout():
-    resp = make_response({"message": "Logged out successfully"})
-    # Clear the jwt_token cookie by setting an expiration in the past
-    resp.set_cookie('jwt_token', '', expires=0)
+    resp = make_response(jsonify({"message": "Logged out successfully"}))
+    
+    # Make sure to match all cookie settings used during creation
+    resp.set_cookie(
+        'access_token_cookie',  # Match the cookie name
+        '',  # Empty value to clear the cookie
+        expires=0,  # Set to 0 to expire immediately
+        httponly=True,  # Same flag as during creation
+        secure=True,  # Secure flag, use True for HTTPS
+        samesite='None',  # Same as during creation
+        path='/',  # Same path as during creation
+    )
+    
     return resp
 
 @app.route('/api/user/me', methods=['GET'])
@@ -60,6 +70,23 @@ def get_user_info():
             'address': user.get('address')  # Use .get in case it's optional
         }), 200
     return jsonify({'error': 'User not found'}), 404
+
+@app.route('/api/user/status', methods=['GET'])
+@jwt_required()
+def check_user_status():
+    access_token = request.cookies.get('access_token_cookie')  # Check for cookie
+
+    if not access_token:
+        return jsonify({"authenticated": False, "error": "Missing token"}), 401
+
+    user_email = get_jwt_identity()
+    if user_email:
+        return jsonify({
+            "authenticated": True,
+            "email": user_email
+        }), 200
+
+    return jsonify({"authenticated": False, "error": "Invalid token"}), 401
 
 @app.route('/api/user/update', methods=['PUT'])
 @jwt_required()
