@@ -1,18 +1,30 @@
 import React, { useState } from "react";
 import DataTable from "react-data-table-component";
-import "../CSS/components/table.css"; // Keep original styles
+import "../CSS/components/table.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) => {
+const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [] }) => {
   const [searchText, setSearchText] = useState("");
-
-  // Convert columns to DataTable format
-  const formattedColumns = columns.map((col) => ({
-    name: col.label,
-    selector: (row) => row[col.key],
-    sortable: true,
-  }));
+  
+  // Convert columns to DataTable format while preserving custom renderers
+  const formattedColumns = columns.map((col) => {
+    // Base column definition
+    const formattedCol = {
+      name: col.label,
+      sortable: true,
+    };
+    
+    // If the column has a custom render function, use it
+    if (col.render) {
+      formattedCol.cell = (row) => col.render(row[col.key], row);
+    } else {
+      // Otherwise use standard selector
+      formattedCol.selector = (row) => row[col.key];
+    }
+    
+    return formattedCol;
+  });
 
   // Add action column if needed
   if (showActions) {
@@ -20,11 +32,11 @@ const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) 
       name: "Action",
       cell: (row) => (
         <div className="edit-delete">
-          <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
+          <button className="edit-btn">
             <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
           </button>
           <div className="splitter"></div>
-          <button className="delete-btn" onClick={() => onDelete && onDelete(row)}>
+          <button className="delete-btn">
             <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
           </button>
         </div>
@@ -38,7 +50,7 @@ const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) 
   // Filter data based on search text
   const filteredData = data.filter((row) =>
     Object.values(row).some((value) =>
-      value && value.toString().toLowerCase().includes(searchText.toLowerCase())
+      value?.toString().toLowerCase().includes(searchText.toLowerCase())
     )
   );
 
@@ -50,15 +62,15 @@ const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) 
         fontWeight: "bold",
         fontSize: "1.1rem",
         color: "var(--primary-color)",
-        borderTopLeftRadius: "15px", // Rounded top-left corner
-        borderTopRightRadius: "15px", // Rounded top-right corner
+        borderTopLeftRadius: "15px",
+        borderTopRightRadius: "15px",
       },
     },
     rows: {
       style: {
         fontSize: "0.9rem",
         borderBottom: "1px solid #ddd",
-        backgroundColor: "transparent", // Make data rows background transparent
+        backgroundColor: "transparent",
       },
     },
     cells: {
@@ -72,6 +84,17 @@ const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) 
         justifyContent: "center",
         alignItems: "center",
         marginTop: "20px",
+      },
+    },
+    // Make sure checkboxes are visible
+    checkbox: {
+      style: {
+        width: "18px",
+        height: "18px",
+        opacity: "1",
+        visibility: "visible",
+        pointerEvents: "auto",
+        cursor: "pointer",
       },
     },
   };
@@ -93,14 +116,13 @@ const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) 
             />
           </div>
         </div>
-        
         <DataTable
           columns={formattedColumns}
-          data={filteredData} // Use filtered data for the table
+          data={filteredData}
           customStyles={customStyles}
           pagination
           highlightOnHover
-          striped={false} // Disable alternating row colors
+          striped={false}
         />
       </div>
     </div>
@@ -108,4 +130,3 @@ const Table = ({ columns, data, showActions = false, title, onEdit, onDelete }) 
 };
 
 export default Table;
-

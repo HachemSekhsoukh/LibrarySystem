@@ -5,6 +5,7 @@ import { FaSearch } from "react-icons/fa";
 import bookData from "./LibraryHome";
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaArrowLeft, FaBookmark, FaCalendarAlt, FaUserAlt } from 'react-icons/fa';
+import NavHeader from '../../components/NavHeader';
 
 const ViewAll = () => {
     const { id } = useParams();
@@ -23,23 +24,7 @@ const ViewAll = () => {
 
   return (
     <div className="library-home">
-      <header className="nav-header">
-        <div className="logo">
-          <img src="public/assets/images/logo.png" alt="ENSIA Logo" />
-        </div>
-        <nav className="main-nav">
-          <ul>
-            <li><a href="#">News</a></li>
-            <li><a href="#">The School</a></li>
-            <li><a href="#">Study</a></li>
-            <li><a href="#">Research</a></li>
-            <li><a href="#">Cooperation</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Connect</a></li>
-          </ul>
-        </nav>
-      </header>
+      <NavHeader />
       <div className = "page-content">
        <div className="back-button" onClick={() => navigate('/library')}>
                 <FaArrowLeft /> Back to Library

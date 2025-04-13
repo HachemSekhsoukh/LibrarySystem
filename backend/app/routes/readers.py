@@ -1,23 +1,33 @@
 from flask import jsonify, request
+import supabase
 from app import app
-from app.database import get_readers, add_reader, delete_reader, get_user_types, add_user_type, add_resource_type, delete_user_type, update_user_type
+from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type
 
 @app.route('/api/readers', methods=['GET'])
 def readers():
     """
     API endpoint to retrieve all readers.
     """
-    reader_list = get_readers()
+    reader_list = get_readers_by_status()
     return jsonify(reader_list)
+
+@app.route('/api/pending-readers', methods=['GET'])
+def pending_readers():
+    """
+    API endpoint to retrieve pending readers.
+    """
+    pending_reader_list = get_readers_by_status(0)
+    return jsonify(pending_reader_list)
 
 @app.route("/api/user-types", methods=["GET"])
 def user_types():
     return jsonify(get_user_types())
 
-@app.route('/api/user-types', methods=['POST'])
-def add_user_type_endpoint():
+@app.route('/api/add-user-types', methods=['POST'])
+def add_new_user_type():
     """
     API endpoint to add a new user type.
+    Expects JSON data with 'u_type' and 'u_description'.
     """
     data = request.get_json()
     
@@ -36,63 +46,37 @@ def add_user_type_endpoint():
     result = add_user_type(data)
     
     if result['success']:
-        return jsonify(result), 201
-    else:
-        return jsonify(result), 400
-
-@app.route('/api/user-types/<int:user_type_id>', methods=['DELETE'])
-def remove_user_type(user_type_id):
-    """
-    API endpoint to delete a user type by ID
-    """
-    result = delete_user_type(user_type_id)
-    return jsonify(result), (200 if result['success'] else 400)
-
-@app.route('/api/user-types/<int:user_type_id>', methods=['PUT'])
-def update_user_type_endpoint(user_type_id):
-    """
-    API endpoint to update a user type by ID
-    """
-    data = request.json
-    
-    if not data:
-        return jsonify({'success': False, 'error': 'No data provided'}), 400
-    
-    # Check for required fields
-    required_fields = ['ut_name', 'ut_borrow']
-    missing_fields = [field for field in required_fields if field not in data]
-    
-    if missing_fields:
-        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
-    
-    # Update the user type
-    result = update_user_type(user_type_id, data)
-    
-    if result['success']:
         return jsonify(result), 200
     else:
         return jsonify(result), 400
 
-@app.route('/api/add-user-types', methods=['POST'])
-def add_new_user_type():
-    """
-    API endpoint to add a new user type.
-    Expects JSON data with 'ut_name' and 'ut_borrow'.
-    This endpoint is now deprecated. Use /api/user-types instead.
-    """
-    # Redirect to the new endpoint for backwards compatibility
-    return add_user_type_endpoint()
 
 @app.route('/api/add-resource-types', methods=['POST'])
 def add_new_resource_type():
     """
     API endpoint to add a new user type.
     Expects JSON data with 'u_type' and 'u_description'.
-    This endpoint is now deprecated. Use /api/resource-types instead.
     """
-    # Redirect to the new endpoint for backwards compatibility
-    from app.routes.resource_types import add_resource_type_endpoint
-    return add_resource_type_endpoint()
+    data = request.get_json()
+    
+    # Check if data is provided
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    # Check for required fields
+    required_fields = ['rt_name', 'rt_borrow']
+    missing_fields = [field for field in required_fields if field not in data or not data[field]]
+    
+    if missing_fields:
+        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+
+    # Add the user type
+    result = add_resource_type(data)
+    
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
 
 @app.route('/api/add-readers', methods=['POST'])
 def add_new_reader():
@@ -120,7 +104,20 @@ def add_new_reader():
         return jsonify(result), 200
     else:
         return jsonify(result), 400
+    
 
+@app.route('/api/update-readers/<int:reader_id>/status', methods=['PATCH'])
+def update_reader_status(reader_id):
+    data = request.get_json()
+    print("Received data:", data)  # Debug log
+
+    if not data or 'status' not in data:
+        return jsonify({'success': False, 'error': 'Missing status in request body'}), 400
+
+    new_status = data['status']
+    result = update_reader_status_in_db(reader_id, new_status)
+    
+    return jsonify(result), (200 if result['success'] else 400)
 
 @app.route('/api/readers/<int:reader_id>', methods=['DELETE'])
 def remove_reader(reader_id):
@@ -129,4 +126,29 @@ def remove_reader(reader_id):
     """
     result = delete_reader(reader_id)
     return jsonify(result), (200 if result['success'] else 400)
+
+@app.route('/api/readers/<int:reader_id>', methods=['PUT'])
+def update_reader_endpoint(reader_id):
+    """
+    API endpoint to update a reader by ID
+    """
+    data = request.json
+    
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    # Check for required fields
+    required_fields = ['u_name', 'u_email', 'u_birthDate', 'u_phone']
+    missing_fields = [field for field in required_fields if field not in data or not data[field]]
+    
+    if missing_fields:
+        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+    
+    # Update the reader
+    result = update_reader(reader_id, data)
+    
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
 

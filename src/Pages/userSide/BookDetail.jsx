@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaArrowLeft, FaBookmark, FaCalendarAlt, FaUserAlt } from 'react-icons/fa';
 import "../../styles/LibraryHome.css";
 import '../../styles/BookDetail.css';
+import NavHeader from '../../components/NavHeader';
 import { fetchResourceById, fetchPopularResources } from '../../utils/api';
 import BookSection from '../../components/BookSection';
 import popularBooks from './LibraryHome'
@@ -80,11 +81,7 @@ const BookDetail = () => {
   if (isLoading) {
     return (
       <div className="book-detail-page">
-        <header className="nav-header">
-          <div className="logo">
-            <img src="/imageslogo.png" alt="ENSIA Logo" />
-          </div>
-        </header>
+        <NavHeader />
         <div className="loading-container">
           <p>Loading book details...</p>
         </div>
@@ -110,7 +107,7 @@ const BookDetail = () => {
   const title = book.title || 'Unknown Title';
   const author = book.author || 'Unknown Author';
   const editor = book.editor || 'Unknown Editor';
-  const observation = book.observation || 'No description available.';
+  const description = book.description || 'No description available.';
   const cote = book.cote || 'N/A';
   
   // Always use static cover image based on book ID
@@ -126,26 +123,9 @@ const BookDetail = () => {
   
   return (
     <div className="book-detail-page">
-      <header className="nav-header">
-        <div className="logo">
-          <img src="/imageslogo.png" alt="ENSIA Logo" />
-        </div>
-        <nav className="main-nav">
-          <ul>
-            <li><a href="#">News</a></li>
-            <li><a href="#">The School</a></li>
-            <li><a href="#">Study</a></li>
-            <li><a href="#">Research</a></li>
-            <li><a href="#">Cooperation</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Connect</a></li>
-          </ul>
-        </nav>
-      </header>
-
+      <NavHeader />
       <div className="page-content">
-        <div className="back-button" onClick={() => navigate('/library')}>
+        <div className="back-button1" onClick={() => navigate('/library')}>
           <FaArrowLeft /> Back to Library
         </div>
 
@@ -175,7 +155,7 @@ const BookDetail = () => {
         </div>
         
         <div className="book-description-container">
-          <p className="book-description">{observation}</p>
+          <p className="book-description">{description}</p>
           <button className="book-now-button" onClick={() => setShowPopup(true)}>Book Now</button>
         </div>
         

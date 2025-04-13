@@ -14,6 +14,37 @@ supabase_url = os.environ.get("SUPABASE_URL")
 supabase_key = os.environ.get("SUPABASE_KEY")
 supabase = create_client(supabase_url, supabase_key)
 
+def get_readers_by_status(status=1):
+    """
+    Retrieve readers with the given u_status from the database.
+    u_status: 1 for verified, 0 for pending
+    """
+    try:
+        user_response = (
+            supabase
+            .from_("User")
+            .select("u_id, u_name, u_email, u_birthDate, u_phone, u_type, u_status")
+            .eq("u_status", status)
+            .execute()
+        )
+        
+        readers = [{
+            'id': user['u_id'],
+            'name': user['u_name'],
+            'email': user['u_email'],
+            'birthDate': user['u_birthDate'],
+            'phone': user['u_phone'],
+            'type': user['u_type'],
+            'status': user['u_status']
+        } for user in user_response.data]
+        
+        return readers
+
+    except Exception as e:
+        print(f"Error fetching readers with status {status}: {e}")
+        return []
+    
+
 def get_readers():
     """
     Retrieve all users with user_type 'reader' from the database by joining User and User_type tables
@@ -37,6 +68,25 @@ def get_readers():
     except Exception as e:
         print(f"Error fetching readers: {e}")
         return []
+    
+def update_reader_status_in_db(reader_id, new_status):
+    try:
+        response = (
+            supabase
+            .from_("User")
+            .update({'u_status': new_status})
+            .eq('u_id', reader_id)
+            .execute()
+        )
+        print("Supabase update response:", response)
+
+        # Only return 400 if there's a real error message
+        if hasattr(response, 'error') and response.error:
+            return {'success': False, 'error': str(response.error)}
+        
+        return {'success': True, 'message': 'Reader status updated successfully.'}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
 
 def get_user_types():
     try:
@@ -206,7 +256,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type"
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type, r_description"
         ).execute()
 
         resources = [{
@@ -221,7 +271,8 @@ def get_resources():
             'receivingDate': resource['r_receivingDate'],
             'status': resource['r_status'],
             'observation': resource['r_observation'],
-            'type': resource['r_type']
+            'type': resource['r_type'],
+            'description': resource['r_description']
         } for resource in response.data]
 
         return resources
@@ -946,3 +997,119 @@ def get_monthly_borrows():
     except Exception as e:
         print("Database error in get_monthly_borrows:", e)
         return []
+
+def update_reservation(reservation_id, user_id=None, resource_id=None, transaction_type=None):
+    """
+    Update an existing reservation in the database
+    :param reservation_id: The ID of the reservation to update
+    :param user_id: The new user ID (borrower)
+    :param resource_id: The new resource ID
+    :param transaction_type: The new transaction type
+    """
+    try:
+        # Map transaction types to status codes if provided
+        update_data = {}
+        
+        if user_id is not None:
+            update_data['res_user_id'] = user_id
+            
+        if resource_id is not None:
+            update_data['res_resource_id'] = resource_id
+            
+        if transaction_type is not None:
+            status_map = {
+                "Borrow": 1,
+                "Return": 2,
+                "Renew": 3
+            }
+            update_data['res_status'] = status_map.get(transaction_type, 1)
+        
+        # Only update if we have data to update
+        if not update_data:
+            return {
+                'success': False,
+                'error': 'No update data provided'
+            }
+            
+        # Update the reservation
+        response = supabase.from_("Reservation").update(update_data).eq("res_id", reservation_id).execute()
+        
+        if response.data:
+            return {
+                'success': True,
+                'reservation': response.data[0],
+                'message': 'Reservation updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Reservation not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating reservation: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def delete_reservation(reservation_id):
+    """
+    Delete a reservation from the database
+    :param reservation_id: The ID of the reservation to delete
+    """
+    try:
+        # Delete the reservation
+        response = supabase.from_("Reservation").delete().eq("res_id", reservation_id).execute()
+        
+        # If data is returned, it means the deletion was successful
+        if response.data:
+            return {
+                'success': True,
+                'message': 'Reservation deleted successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Reservation not found or could not be deleted'
+            }
+    except Exception as e:
+        print(f"Error deleting reservation: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def update_reader(reader_id, reader_data):
+    """
+    Update a reader's information in the database.
+    :param reader_id: The ID of the reader to update.
+    :param reader_data: Dictionary containing the updated reader details.
+    """
+    try:
+        # Check if u_type is already an ID or needs to be looked up
+        if isinstance(reader_data.get('u_type'), dict) and 'id' in reader_data['u_type']:
+            # If u_type is an object with an id property, use that ID
+            reader_type_id = reader_data['u_type']['id']
+        elif isinstance(reader_data.get('u_type'), (int, str)):
+            # If u_type is already an ID (int or string), use it directly
+            reader_type_id = reader_data['u_type']
+        else:
+            return {'success': False, 'error': "Invalid user type provided"}
+
+        # Assign reader type ID
+        reader_data['u_type'] = reader_type_id
+        
+        # If password is empty, remove it from the update data
+        if 'u_password' in reader_data and not reader_data['u_password']:
+            del reader_data['u_password']
+        
+        # Update the reader in the database
+        response = supabase.from_("User").update(reader_data).eq("u_id", reader_id).execute()
+        
+        if response.data:
+            return {'success': True, 'reader': response.data[0]}
+        else:
+            return {'success': False, 'error': 'Reader not found or could not be updated'}
+    except Exception as e:
+        print(f"Error updating reader: {e}")
+        return {'success': False, 'error': str(e)}
