@@ -7,38 +7,6 @@ import { fetchLatestResources, fetchPopularResources, searchResources } from '..
 import BookCard from '../../components/BookCard'
 import BookSection from '../../components/BookSection'
 
-// Book data for fallback (will be replaced by API data)
-const bookData = [
-  {
-    id: 1,
-    title: 'The C++ Programming Language',
-    author: 'Bjarne Stroustrup',
-    edition: 'Fourth Edition',
-    coverImage: '/assets/books/blue_cpp.png',
-    category: 'Mathematics'
-  },
-  {
-    id: 2,
-    title: 'C++ A Beginner\'s Guide',
-    author: 'Herbert Schildt',
-    edition: 'Second Edition',
-    coverImage: '/assets/books/yellow_cpp.png',
-    category: 'Mathematics'
-  },
-  {
-    id: 3,
-    title: 'C++ Programming',
-    author: 'Al Stevens',
-    edition: '7th Edition',
-    coverImage: '/assets/books/cpp_stevens.jpg',
-    category: 'Mathematics'
-  }
-];
-
-// Make sure we're using the right image
-bookData[0].coverImage = '/assets/books/blue_cpp.png';
-
-
 const DebugSection = ({ data, title }) => {
   if (!data || data.length === 0) return null;
   
@@ -55,23 +23,18 @@ const DebugSection = ({ data, title }) => {
   );
 };
 
-
-
 const BookShowcase = ({ books = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(1);
   
-  // Ensure we always have at least 3 books for the showcase
+  // Ensure we have at least 3 books for the showcase
   const displayBooks = useMemo(() => {
-    const result = [...books];
-    while (result.length < 3) {
-      result.push(bookData[result.length % bookData.length]);
-    }
-    return result.slice(0, 3); // Always use exactly 3 books
+    return books.slice(0, 3); // Only show up to 3 books
   }, [books]);
   
   useEffect(() => {
+    if (displayBooks.length === 0) return;
+    
     const timer = setInterval(() => {
-      // Move in the opposite direction (right to left)
       setCurrentIndex((prevIndex) => (prevIndex - 1 + displayBooks.length) % displayBooks.length);
     }, 4000);
     
@@ -127,19 +90,43 @@ const BookShowcase = ({ books = [] }) => {
   };
 
   // Create springs for each book - always create exactly 3
-  const bookSprings = displayBooks.map((_, index) => {
-    return useSpring({
-      to: getPositionStyles(index),
-      config: { 
-        mass: 1.2, 
-        tension: 220, 
-        friction: 26,
-        clamp: false,
-        precision: 0.01
-      },
-      immediate: false
-    });
+  const spring1 = useSpring({
+    to: getPositionStyles(0),
+    config: { 
+      mass: 1.2, 
+      tension: 220, 
+      friction: 26,
+      clamp: false,
+      precision: 0.01
+    },
+    immediate: false
   });
+
+  const spring2 = useSpring({
+    to: getPositionStyles(1),
+    config: { 
+      mass: 1.2, 
+      tension: 220, 
+      friction: 26,
+      clamp: false,
+      precision: 0.01
+    },
+    immediate: false
+  });
+
+  const spring3 = useSpring({
+    to: getPositionStyles(2),
+    config: { 
+      mass: 1.2, 
+      tension: 220, 
+      friction: 26,
+      clamp: false,
+      precision: 0.01
+    },
+    immediate: false
+  });
+
+  const bookSprings = [spring1, spring2, spring3];
 
   return (
     <div className="book-showcase-container">
@@ -220,7 +207,7 @@ const LibraryHome = () => {
   const [latestBooks, setLatestBooks] = useState([]);
   const [popularBooks, setPopularBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [debugMode, setDebugMode] = useState(false); // Enable debug mode by default
+  const [debugMode, setDebugMode] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -234,28 +221,13 @@ const LibraryHome = () => {
         console.log('Latest books data:', latestData);
         console.log('Popular books data:', popularData);
         
-        // Only use the database data, no fallback unless absolutely necessary
-        if (latestData && latestData.length > 0) {
-          setLatestBooks(latestData);
-        } else {
-          console.warn('No latest books found in database, using fallback data');
-          setLatestBooks(bookData);
-        }
+        setLatestBooks(latestData || []);
+        setPopularBooks(popularData || []);
         
-        if (popularData && popularData.length > 0) {
-          setPopularBooks(popularData);
-        } else {
-          console.warn('No popular books found in database, using fallback data');
-          setPopularBooks(bookData);
-        }
-        
-        console.log('Final latest books state:', latestData.length > 0 ? latestData : bookData);
       } catch (error) {
         console.error('Error fetching books:', error);
-        // Only fallback to static data on actual error
-        console.warn('API error, using fallback data');
-        setLatestBooks(bookData);
-        setPopularBooks(bookData);
+        setLatestBooks([]);
+        setPopularBooks([]);
       } finally {
         setIsLoading(false);
       }
@@ -371,7 +343,10 @@ const LibraryHome = () => {
       ) : (
         <main className={`main-content ${showMainContent ? '' : 'hidden'}`}>
           {isLoading ? (
-            <div className="loading">Loading books...</div>
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+              <p>Loading books...</p>
+            </div>
           ) : (
             <>
               <BookSection title="Latest Books" books={latestBooks} />

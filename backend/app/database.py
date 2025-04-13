@@ -255,7 +255,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type"
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type, r_description"
         ).execute()
 
         resources = [{
@@ -270,7 +270,8 @@ def get_resources():
             'receivingDate': resource['r_receivingDate'],
             'status': resource['r_status'],
             'observation': resource['r_observation'],
-            'type': resource['r_type']
+            'type': resource['r_type'],
+            'description': resource['r_description']
         } for resource in response.data]
 
         return resources
