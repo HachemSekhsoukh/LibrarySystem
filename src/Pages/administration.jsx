@@ -5,9 +5,12 @@ import Popup from "../components/Popup";
 import { TextField, Snackbar, Alert, CircularProgress } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../CSS/administration.css";
-import { fetchAllStaff, addStaffMember } from "../utils/api"; 
+import { fetchAllStaff, addStaffMember, fetchStaffTypes, addStaffType } from "../utils/api";
 
 const Administration = () => {
+  const [staffTypesData, setStaffTypesData] = useState([]);
+  const [openTypePopup, setOpenTypePopup] = useState(false);
+  const [newStaffType, setNewStaffType] = useState({ st_name: "" });
   const [staffData, setStaffData] = useState([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [newStaff, setNewStaff] = useState({
@@ -24,6 +27,11 @@ const Administration = () => {
     severity: "success"
   });
 
+  const staffTypesColumns = [
+    { label: "ID", key: "id" },
+    { label: "Type", key: "name" },
+  ];
+  
   const columns = [
     { label: "ID", key: "id" },
     { label: "Name", key: "name" },
@@ -32,30 +40,88 @@ const Administration = () => {
     { label: "Address", key: "address" },
     { label: "Birthdate", key: "birthdate" }
   ];
-
-  useEffect(() => {
-    const fetchStaff = async () => {
-      const result = await fetchAllStaff();
-      
-      // Check if result is an array directly (not necessarily within 'staff')
-      if (Array.isArray(result)) {
-        const formatted = result.map((member) => ({
-          id: member.s_id,
-          name: member.s_name,
-          email: member.s_email,
-          phone: member.s_phone || "N/A", // handle missing fields
-          address: member.s_address,
-          birthdate: member.s_birthdate,
-        }));
-        setStaffData(formatted);
-      } else {
-        console.error('Failed to fetch valid staff data, invalid structure');
-      }
-      setLoading(false); // Set loading to false after data is fetched
-    };
+  const fetchStaffData = async () => {
+    setLoading(true);
+    const result = await fetchAllStaff();
+    if (Array.isArray(result)) {
+      const formatted = result.map((member) => ({
+        id: member.s_id,
+        name: member.s_name,
+        email: member.s_email,
+        phone: member.s_phone || "N/A",
+        address: member.s_address,
+        birthdate: member.s_birthdate,
+      }));
+      setStaffData(formatted);
+    }
+    setLoading(false);
+  };
   
-    fetchStaff();
+  const fetchStaffTypesData = async () => {
+    setLoading(true);
+    try {
+      const result = await fetchStaffTypes();
+      
+      if (Array.isArray(result)) {
+        const formatted = result.map((type) => ({
+          id: type.id,
+          name: type.name,
+        }));
+        setStaffTypesData(formatted);
+      } else {
+        console.error("Expected array of staff types, got:", result);
+        setStaffTypesData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching staff types:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch staff types",
+        severity: "error"
+      });
+      setStaffTypesData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchStaffData();
+    fetchStaffTypesData();
   }, []);
+    
+  
+  const handleTypeChange = (e) => {
+    setNewStaffType({ ...newStaffType, [e.target.name]: e.target.value });
+  };
+  
+  const handleAddStaffType = async () => {
+    setLoading(true);
+    try {
+      const response = await addStaffType(newStaffType);
+  
+      if (response?.success) {
+        setSnackbar({
+          open: true,
+          message: "Staff type added successfully!",
+          severity: "success"
+        });
+        setNewStaffType({ st_name: "" });
+        setOpenTypePopup(false);
+  
+        await fetchStaffTypesData();
+      } else {
+        throw new Error("Failed to add staff type");
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: `Error: ${error.message}`,
+        severity: "error"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };  
 
   const handleChange = (e) => {
     setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
@@ -87,27 +153,7 @@ const Administration = () => {
           birthdate: ""
         });
         setOpenPopup(false);
-          const fetchStaff = async () => {
-            const result = await fetchAllStaff();
-            
-            // Check if result is an array directly (not necessarily within 'staff')
-            if (Array.isArray(result)) {
-              const formatted = result.map((member) => ({
-                id: member.s_id,
-                name: member.s_name,
-                email: member.s_email,
-                phone: member.s_phone || "N/A", // handle missing fields
-                address: member.s_address,
-                birthdate: member.s_birthdate,
-              }));
-              setStaffData(formatted);
-            } else {
-              console.error('Failed to fetch valid staff data, invalid structure');
-            }
-            setLoading(false); // Set loading to false after data is fetched
-          };
-        
-          fetchStaff();
+        await fetchStaffData();
       } else {
         throw new Error("Failed to add staff member");
       }
@@ -125,22 +171,83 @@ const Administration = () => {
   return (
     <div className="administration-page">
       <div className="recent-transactions-container">
-                   {/* Show loading spinner while loading */}
-                   {loading ? (
-              <div className="loader"></div>
-            ) : (
-              <Table columns={columns} data={staffData} showActions={true} title={"Staff Members"} />
-            )}
-        <div className="bottom-buttons">
-          <Button
-            onClick={() => setOpenPopup(true)}
-            label="Add Staff Member"
-            lightBackgrnd={false}
-            icon={<AddIcon />}
-            size="large"
-          />
-        </div>
+        {loading ? (
+          <div className="loader"></div>
+        ) : (
+          <>
+            <Table 
+              columns={columns} 
+              data={staffData} 
+              showActions={true} 
+              title={"Staff Members"} 
+            />
+            <div className="bottom-buttons">
+              <Button
+                onClick={() => setOpenPopup(true)}
+                label="Add Staff Member"
+                lightBackgrnd={false}
+                icon={<AddIcon />}
+                size="large"
+              />
+            </div>
+          </>
+        )}
       </div>
+      
+      <div className="recent-transactions-container">
+        {loading ? (
+          <div className="loader"></div>
+        ) : (
+          <>
+            <Table 
+              columns={staffTypesColumns} 
+              data={staffTypesData} 
+              showActions={true} 
+              title={"Staff Types"} 
+            />
+            <div className="bottom-buttons">
+              <Button
+                onClick={() => setOpenTypePopup(true)}
+                label="Add Staff Type"
+                lightBackgrnd={false}
+                icon={<AddIcon />}
+                size="large"
+              />
+            </div>
+          </>
+        )}
+      </div>
+
+      <Popup
+        title="Add Staff Type"
+        openPopup={openTypePopup}
+        setOpenPopup={setOpenTypePopup}
+      >
+        <div className="add-staff-type-form">
+          <div className="form-field">
+            <label>Staff Type Name</label>
+            <TextField
+              className="text-field"
+              name="st_name"
+              value={newStaffType.st_name}
+              onChange={handleTypeChange}
+              variant="outlined"
+              fullWidth
+              placeholder="Enter staff type name"
+            />
+          </div>
+
+          <div className="dialog-button-container">
+            <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>
+              Cancel
+            </button>
+            <button className="dialog-save-button" onClick={handleAddStaffType} disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : "Save"}
+            </button>
+          </div>
+        </div>
+      </Popup>
+
 
       <Popup
         title="Add Staff Member"

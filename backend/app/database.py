@@ -676,7 +676,86 @@ def get_all_staff_members():
     except Exception as e:
         print(f"Error fetching staff members: {e}")
         return []
-    
+
+
+def get_staff_types():
+    """
+    Retrieve all staff types from the database.
+    """
+    try:
+        response = supabase.from_("Staff_type").select("st_id, st_name").execute()
+
+        resource_types = [{
+            'id': resource_type['st_id'],
+            'name': resource_type['st_name']
+        } for resource_type in response.data]
+
+        return resource_types
+    except Exception as e:
+        print(f"Error fetching resource types: {e}")
+        return []
+
+
+def add_staff_type(staff_type_data):
+    """
+    Add a new staff type to the database.
+    :param staff_type_data: Dictionary containing staff type details.
+    """
+    try:
+        response = supabase.from_("Staff_type").insert(staff_type_data).execute()
+
+        if response.data:
+            return {'success': True, 'staff_type': response.data[0]}
+        else:
+            return {'success': False, 'error': 'Failed to add staff type'}
+    except Exception as e:
+        print(f"Error adding staff type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def delete_staff_type(staff_type_id):
+    """
+    Delete a staff type from the database by its ID.
+    :param staff_type_id: The ID of the staff type to delete.
+    """
+    try:
+        response = supabase.from_("Staff_type").delete().eq("st_id", staff_type_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Staff type deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Staff type not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting staff type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_staff_type(staff_type_id, staff_type_data):
+    """
+    Update a staff type in the database.
+    :param staff_type_id: The ID of the staff type to update.
+    :param staff_type_data: Dictionary containing updated staff type details.
+    """
+    try:
+        response = supabase.from_("Staff_type").update(staff_type_data).eq("st_id", staff_type_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'staff_type': response.data[0],
+                'message': 'Staff type updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Staff type not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating staff type: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+
 def add_staff_member(data):
     """
     Add a new staff member to the Staff table.

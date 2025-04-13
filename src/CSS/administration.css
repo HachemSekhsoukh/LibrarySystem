@@ -3,7 +3,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    gap: 2rem; 
 }
+
+
 
 .loader {
     border: 6px solid #f3f3f3;
