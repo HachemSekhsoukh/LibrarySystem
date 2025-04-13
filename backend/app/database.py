@@ -1,7 +1,8 @@
 import os
 from supabase import create_client
 from dotenv import load_dotenv
-import datetime
+from datetime import datetime
+import calendar
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -865,3 +866,83 @@ def add_staff_member(data):
     except Exception as e:
         print(f"Error adding staff member: {e}")
         return {'success': False, 'error': str(e)}, 500
+    
+def get_total_users():
+    try:
+        response = supabase.from_("User").select("u_id", count="exact").execute()
+        return response.count or 0
+    except Exception as e:
+        print(f"Error getting total users: {e}")
+        return 0
+
+def get_total_resources():
+    try:
+        response = supabase.from_("Resource").select("r_id", count="exact").execute()
+        return response.count or 0
+    except Exception as e:
+        print(f"Error getting total resources: {e}")
+        return 0
+
+def get_total_reservations():
+    try:
+        response = supabase.from_("Reservation").select("res_id", count="exact").execute()
+        return response.count or 0
+    except Exception as e:
+        print(f"Error getting total reservations: {e}")
+        return 0
+
+def get_monthly_reservations():
+    try:
+        now = datetime.now()
+        first_day = now.replace(day=1).date().isoformat()
+        last_day = now.replace(day=calendar.monthrange(now.year, now.month)[1]).date().isoformat()
+
+        response = supabase.from_("Reservation") \
+            .select("res_id", count="exact") \
+            .gte("res_date", first_day) \
+            .lte("res_date", last_day) \
+            .execute()
+
+        return response.count or 0
+    except Exception as e:
+        print(f"Error getting monthly reservations: {e}")
+        return 0
+
+def get_stats():
+    try:
+        return {
+            'total_users': get_total_users(),
+            'total_resources': get_total_resources(),
+            'total_reservations': get_total_reservations(),
+            'monthly_borrows': get_monthly_reservations()
+        }
+    except Exception as e:
+        print(f"Error fetching dashboard stats: {e}")
+        return {
+            'total_users': 0,
+            'total_resources': 0,
+            'total_reservations': 0,
+            'monthly_borrows': 0
+        }
+    
+def get_monthly_borrows():
+    try:
+        response = supabase.table("Reservation").select("res_id, res_date").execute()
+
+        borrow_counts = {}
+
+        for row in response.data:
+            res_date = row.get("res_date")
+            if res_date:
+                date = datetime.fromisoformat(res_date.replace("Z", "+00:00"))
+                month = date.strftime("%b")  # 'Jan', 'Feb', ...
+                borrow_counts[month] = borrow_counts.get(month, 0) + 1
+
+        # Return months in calendar order
+        ordered_months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        return [{"month": m, "borrows": borrow_counts.get(m, 0)} for m in ordered_months]
+
+    except Exception as e:
+        print("Database error in get_monthly_borrows:", e)
+        return []

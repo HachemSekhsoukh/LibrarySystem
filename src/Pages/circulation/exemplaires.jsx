@@ -10,11 +10,16 @@ import {
   Snackbar,
   Alert
 } from "@mui/material";
+import {
+  fetchReaders,
+  fetchResources,
+  fetchTransactions,
+  createTransaction
+} from "../../utils/api.js";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
 
 const Exemplaires = () => {
-  const API_BASE_URL = "http://127.0.0.1:5000/";
   const [openPopup, setOpenPopup] = useState(false);
   const [transactionData, setTransactionData] = useState({
     borrowerName: "",
@@ -36,17 +41,11 @@ const Exemplaires = () => {
     severity: 'success'
   });
 
-  // Fetch readers from API
   useEffect(() => {
-    const fetchReaders = async () => {
+    const loadReaders = async () => {
       setLoadingReaders(true);
       try {
-        const response = await fetch(`${API_BASE_URL}api/readers`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch readers');
-        }
-        const data = await response.json();
-        // Transform data to match the format expected by Autocomplete
+        const data = await fetchReaders();
         const readerOptions = data.map(reader => ({
           id: reader.id,
           label: reader.name,
@@ -55,78 +54,61 @@ const Exemplaires = () => {
         setReaders(readerOptions);
         setReaderError(null);
       } catch (err) {
-        console.error('Error fetching readers:', err);
+        console.error(err);
         setReaderError('Failed to load readers. Please try again later.');
       } finally {
         setLoadingReaders(false);
       }
     };
 
-    fetchReaders();
+    loadReaders();
   }, []);
 
-
   useEffect(() => {
-    const fetchTransactions = async () => {
-      setLoadingTransactions(true);
-      try {
-        const response = await fetch(`${API_BASE_URL}api/transactions`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch transactions");
-        }
-        const data = await response.json();
-        setTransactions(data);
-        setTransactionError(null);
-      } catch (err) {
-        console.error("Error fetching transactions:", err);
-        setTransactionError("Failed to load transactions. Please try again.");
-      } finally {
-        setLoadingTransactions(false);
-      }
-    };
-
-    fetchTransactions();
-  }, []);
-
-  // Fetch resources from API
-  useEffect(() => {
-    const fetchResources = async () => {
+    const loadResources = async () => {
       setLoadingResources(true);
       try {
-        const response = await fetch(`${API_BASE_URL}api/resources`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch resources');
-        }
-        const data = await response.json();
-        // Transform data to match the format expected by Autocomplete
+        const data = await fetchResources();
         const resourceOptions = data.map(resource => ({
           id: resource.id,
           title: resource.title,
           author: resource.author,
           isbn: resource.isbn,
-          // Create a searchable label that includes both title and author
           label: resource.title + (resource.author ? ` by ${resource.author}` : ''),
-          // Create a display label for the dropdown
           displayLabel: `${resource.title}${resource.author ? ` by ${resource.author}` : ''}`
         }));
         setResources(resourceOptions);
         setResourceError(null);
       } catch (err) {
-        console.error('Error fetching resources:', err);
+        console.error(err);
         setResourceError('Failed to load resources. Please try again later.');
       } finally {
         setLoadingResources(false);
       }
     };
 
-    fetchResources();
+    loadResources();
   }, []);
 
-  const transactionTypes = [
-    "Borrow",
-    "Return",
-    "Renew"
-  ];
+  const loadTransactions = async () => {
+    setLoadingTransactions(true);
+    try {
+      const data = await fetchTransactions();
+      setTransactions(data);
+      setTransactionError(null);
+    } catch (err) {
+      console.error(err);
+      setTransactionError("Failed to load transactions. Please try again.");
+    } finally {
+      setLoadingTransactions(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
+
+  const transactionTypes = ["Borrow", "Return", "Renew"];
 
   const handleChange = (e) => {
     setTransactionData({ ...transactionData, [e.target.name]: e.target.value });
@@ -137,105 +119,47 @@ const Exemplaires = () => {
   };
 
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setSnackbar({ ...snackbar, open: false });
   };
 
   const handleSubmit = async () => {
     try {
-      // Get the selected reader's ID if a reader was selected from the dropdown
-      let readerId = null;
-      if (typeof transactionData.borrowerName === 'object' && transactionData.borrowerName) {
-        readerId = transactionData.borrowerName.id;
-      }
+      const readerId = transactionData.borrowerName?.id;
+      const bookId = transactionData.documentTitle?.id;
 
-      // Get the selected resource's ID
-      let bookId = null;
-      if (typeof transactionData.documentTitle === 'object' && transactionData.documentTitle) {
-        bookId = transactionData.documentTitle.id;
-      }
-
-      // Validate required fields
-      if (!readerId) {
+      if (!readerId || !bookId) {
         setSnackbar({
           open: true,
-          message: 'Please select a borrower',
+          message: !readerId ? 'Please select a borrower' : 'Please select a document',
           severity: 'error'
         });
         return;
       }
 
-      if (!bookId) {
-        setSnackbar({
-          open: true,
-          message: 'Please select a document',
-          severity: 'error'
-        });
-        return;
-      }
-
-      const transactionPayload = {
-        readerId: readerId,
-        bookId: bookId,
+      const payload = {
+        readerId,
+        bookId,
         transactionType: transactionData.transactionType
       };
 
-      // Send data to backend
-      const response = await fetch(`${API_BASE_URL}api/transactions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(transactionPayload),
-      });
+      await createTransaction(payload);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create transaction');
-      }
-
-      const result = await response.json();
-      console.log("Transaction created:", result);
-      
-      // Show success message
       setSnackbar({
         open: true,
         message: 'Transaction saved successfully!',
         severity: 'success'
       });
 
-      // Reset form and close popup
       setTransactionData({
         borrowerName: "",
         transactionType: "Borrow",
         documentTitle: ""
       });
       setOpenPopup(false);
-      
-      // Refresh the transactions list
-      const fetchTransactions = async () => {
-        setLoadingTransactions(true);
-        try {
-          const response = await fetch(`${API_BASE_URL}api/transactions`);
-          if (!response.ok) {
-            throw new Error("Failed to fetch transactions");
-          }
-          const data = await response.json();
-          setTransactions(data);
-          setTransactionError(null);
-        } catch (err) {
-          console.error("Error fetching transactions:", err);
-          setTransactionError("Failed to load transactions. Please try again.");
-        } finally {
-          setLoadingTransactions(false);
-        }
-      };
-      
-      fetchTransactions();
+      loadTransactions();
     } catch (err) {
-      console.error('Error creating transaction:', err);
+      console.error(err);
       setSnackbar({
         open: true,
         message: `Failed to create transaction: ${err.message}`,
@@ -255,7 +179,7 @@ const Exemplaires = () => {
     <>
     <div className="container">
     <div id='table'>
-    <Table columns={columns} data={transactions} showActions={true} title={"Recent Transactions"}/>
+    <Table columns={columns} data={transactions} showActions={true} title={"Transactions"}/>
     </div>
     <div className="bottom-buttons">
       <Button 
