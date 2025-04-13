@@ -19,6 +19,8 @@ import CatalogageAdministration from "./Pages/catalogage/administration";
 import PagesLayout from "./Layouts/PagesLayout";
 import LibraryHome from "./Pages/userSide/LibraryHome";
 import BookDetail from "./Pages/userSide/BookDetail";
+import Categories from "./Pages/userSide/Categories";
+import "./App.css";
 import ViewAll from "./Pages/userSide/viewAll";
 
 import ProtectedRoute from "./components/ProtectedRoute"; // Import your protected route
@@ -34,6 +36,7 @@ const router = createBrowserRouter(
       <Route path="/book/:id" element={<BookDetail />} />
       <Route path="/login" element={<Login />} />
       <Route path="/view-all" element={<ViewAll />} />
+      <Route path="/categories" element={<Categories />} />
 
       {/* Protected Routes (requires token) */}
       <Route element={<ProtectedRoute />}>

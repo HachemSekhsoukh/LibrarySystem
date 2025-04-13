@@ -6,6 +6,7 @@ import "../../styles/LibraryHome.css";
 import { fetchLatestResources, fetchPopularResources, searchResources } from '../../utils/api';
 import BookCard from '../../components/BookCard'
 import BookSection from '../../components/BookSection'
+import NavHeader from '../../components/NavHeader';
 
 const DebugSection = ({ data, title }) => {
   if (!data || data.length === 0) return null;
@@ -24,29 +25,51 @@ const DebugSection = ({ data, title }) => {
 };
 
 const BookShowcase = ({ books = [] }) => {
-  const [currentIndex, setCurrentIndex] = useState(1);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 992);
+  const [isFading, setIsFading] = useState(false);
   
-  // Ensure we have at least 3 books for the showcase
+  // Ensure we have at least 3 books for the showcase on desktop, 1 for mobile
   const displayBooks = useMemo(() => {
-    return books.slice(0, 3); // Only show up to 3 books
-  }, [books]);
+    if (isMobile) {
+      return books; // Show all books for mobile cycling
+    }
+    return books.slice(0, 3); // Show up to 3 books for desktop
+  }, [books, isMobile]);
   
   useEffect(() => {
-    if (displayBooks.length === 0) return;
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 992);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  useEffect(() => {
+    if (books.length === 0) return;
     
     const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex - 1 + displayBooks.length) % displayBooks.length);
-    }, 4000);
+      if (isMobile) {
+        setIsFading(true);
+        setTimeout(() => {
+          setCurrentIndex((prevIndex) => (prevIndex + 1) % displayBooks.length);
+          setIsFading(false);
+        }, 500); // Match the fade-out animation duration
+      } else {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % displayBooks.length);
+      }
+    }, isMobile ? 3000 : 4000); // 3 seconds for mobile, 4 seconds for desktop
     
     return () => clearInterval(timer);
-  }, [displayBooks.length]);
+  }, [books.length, displayBooks.length, isMobile]);
 
-  // Calculate positions for all books
+  // Calculate positions for all books (desktop only)
   const getPositionStyles = (index) => {
-    // Calculate relative position (-1, 0, 1) for (left, center, right)
+    if (isMobile) return {};
+    
     const relativePosition = ((index - currentIndex + displayBooks.length) % displayBooks.length);
     
-    // Only show 3 books at a time
     if (relativePosition > 1 && relativePosition < displayBooks.length - 1) {
       return { display: 'none' };
     }
@@ -58,27 +81,23 @@ const BookShowcase = ({ books = [] }) => {
     let rotateY = 0;
     
     if (relativePosition === 0) {
-      // Center book
       xPos = 0;
       scale = 1.1;
       zIndex = 3;
       rotateY = 0;
     } else if (relativePosition === 1) {
-      // Right book
       xPos = 250;
       scale = 0.8;
       zIndex = 1;
       opacity = 0.8;
       rotateY = -8;
     } else if (relativePosition === displayBooks.length - 1) {
-      // Left book
       xPos = -250;
       scale = 0.8;
       zIndex = 1;
       opacity = 0.8;
       rotateY = 8;
     } else {
-      // Hidden books
       opacity = 0;
     }
     
@@ -89,7 +108,7 @@ const BookShowcase = ({ books = [] }) => {
     };
   };
 
-  // Create springs for each book - always create exactly 3
+  // Create springs for each book (desktop only)
   const spring1 = useSpring({
     to: getPositionStyles(0),
     config: { 
@@ -128,44 +147,68 @@ const BookShowcase = ({ books = [] }) => {
 
   const bookSprings = [spring1, spring2, spring3];
 
+  if (displayBooks.length === 0) return null;
+
   return (
     <div className="book-showcase-container">
       <div className="book-showcase">
-        {displayBooks.map((book, index) => {
-          const id = book.id || index;
-          const title = book.title || 'Unknown Title';
-          
-          // Always use static cover image based on book ID
-          const getStaticCoverImage = () => {
-            const coverImages = [
-              '/assets/books/blue_cpp.png',
-              '/assets/books/yellow_cpp.png', 
-              '/assets/books/cpp_stevens.jpg'
-            ];
-            return coverImages[id % coverImages.length];
-          };
-          
-          return (
-            <animated.div 
-              key={id} 
-              className="showcase-book-wrapper"
-              style={bookSprings[index]}
+        {isMobile ? (
+          // Mobile view - show one book at a time with fade
+          <animated.div 
+            key={currentIndex}
+            className={`showcase-book-wrapper ${isFading ? 'fade-out' : 'fade-in'}`}
+            style={{
+              transform: 'translateX(0) scale(1)'
+            }}
+          >
+            <Link 
+              to={`/book/${displayBooks[currentIndex]?.id || 0}`} 
+              className="showcase-book"
             >
-              <Link 
-                to={`/book/${id}`} 
-                className="showcase-book"
+              <img 
+                src={getStaticCoverImage(displayBooks[currentIndex]?.id || 0)} 
+                alt={displayBooks[currentIndex]?.title || 'Unknown Title'} 
+              />
+            </Link>
+          </animated.div>
+        ) : (
+          // Desktop view - show sliding books
+          displayBooks.map((book, index) => {
+            const id = book.id || index;
+            const title = book.title || 'Unknown Title';
+            
+            return (
+              <animated.div 
+                key={id} 
+                className="showcase-book-wrapper"
+                style={bookSprings[index]}
               >
-                <img 
-                  src={getStaticCoverImage()} 
-                  alt={title} 
-                />
-              </Link>
-            </animated.div>
-          );
-        })}
+                <Link 
+                  to={`/book/${id}`} 
+                  className="showcase-book"
+                >
+                  <img 
+                    src={getStaticCoverImage(id)} 
+                    alt={title} 
+                  />
+                </Link>
+              </animated.div>
+            );
+          })
+        )}
       </div>
     </div>
   );
+};
+
+// Helper function for cover images
+const getStaticCoverImage = (id) => {
+  const coverImages = [
+    '/assets/books/blue_cpp.png',
+    '/assets/books/yellow_cpp.png', 
+    '/assets/books/cpp_stevens.jpg'
+  ];
+  return coverImages[id % coverImages.length];
 };
 
 const SearchResults = ({ results, closeSearch }) => {
@@ -292,23 +335,7 @@ const LibraryHome = () => {
         </div>
       )}
       
-      <header className="nav-header">
-        <div className="logo">
-          <img src="assets/images/logo.png" alt="ENSIA Library Logo" />
-        </div>
-        <nav className="main-nav">
-          <ul>
-            <li><a href="#">News</a></li>
-            <li><a href="#">The School</a></li>
-            <li><a href="#">Study</a></li>
-            <li><a href="#">Research</a></li>
-            <li><a href="#">Cooperation</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Connect</a></li>
-          </ul>
-        </nav>
-      </header>
+      <NavHeader />
 
       {showMainContent && (
         <section className="hero-section">
