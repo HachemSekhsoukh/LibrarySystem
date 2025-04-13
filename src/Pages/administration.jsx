@@ -2,10 +2,24 @@ import React, { useState, useEffect } from "react";
 import Table from "../components/Table";
 import Button from '../components/Button';
 import Popup from "../components/Popup";
-import { TextField, Snackbar, Alert, CircularProgress } from "@mui/material";
+import {
+  TextField,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl
+} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../CSS/administration.css";
-import { fetchAllStaff, addStaffMember, fetchStaffTypes, addStaffType } from "../utils/api";
+import {
+  fetchAllStaff,
+  addStaffMember,
+  fetchStaffTypes,
+  addStaffType
+} from "../utils/api";
 
 const Administration = () => {
   const [staffTypesData, setStaffTypesData] = useState([]);
@@ -16,9 +30,11 @@ const Administration = () => {
   const [newStaff, setNewStaff] = useState({
     name: "",
     email: "",
+    password: "",
     phone: "",
     address: "",
-    birthdate: ""
+    birthdate: "",
+    staff_type_id: ""
   });
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
@@ -31,7 +47,7 @@ const Administration = () => {
     { label: "ID", key: "id" },
     { label: "Type", key: "name" },
   ];
-  
+
   const columns = [
     { label: "ID", key: "id" },
     { label: "Name", key: "name" },
@@ -40,6 +56,7 @@ const Administration = () => {
     { label: "Address", key: "address" },
     { label: "Birthdate", key: "birthdate" }
   ];
+
   const fetchStaffData = async () => {
     setLoading(true);
     const result = await fetchAllStaff();
@@ -56,12 +73,12 @@ const Administration = () => {
     }
     setLoading(false);
   };
-  
+
   const fetchStaffTypesData = async () => {
     setLoading(true);
     try {
       const result = await fetchStaffTypes();
-      
+
       if (Array.isArray(result)) {
         const formatted = result.map((type) => ({
           id: type.id,
@@ -84,21 +101,21 @@ const Administration = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchStaffData();
     fetchStaffTypesData();
   }, []);
-    
-  
+
   const handleTypeChange = (e) => {
     setNewStaffType({ ...newStaffType, [e.target.name]: e.target.value });
   };
-  
+
   const handleAddStaffType = async () => {
     setLoading(true);
     try {
       const response = await addStaffType(newStaffType);
-  
+
       if (response?.success) {
         setSnackbar({
           open: true,
@@ -107,7 +124,6 @@ const Administration = () => {
         });
         setNewStaffType({ st_name: "" });
         setOpenTypePopup(false);
-  
         await fetchStaffTypesData();
       } else {
         throw new Error("Failed to add staff type");
@@ -121,7 +137,7 @@ const Administration = () => {
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   const handleChange = (e) => {
     setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
@@ -137,7 +153,7 @@ const Administration = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await addStaffMember(newStaff); 
+      const response = await addStaffMember(newStaff);
 
       if (response?.success) {
         setSnackbar({
@@ -148,9 +164,11 @@ const Administration = () => {
         setNewStaff({
           name: "",
           email: "",
+          password: "",
           phone: "",
           address: "",
-          birthdate: ""
+          birthdate: "",
+          staff_type_id: ""
         });
         setOpenPopup(false);
         await fetchStaffData();
@@ -175,11 +193,11 @@ const Administration = () => {
           <div className="loader"></div>
         ) : (
           <>
-            <Table 
-              columns={columns} 
-              data={staffData} 
-              showActions={true} 
-              title={"Staff Members"} 
+            <Table
+              columns={columns}
+              data={staffData}
+              showActions={true}
+              title={"Staff Members"}
             />
             <div className="bottom-buttons">
               <Button
@@ -193,17 +211,17 @@ const Administration = () => {
           </>
         )}
       </div>
-      
+
       <div className="recent-transactions-container">
         {loading ? (
           <div className="loader"></div>
         ) : (
           <>
-            <Table 
-              columns={staffTypesColumns} 
-              data={staffTypesData} 
-              showActions={true} 
-              title={"Staff Types"} 
+            <Table
+              columns={staffTypesColumns}
+              data={staffTypesData}
+              showActions={true}
+              title={"Staff Types"}
             />
             <div className="bottom-buttons">
               <Button
@@ -218,6 +236,7 @@ const Administration = () => {
         )}
       </div>
 
+      {/* Add Staff Type Popup */}
       <Popup
         title="Add Staff Type"
         openPopup={openTypePopup}
@@ -248,7 +267,7 @@ const Administration = () => {
         </div>
       </Popup>
 
-
+      {/* Add Staff Member Popup */}
       <Popup
         title="Add Staff Member"
         openPopup={openPopup}
@@ -256,93 +275,111 @@ const Administration = () => {
         className="staff-popup"
       >
         <div className="add-staff-form">
-        <div className="form-field-row">
-              <div className="form-field">
-                <label>Name</label>
-                <TextField
-                  className="text-field"
-                  name="name"
-                  value={newStaff.name}
-                  onChange={handleChange}
-                  variant="outlined"
-                  fullWidth
-                  placeholder="Enter name"
-                />
-              </div>
-
-              <div className="form-field">
-                <label>Email</label>
-                <TextField
+          <div className="form-field-row">
+            <div className="form-field">
+              <label>Name</label>
+              <TextField
                 className="text-field"
-                  name="email"
-                  value={newStaff.email}
-                  onChange={handleChange}
-                  variant="outlined"
-                  fullWidth
-                  placeholder="Enter email"
-                />
-              </div>
-        </div>
-          
-        <div className="form-field-row">
-              <div className="form-field">
-                <label>Password</label>
-                <TextField
-                className="text-field"
-                  name="password"
-                  value={newStaff.password}
-                  onChange={handleChange}
-                  variant="outlined"
-                  fullWidth
-                  placeholder="Enter password"
-                />
-              </div>
+                name="name"
+                value={newStaff.name}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                placeholder="Enter name"
+              />
+            </div>
 
-              <div className="form-field">
-                <label>Phone Number</label>
-                <TextField
+            <div className="form-field">
+              <label>Email</label>
+              <TextField
                 className="text-field"
-                  name="phone"
-                  value={newStaff.phone}
-                  onChange={handleChange}
-                  variant="outlined"
-                  fullWidth
-                  placeholder="Enter phone number"
-                />
-              </div>
-        </div>
-         
-        <div className="form-field-row">
-                <div className="form-field">
-                  <label>Address</label>
-                  <TextField
-                  className="text-field"
-                    name="address"
-                    value={newStaff.address}
-                    onChange={handleChange}
-                    variant="outlined"
-                    fullWidth
-                    placeholder="Enter address"
-                  />
-                </div>
+                name="email"
+                value={newStaff.email}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                placeholder="Enter email"
+              />
+            </div>
+          </div>
 
-                <div className="form-field">
-                  <label>Birthdate</label>
-                  <TextField
-                    className="text-field"
-                    name="birthdate"
-                    value={newStaff.birthdate}
-                    onChange={handleChange}
-                    variant="outlined"
-                    fullWidth
-                    placeholder="Enter birthdate"
-                    type="date"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                </div>
+          <div className="form-field-row">
+            <div className="form-field">
+              <label>Password</label>
+              <TextField
+                className="text-field"
+                name="password"
+                value={newStaff.password}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                placeholder="Enter password"
+              />
+            </div>
+
+            <div className="form-field">
+              <label>Phone Number</label>
+              <TextField
+                className="text-field"
+                name="phone"
+                value={newStaff.phone}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                placeholder="Enter phone number"
+              />
+            </div>
+          </div>
+
+          <div className="form-field-row">
+            <div className="form-field">
+              <label>Address</label>
+              <TextField
+                className="text-field"
+                name="address"
+                value={newStaff.address}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                placeholder="Enter address"
+              />
+            </div>
+
+            <div className="form-field">
+              <label>Birthdate</label>
+              <TextField
+                className="text-field"
+                name="birthdate"
+                value={newStaff.birthdate}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                type="date"
+                InputLabelProps={{ shrink: true }}
+              />
+            </div>
+          </div>
+
+        <div className="form-field">
+          <label>Staff Type</label>
+          <TextField
+            select
+            className="text-field"
+            name="staff_type_id"
+            value={newStaff.staff_type_id}
+            onChange={handleChange}
+            variant="outlined"
+            fullWidth
+            placeholder="Select staff type"
+          >
+            {staffTypesData.map((type) => (
+              <MenuItem key={type.id} value={type.id}>
+                {type.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </div>
+
 
           <div className="dialog-button-container">
             <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>
