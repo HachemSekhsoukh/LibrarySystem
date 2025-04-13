@@ -9,7 +9,12 @@ import {
   Autocomplete, 
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
@@ -25,6 +30,10 @@ const CirculationAdministration = () => {
     ut_borrow: 0
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentReaderTypeId, setCurrentReaderTypeId] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [readerTypeToDelete, setReaderTypeToDelete] = useState(null);
 
   useEffect(() => {
     fetchReaderTypes();
@@ -54,6 +63,15 @@ const CirculationAdministration = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const resetForm = () => {
+    setNewReaderType({ 
+      ut_name: "", 
+      ut_borrow: 0
+    });
+    setIsEditing(false);
+    setCurrentReaderTypeId(null);
+  };
+
   const handleAddReaderType = async () => {
     if (!newReaderType.ut_name) {
       setSnackbar({ open: true, message: "Reader type name is required", severity: "error" });
@@ -61,26 +79,89 @@ const CirculationAdministration = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/add-user-types`, {
-        method: "POST",
+      let response;
+      let endpoint = isEditing 
+        ? `${API_BASE_URL}api/user-types/${currentReaderTypeId}` 
+        : `${API_BASE_URL}api/user-types`;
+
+      let method = isEditing ? "PUT" : "POST";
+      
+      response = await fetch(endpoint, {
+        method: method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newReaderType),
       });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add reader type");
+        throw new Error(errorData.error || `Failed to ${isEditing ? 'update' : 'add'} reader type`);
       }
 
-      setSnackbar({ open: true, message: "Reader type added successfully", severity: "success" });
+      const result = await response.json();
+      setSnackbar({ 
+        open: true, 
+        message: isEditing ? "Reader type updated successfully" : "Reader type added successfully", 
+        severity: "success" 
+      });
       setOpenPopup(false);
-      setNewReaderType({ ut_name: "", ut_borrow: 0 });
+      resetForm();
       
       // Refresh the reader types list
       fetchReaderTypes();
     } catch (error) {
-      console.error("Error adding reader type:", error);
-      setSnackbar({ open: true, message: error.message || "Error adding reader type", severity: "error" });
+      console.error(`Error ${isEditing ? 'updating' : 'adding'} reader type:`, error);
+      setSnackbar({ open: true, message: error.message || `Error ${isEditing ? 'updating' : 'adding'} reader type`, severity: "error" });
+    }
+  };
+
+  const handleEdit = (readerType) => {
+    setCurrentReaderTypeId(readerType.id);
+    setNewReaderType({
+      ut_name: readerType.name,
+      ut_borrow: readerType.borrow
+    });
+    setIsEditing(true);
+    setOpenPopup(true);
+  };
+
+  const handleDelete = (readerType) => {
+    setReaderTypeToDelete(readerType);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}api/user-types/${readerTypeToDelete.id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setSnackbar({
+          open: true,
+          message: "Reader type deleted successfully!",
+          severity: "success"
+        });
+        fetchReaderTypes(); // Refresh the list
+      } else {
+        throw new Error(result.error || "Failed to delete reader type");
+      }
+    } catch (error) {
+      console.error("Error deleting reader type:", error);
+      setSnackbar({
+        open: true,
+        message: `Failed to delete reader type: ${error.message}`,
+        severity: "error"
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setReaderTypeToDelete(null);
     }
   };
 
@@ -94,15 +175,32 @@ const CirculationAdministration = () => {
     <div className="circulation-administration-page">
       <div className="container">
         <div id="table">
-          <Table columns={columns} data={readerTypes} showActions={true} title={"Reader Types"} loading={loading} />
+          <Table 
+            columns={columns} 
+            data={readerTypes} 
+            showActions={true} 
+            title={"Reader Types"} 
+            loading={loading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         </div>
         <div className="bottom-buttons">
-          <Button onClick={() => setOpenPopup(true)} label="Add New Reader Type" lightBackgrnd={false} icon={<AddIcon />} size="large" />
+          <Button 
+            onClick={() => {
+              resetForm();
+              setOpenPopup(true);
+            }} 
+            label="Add New Reader Type" 
+            lightBackgrnd={false} 
+            icon={<AddIcon />} 
+            size="large" 
+          />
         </div>
       </div>
       
-      {/* Add New Reader Type Popup */}
-      <Popup title="Add New Reader Type" openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      {/* Add/Edit Reader Type Popup */}
+      <Popup title={isEditing ? "Edit Reader Type" : "Add New Reader Type"} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <div className="add-reader-type-form">
           <div className="form-row">
             <div className="form-group">
@@ -130,11 +228,33 @@ const CirculationAdministration = () => {
           </div>
 
           <div className="dialog-button-container">
-            <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>Cancel</button>
-            <button className="dialog-save-button" onClick={handleAddReaderType}>Save</button>
+            <button className="dialog-cancel-button" onClick={() => {
+              resetForm();
+              setOpenPopup(false);
+            }}>Cancel</button>
+            <button className="dialog-save-button" onClick={handleAddReaderType}>
+              {isEditing ? 'Update' : 'Save'}
+            </button>
           </div>
         </div>
       </Popup>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete the reader type "{readerTypeToDelete?.name}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+        </DialogActions>
+      </Dialog>
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>{snackbar.message}</Alert>

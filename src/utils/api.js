@@ -369,3 +369,52 @@ export const addStaffMember = async (staffData) => {
     return { success: false, message: error.message };
   }
 };
+
+
+export const fetchStaffTypes = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/staff-types`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch staff types");
+    }
+
+    const data = await response.json();
+    
+    // Since the API returns an array directly, we can return it as is
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Failed to fetch staff types", error);
+    return [];
+  }
+};
+
+export const addStaffType = async (data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/staff-types`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to add staff type");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Failed to add staff type", error);
+    return { success: false, message: error.message };
+  }
+};

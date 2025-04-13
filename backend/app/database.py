@@ -71,6 +71,49 @@ def add_user_type(user_type_data):
         print(f"Error adding user type: {e}")
         return {'success': False, 'error': str(e)}
 
+def delete_user_type(user_type_id):
+    """
+    Delete a user type from the database by its ID.
+    :param user_type_id: The ID of the user type to delete.
+    """
+    try:
+        response = supabase.from_("User_type").delete().eq("ut_id", user_type_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'User type deleted successfully'}
+        else:
+            return {'success': False, 'error': 'User type not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting user type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_user_type(user_type_id, user_type_data):
+    """
+    Update a user type in the database.
+    :param user_type_id: The ID of the user type to update.
+    :param user_type_data: Dictionary containing updated user type details.
+    """
+    try:
+        response = supabase.from_("User_type").update(user_type_data).eq("ut_id", user_type_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'user_type': response.data[0],
+                'message': 'User type updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'User type not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating user type: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
 def add_reader(reader_data):
     """
     Add a new reader to the database.
@@ -220,6 +263,49 @@ def add_resource_type(resource_type_data):
         print(f"Error adding resource type: {e}")
         return {'success': False, 'error': str(e)}
 
+def delete_resource_type(resource_type_id):
+    """
+    Delete a resource type from the database by its ID.
+    :param resource_type_id: The ID of the resource type to delete.
+    """
+    try:
+        response = supabase.from_("Resource_type").delete().eq("rt_id", resource_type_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Resource type deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Resource type not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting resource type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_resource_type(resource_type_id, resource_type_data):
+    """
+    Update a resource type in the database.
+    :param resource_type_id: The ID of the resource type to update.
+    :param resource_type_data: Dictionary containing updated resource type details.
+    """
+    try:
+        response = supabase.from_("Resource_type").update(resource_type_data).eq("rt_id", resource_type_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'resource_type': response.data[0],
+                'message': 'Resource type updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Resource type not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating resource type: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
 def add_resource(resource_data):
     """
     Add a new resource (book) to the database.
@@ -240,6 +326,49 @@ def add_resource(resource_data):
             }
     except Exception as e:
         print(f"Error adding resource: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def delete_resource(resource_id):
+    """
+    Delete a resource from the database by its ID.
+    :param resource_id: The ID of the resource to delete.
+    """
+    try:
+        response = supabase.from_("Resource").delete().eq("r_id", resource_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Resource deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Resource not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting resource: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_resource(resource_id, resource_data):
+    """
+    Update a resource in the database.
+    :param resource_id: The ID of the resource to update.
+    :param resource_data: Dictionary containing updated resource details.
+    """
+    try:
+        response = supabase.from_("Resource").update(resource_data).eq("r_id", resource_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'resource': response.data[0],
+                'message': 'Resource updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Resource not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating resource: {e}")
         return {
             'success': False,
             'error': str(e)
@@ -547,7 +676,86 @@ def get_all_staff_members():
     except Exception as e:
         print(f"Error fetching staff members: {e}")
         return []
-    
+
+
+def get_staff_types():
+    """
+    Retrieve all staff types from the database.
+    """
+    try:
+        response = supabase.from_("Staff_type").select("st_id, st_name").execute()
+
+        resource_types = [{
+            'id': resource_type['st_id'],
+            'name': resource_type['st_name']
+        } for resource_type in response.data]
+
+        return resource_types
+    except Exception as e:
+        print(f"Error fetching resource types: {e}")
+        return []
+
+
+def add_staff_type(staff_type_data):
+    """
+    Add a new staff type to the database.
+    :param staff_type_data: Dictionary containing staff type details.
+    """
+    try:
+        response = supabase.from_("Staff_type").insert(staff_type_data).execute()
+
+        if response.data:
+            return {'success': True, 'staff_type': response.data[0]}
+        else:
+            return {'success': False, 'error': 'Failed to add staff type'}
+    except Exception as e:
+        print(f"Error adding staff type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def delete_staff_type(staff_type_id):
+    """
+    Delete a staff type from the database by its ID.
+    :param staff_type_id: The ID of the staff type to delete.
+    """
+    try:
+        response = supabase.from_("Staff_type").delete().eq("st_id", staff_type_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Staff type deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Staff type not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting staff type: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_staff_type(staff_type_id, staff_type_data):
+    """
+    Update a staff type in the database.
+    :param staff_type_id: The ID of the staff type to update.
+    :param staff_type_data: Dictionary containing updated staff type details.
+    """
+    try:
+        response = supabase.from_("Staff_type").update(staff_type_data).eq("st_id", staff_type_id).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'staff_type': response.data[0],
+                'message': 'Staff type updated successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Staff type not found or could not be updated'
+            }
+    except Exception as e:
+        print(f"Error updating staff type: {e}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+
 def add_staff_member(data):
     """
     Add a new staff member to the Staff table.
