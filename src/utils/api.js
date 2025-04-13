@@ -370,6 +370,31 @@ export const addStaffMember = async (staffData) => {
   }
 };
 
+export async function checkAuthStatus() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/status`, {
+      method: 'GET',
+      credentials: 'include', // VERY IMPORTANT: ensures cookies are sent
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      // Token is invalid or missing
+      return { authenticated: false };
+    }
+
+    const data = await response.json();
+    return data; // Should include { authenticated: true, email: ... }
+
+  } catch (error) {
+    console.error('Error checking auth status:', error);
+    return { authenticated: false };
+  }
+}
+
+
 
 export const fetchStaffTypes = async () => {
   try {

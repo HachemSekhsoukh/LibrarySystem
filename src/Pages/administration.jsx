@@ -10,7 +10,7 @@ import {
   MenuItem,
   Select,
   InputLabel,
-  FormControl
+  FormControl, Checkbox, FormControlLabel, Grid
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../CSS/administration.css";
@@ -42,6 +42,23 @@ const Administration = () => {
     message: "",
     severity: "success"
   });
+
+  // Example checkbox options
+  const checkboxOptions = [
+    "Can View",
+    "Can Edit",
+    "Can Delete",
+    "Can Create",
+    "Can Manage Users",
+    "Can Export Data",
+  ];
+
+  const [checkboxValues, setCheckboxValues] = useState({});
+
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setCheckboxValues((prev) => ({ ...prev, [name]: checked }));
+  };
 
   const staffTypesColumns = [
     { label: "ID", key: "id" },
@@ -256,16 +273,37 @@ const Administration = () => {
             />
           </div>
 
-          <div className="dialog-button-container">
-            <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>
-              Cancel
-            </button>
-            <button className="dialog-save-button" onClick={handleAddStaffType} disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : "Save"}
-            </button>
-          </div>
-        </div>
-      </Popup>
+    {/* Checkboxes in grid */}
+    <div className="form-field">
+        <label>Privelages:</label>
+        <Grid container spacing={1}>
+          {checkboxOptions.map((option, index) => (
+            <Grid item xs={6} key={index}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name={option}
+                    checked={!!checkboxValues[option]}
+                    onChange={handleCheckboxChange}
+                  />
+                }
+                label={option}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </div>
+
+      <div className="dialog-button-container">
+        <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>
+          Cancel
+        </button>
+        <button className="dialog-save-button" onClick={handleAddStaffType} disabled={loading}>
+          {loading ? <CircularProgress size={24} /> : "Save"}
+        </button>
+      </div>
+    </div>
+  </Popup>
 
       {/* Add Staff Member Popup */}
       <Popup
