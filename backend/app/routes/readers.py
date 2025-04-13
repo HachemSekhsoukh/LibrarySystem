@@ -1,7 +1,7 @@
 from flask import jsonify, request
 import supabase
 from app import app
-from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db
+from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type,
 
 @app.route('/api/readers', methods=['GET'])
 def readers():
@@ -119,7 +119,6 @@ def update_reader_status(reader_id):
     
     return jsonify(result), (200 if result['success'] else 400)
 
-
 @app.route('/api/readers/<int:reader_id>', methods=['DELETE'])
 def remove_reader(reader_id):
     """
@@ -127,4 +126,29 @@ def remove_reader(reader_id):
     """
     result = delete_reader(reader_id)
     return jsonify(result), (200 if result['success'] else 400)
+
+@app.route('/api/readers/<int:reader_id>', methods=['PUT'])
+def update_reader_endpoint(reader_id):
+    """
+    API endpoint to update a reader by ID
+    """
+    data = request.json
+    
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    # Check for required fields
+    required_fields = ['u_name', 'u_email', 'u_birthDate', 'u_phone']
+    missing_fields = [field for field in required_fields if field not in data or not data[field]]
+    
+    if missing_fields:
+        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+    
+    # Update the reader
+    result = update_reader(reader_id, data)
+    
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
 

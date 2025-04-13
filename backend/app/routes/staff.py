@@ -16,6 +16,7 @@ def get_all_staff():
 @jwt_required()
 def handle_add_staff():
     data = request.get_json()
+    print(data)
     result, status_code = add_staff_member(data)
     return jsonify(result), status_code
 
