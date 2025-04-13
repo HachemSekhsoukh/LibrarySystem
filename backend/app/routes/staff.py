@@ -22,6 +22,7 @@ def handle_add_staff():
 
 
 @app.route('/api/staff-types', methods=['GET'])
+@jwt_required()
 def staff_types():
     """
     API endpoint to retrieve all staff types
@@ -30,6 +31,7 @@ def staff_types():
     return jsonify(staff_type_list)
 
 @app.route('/api/staff-types', methods=['POST'])
+@jwt_required()
 def add_staff_type_endpoint():
     """
     API endpoint to add a new staff type
@@ -55,6 +57,7 @@ def add_staff_type_endpoint():
         return jsonify(result), 400
 
 @app.route('/api/staff-types/<int:staff_type_id>', methods=['DELETE'])
+@jwt_required()
 def remove_staff_type(staff_type_id):
     """
     API endpoint to delete a resource type by ID
@@ -63,6 +66,7 @@ def remove_staff_type(staff_type_id):
     return jsonify(result), (200 if result['success'] else 400)
 
 @app.route('/api/staff-types/<int:staff_type_id>', methods=['PUT'])
+@jwt_required()
 def update_staff_type_endpoint(staff_type_id):
     """
     API endpoint to update a staff type by ID
