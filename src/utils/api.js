@@ -443,3 +443,75 @@ export const addStaffType = async (data) => {
     return { success: false, message: error.message };
   }
 };
+
+
+export const fetchStats = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/stats`,{
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+    });
+    console.log(res)
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error);
+    return null;
+  }
+};
+
+
+export const fetchReaders = async () => {
+  const response = await fetch(`${API_BASE_URL}/readers`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch readers');
+  }
+  return await response.json();
+};
+
+
+export const fetchTransactions = async () => {
+  const response = await fetch(`${API_BASE_URL}/transactions`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch transactions");
+  }
+  return await response.json();
+};
+
+export const createTransaction = async (payload) => {
+  const response = await fetch(`${API_BASE_URL}/transactions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to create transaction');
+  }
+
+  return await response.json();
+};
+
+export const fetchMonthlyBorrows = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/stats/monthly-borrows`,{
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+    });
+    const data = await res.json();
+    return data; // Expected: [{ month: "Jan", borrows: 40 }, ...]
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
