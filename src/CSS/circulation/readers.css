@@ -1,167 +1,30 @@
 .container{
-  height: 85vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: baseline;
-  align-items: center;
-  border-radius: 25px;
-  background-color: var(--secondary-background-color);
-  width: 100%;
-  margin-top: 1rem;
-  font-weight: bold;
-  font-style: bold;
-  font-family: "Inter";
-  padding-top: 0.3rem;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    align-items: center;
+    border-radius: 25px;
+    background-color: var(--secondary-background-color);
+    width: 100%;
+    margin-top: 1rem;
+    font-weight: bold;
+    font-style: bold;
+    font-family: "Inter";
+    padding-top: 0.3rem;
 }
 
 .bottom-buttons{
-  width: 95%;
-  margin-top: 0;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: right;
+    width: 95%;
+    margin-top: 0;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
 }
 
 #table{
-  width: 98%;
-  height: 90%;
-}
-
-.verify-readers-container {
-padding: 16px;
-width: 100%;
-}
-
-.verify-actions {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-top: 16px;
-padding: 0 16px;
-}
-
-.selected-count {
-font-size: 14px;
-color: #666;
-}
-
-.loading-message, .no-readers-message {
-padding: 24px;
-text-align: center;
-color: #666;
-}
-
-/* Popup title bar with close button */
-.popup-title-bar {
-display: flex;
-justify-content: space-between;
-align-items: center;
-width: 100%;
-}
-
-.popup-header {
-display: flex;
-justify-content: flex-end;
-padding: 8px;
-}
-
-.close-button {
-background: none;
-border: none;
-font-size: 24px;
-cursor: pointer;
-color: #666;
-}
-
-
-/* Make sure checkboxes are visible */
-input[type="checkbox"] {
-width: 16px;
-height: 16px;
-margin: 0;
-padding: 0;
-visibility: visible;
-opacity: 1;
-}
-
-/* Make sure checkboxes are visible */
-.verify-readers-container input[type="checkbox"] {
-width: 18px;
-height: 18px;
-margin: 0;
-padding: 0;
-visibility: visible !important;
-opacity: 1 !important;
-position: relative !important;
-display: inline-block !important;
-pointer-events: auto !important;
-appearance: auto !important;
--webkit-appearance: checkbox !important;
-}
-
-/* Style for the popup header and close button */
-.popup-header {
-display: flex;
-justify-content: flex-end;
-padding: 8px;
-}
-
-/* Close button styles */
-.popup-header {
-display: flex;
-justify-content: flex-end;
-padding: 8px;
-position: relative;
-}
-
-.close-button {
-background: none;
-border: none;
-font-size: 24px;
-cursor: pointer;
-color: var(--primary-color);
-font-weight: bold;
-}
-
-.close-button:hover {
-opacity: 0.8;
-}
-
-/* Style for verify actions section */
-.verify-actions {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-top: 20px;
-padding: 10px;
-}
-
-.verify-buttons {
-display: flex;
-gap: 10px;
-}
-
-.verify-button, .reject-button {
-padding: 8px 16px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-font-weight: bold;
-}
-
-.verify-button {
-background-color: var(--primary-color);
-color: white;
-}
-
-.reject-button {
-background-color: #f44336;
-color: white;
-}
-
-.verify-button:disabled, .reject-button:disabled {
-opacity: 0.6;
-cursor: not-allowed;
+    width: 98%;
+    height: 90%;
 }

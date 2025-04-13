@@ -1,30 +1,18 @@
 import React, { useState } from "react";
 import DataTable from "react-data-table-component";
-import "../CSS/components/table.css";
+import "../CSS/components/table.css"; // Keep original styles
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [] }) => {
+const Table = ({ columns, data, showActions = false , title}) => {
   const [searchText, setSearchText] = useState("");
-  
-  // Convert columns to DataTable format while preserving custom renderers
-  const formattedColumns = columns.map((col) => {
-    // Base column definition
-    const formattedCol = {
-      name: col.label,
-      sortable: true,
-    };
-    
-    // If the column has a custom render function, use it
-    if (col.render) {
-      formattedCol.cell = (row) => col.render(row[col.key], row);
-    } else {
-      // Otherwise use standard selector
-      formattedCol.selector = (row) => row[col.key];
-    }
-    
-    return formattedCol;
-  });
+
+  // Convert columns to DataTable format
+  const formattedColumns = columns.map((col) => ({
+    name: col.label,
+    selector: (row) => row[col.key],
+    sortable: true,
+  }));
 
   // Add action column if needed
   if (showActions) {
@@ -50,7 +38,7 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
   // Filter data based on search text
   const filteredData = data.filter((row) =>
     Object.values(row).some((value) =>
-      value?.toString().toLowerCase().includes(searchText.toLowerCase())
+      value.toString().toLowerCase().includes(searchText.toLowerCase())
     )
   );
 
@@ -62,15 +50,15 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
         fontWeight: "bold",
         fontSize: "1.1rem",
         color: "var(--primary-color)",
-        borderTopLeftRadius: "15px",
-        borderTopRightRadius: "15px",
+        borderTopLeftRadius: "15px", // Rounded top-left corner
+        borderTopRightRadius: "15px", // Rounded top-right corner
       },
     },
     rows: {
       style: {
         fontSize: "0.9rem",
         borderBottom: "1px solid #ddd",
-        backgroundColor: "transparent",
+        backgroundColor: "transparent", // Make data rows background transparent
       },
     },
     cells: {
@@ -84,17 +72,6 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
         justifyContent: "center",
         alignItems: "center",
         marginTop: "20px",
-      },
-    },
-    // Make sure checkboxes are visible
-    checkbox: {
-      style: {
-        width: "18px",
-        height: "18px",
-        opacity: "1",
-        visibility: "visible",
-        pointerEvents: "auto",
-        cursor: "pointer",
       },
     },
   };
@@ -116,13 +93,14 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
             />
           </div>
         </div>
+        
         <DataTable
           columns={formattedColumns}
-          data={filteredData}
+          data={filteredData} // Use filtered data for the table
           customStyles={customStyles}
           pagination
           highlightOnHover
-          striped={false}
+          striped={false} // Disable alternating row colors
         />
       </div>
     </div>
@@ -130,3 +108,4 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
 };
 
 export default Table;
+

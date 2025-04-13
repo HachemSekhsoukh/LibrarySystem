@@ -1,23 +1,14 @@
 from flask import jsonify, request
-import supabase
 from app import app
-from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db
+from app.database import get_readers, add_reader, delete_reader, get_user_types, add_user_type, add_resource_type
 
 @app.route('/api/readers', methods=['GET'])
 def readers():
     """
     API endpoint to retrieve all readers.
     """
-    reader_list = get_readers_by_status()
+    reader_list = get_readers()
     return jsonify(reader_list)
-
-@app.route('/api/pending-readers', methods=['GET'])
-def pending_readers():
-    """
-    API endpoint to retrieve pending readers.
-    """
-    pending_reader_list = get_readers_by_status(0)
-    return jsonify(pending_reader_list)
 
 @app.route("/api/user-types", methods=["GET"])
 def user_types():
@@ -104,20 +95,6 @@ def add_new_reader():
         return jsonify(result), 200
     else:
         return jsonify(result), 400
-    
-
-@app.route('/api/update-readers/<int:reader_id>/status', methods=['PATCH'])
-def update_reader_status(reader_id):
-    data = request.get_json()
-    print("Received data:", data)  # Debug log
-
-    if not data or 'status' not in data:
-        return jsonify({'success': False, 'error': 'Missing status in request body'}), 400
-
-    new_status = data['status']
-    result = update_reader_status_in_db(reader_id, new_status)
-    
-    return jsonify(result), (200 if result['success'] else 400)
 
 
 @app.route('/api/readers/<int:reader_id>', methods=['DELETE'])
