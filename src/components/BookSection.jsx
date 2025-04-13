@@ -14,7 +14,7 @@ const BookSection = ({ title, books, showViewAll = true, number = 5}) => {
       {showViewAll && (
         <button
           onClick={() => navigate('/view-all')}
-          className="back-button"
+          className="view-all"
           type="button"
         >
           view all <FaArrowRight />
