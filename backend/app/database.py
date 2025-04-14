@@ -257,7 +257,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation,r_description,r_type, "
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type, "
             "Resource_type(rt_name)"
         ).execute()
         status_map = {
@@ -275,6 +275,7 @@ def get_resources():
             'cote': resource['r_cote'],
             'receivingDate': resource['r_receivingDate'],
             'status': resource['r_status'],
+            'numofborrows': resource['r_num_of_borrows'],
             'observation': resource['r_observation'],
             'type': resource['r_type'],
             'description': resource['r_description'],
@@ -433,43 +434,10 @@ def update_resource(resource_id, resource_data):
             'error': str(e)
         }
 
-def create_transaction(reader_id, book_id, transaction_type='Borrow'):
-    """
-    Create a new transaction (exemplaire) in the database
-    """
-    try:
-        # Create transaction data
-        transaction_data = {
-            'reader_id': reader_id,
-            'book_id': book_id,
-            'transaction_type': transaction_type,
-            'transaction_date': datetime.datetime.now().isoformat()
-        }
-        
-        # Insert into the transactions table
-        # Note: Replace 'transactions' with your actual table name
-        response = supabase.from_("transactions").insert(transaction_data).execute()
-        
-        if response.data:
-            return {
-                'success': True,
-                'transaction': response.data[0]
-            }
-        else:
-            return {
-                'success': False,
-                'error': 'Failed to create transaction'
-            }
-    except Exception as e:
-        print(f"Error creating transaction: {e}")
-        return {
-            'success': False,
-            'error': str(e)
-        }
-
 def create_reservation(user_id, resource_id, transaction_type):
     """
-    Create a new reservation in the database
+    Create a new reservation in the database and increment the
+    number of borrows for the resource in the Resource table.
     """
     try:
         # First, get the latest res_id to increment it
@@ -500,10 +468,43 @@ def create_reservation(user_id, resource_id, transaction_type):
         response = supabase.from_("Reservation").insert(reservation_data).execute()
         
         if response.data:
-            return {
-                'success': True,
-                'reservation': response.data[0]
-            }
+            # If the transaction type is "Borrow", increment the r_num_of_borrows in the Resource table
+            if transaction_type == "Borrow":
+                # Fetch the current number of borrows for the resource
+                resource_data = supabase.from_("Resource").select("r_num_of_borrows").eq('r_id', resource_id).execute()
+
+                if resource_data.data and len(resource_data.data) > 0:
+                    current_borrows = resource_data.data[0]['r_num_of_borrows']
+
+                    # Increment the borrow count
+                    updated_borrows = current_borrows + 1
+
+                    # Update the resource with the new borrow count
+                    update_response = supabase.from_("Resource").update(
+                        {'r_num_of_borrows': updated_borrows}
+                    ).eq('r_id', resource_id).execute()
+
+                    if update_response.data:
+                        return {
+                            'success': True,
+                            'reservation': response.data[0],
+                            'message': 'Reservation created and borrow count updated successfully'
+                        }
+                    else:
+                        return {
+                            'success': False,
+                            'error': 'Failed to update borrow count in Resource table'
+                        }
+                else:
+                    return {
+                        'success': False,
+                        'error': 'Failed to fetch resource data'
+                    }
+            else:
+                return {
+                    'success': True,
+                    'reservation': response.data[0]
+                }
         else:
             return {
                 'success': False,
@@ -514,7 +515,9 @@ def create_reservation(user_id, resource_id, transaction_type):
         return {
             'success': False,
             'error': str(e)
-        } 
+        }
+
+
     
 def login(email, password):
     """
@@ -1120,3 +1123,25 @@ def update_reader(reader_id, reader_data):
     except Exception as e:
         print(f"Error updating reader: {e}")
         return {'success': False, 'error': str(e)}
+
+
+def get_most_borrowed_resources(limit=5):
+    """
+    Fetch the most borrowed resources from the Resource table.
+    Returns a list of dictionaries with resource info sorted by r_num_of_borrows.
+    """
+    try:
+        response = supabase.table("Resource") \
+            .select("r_id,r_author ,r_title, r_cote, r_type, r_num_of_borrows") \
+            .order("r_num_of_borrows", desc=True) \
+            .limit(limit) \
+            .execute()
+        print(response)
+
+        if response.data:
+            return response.data
+        else:
+            return []
+    except Exception as e:
+        print("Error fetching most borrowed resources:", e)
+        return []

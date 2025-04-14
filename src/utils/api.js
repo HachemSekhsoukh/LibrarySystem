@@ -515,3 +515,22 @@ export const fetchMonthlyBorrows = async () => {
     return [];
   }
 };
+
+// api.js
+
+export const fetchMostBorrowedBooks = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/stats/most-borrowed-books`,{
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: "include",
+    });
+    const data = await response.json();
+    return data; // Returning the list of most borrowed books
+  } catch (error) {
+    console.error("Error fetching most borrowed books:", error);
+    return [];
+  }
+};
+
