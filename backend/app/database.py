@@ -23,7 +23,7 @@ def get_readers_by_status(status=1):
         user_response = (
             supabase
             .from_("User")
-            .select("u_id, u_name, u_email, u_birthDate, u_phone, u_type, u_status")
+            .select("u_id, u_name, u_email, u_birthDate, u_phone, User_type (ut_name), u_status")
             .eq("u_status", status)
             .execute()
         )
@@ -34,7 +34,7 @@ def get_readers_by_status(status=1):
             'email': user['u_email'],
             'birthDate': user['u_birthDate'],
             'phone': user['u_phone'],
-            'type': user['u_type'],
+            'type': user['User_type']['ut_name'],
             'status': user['u_status']
         } for user in user_response.data]
         
@@ -52,7 +52,8 @@ def get_readers():
     try:
         
         # Then get all users with that user_type
-        user_response = supabase.from_("User").select("u_id, u_name, u_email, u_birthDate, u_phone, u_type").execute()
+        user_response = supabase.from_("User").select("""u_id, u_name, u_email, u_birthDate, u_phone, User_type (ut_name)""").execute()
+
         
         # Transform the response to a simpler format
         readers = [{
@@ -61,7 +62,7 @@ def get_readers():
             'email': user['u_email'],
             'birthDate': user['u_birthDate'],
             'phone': user['u_phone'],
-            'type': user['u_type']
+            'type': user['User_type']['ut_name']
         } for user in user_response.data]
         
         return readers
@@ -256,9 +257,13 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation, r_type, r_description"
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation,r_description,r_type, "
+            "Resource_type(rt_name)"
         ).execute()
-
+        status_map = {
+            0:"Not Available",
+            1:"Available",
+        }
         resources = [{
             'id': resource['r_id'],
             'inventoryNum': resource['r_inventoryNum'],
@@ -272,7 +277,9 @@ def get_resources():
             'status': resource['r_status'],
             'observation': resource['r_observation'],
             'type': resource['r_type'],
-            'description': resource['r_description']
+            'description': resource['r_description'],
+            'type_name': resource['Resource_type']['rt_name'] if resource.get('Resource_type') else None,
+            'status_name': status_map.get(resource['r_status'], "Unknown")  # Map status to name
         } for resource in response.data]
 
         return resources
