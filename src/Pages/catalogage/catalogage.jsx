@@ -218,8 +218,8 @@ const Catalogage = () => {
     { label: "ID", key: "id" },
     { label: "Title", key: "title" },
     { label: "Author", key: "author" },
-    { label: "Type", key: "type" },
-    { label: "Status", key: "status" },
+    { label: "Type", key: "type_name" },
+    { label: "Status", key: "status_name" },
     { label: "ISBN", key: "isbn" },
   ];
 

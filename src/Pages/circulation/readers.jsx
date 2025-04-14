@@ -432,7 +432,6 @@ const Readers = () => {
     { label: "Date of Birth", key: "dob" },
     { label: "Email", key: "email" },
     { label: "Phone", key: "phone" },
-    { label: "Status", key: "status" },
     { label: "Category", key: "type" }
   ];
 
