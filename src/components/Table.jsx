@@ -4,7 +4,7 @@ import "../CSS/components/table.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [] }) => {
+const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [], onEdit, onDelete }) => {
   const [searchText, setSearchText] = useState("");
   
   // Convert columns to DataTable format while preserving custom renderers
@@ -32,11 +32,11 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
       name: "Action",
       cell: (row) => (
         <div className="edit-delete">
-          <button className="edit-btn">
+          <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
             <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
           </button>
           <div className="splitter"></div>
-          <button className="delete-btn">
+          <button className="delete-btn" onClick={() => onDelete && onDelete(row)}>
             <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
           </button>
         </div>
