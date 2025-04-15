@@ -182,8 +182,8 @@ export const loginUser = async (email, password) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ email, password }),
-      credentials: 'include',  // Ensure cookies are sent with the request
     });
 
     if (!response.ok) {
@@ -250,6 +250,91 @@ export const logoutUser = async () => {
     return null;
   }
 };
+
+/**
+ * Logs in a student with email and password
+ * @param {string} email - Student's email
+ * @param {string} password - Student's password
+ * @returns {Promise<Object|null>} - Student data or null on failure
+ */
+export const loginStudent = async (email, password) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/student/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include',
+    });
+
+    console.log(response)
+
+    if (!response.ok) {
+      throw new Error('Invalid email or password');
+    }
+
+    const data = await response.json();
+    console.log('Login successful:', data);
+    return data;
+  } catch (error) {
+    console.error('Login error:', error);
+    return null;
+  }
+};
+
+/**
+ * Signs up a new student
+ * @param {Object} studentData - Object containing student details (name, email, password, etc.)
+ * @returns {Promise<Object|null>} - Registered student data or null on failure
+ */
+export const signupStudent = async (studentData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/student/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(studentData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Signup failed');
+    }
+
+    const data = await response.json();
+    console.log('Signup successful:', data);
+    return data;
+  } catch (error) {
+    console.error('Signup error:', error);
+    return null;
+  }
+};
+
+/**
+ * Logs out the current student
+ * @returns {Promise<Object|null>} - Logout response data or null on failure
+ */
+export const logoutStudent = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/student/logout`, {
+      method: 'POST',
+      credentials: 'include',  // Important: Include credentials (cookies)
+    });
+
+    if (!response.ok) {
+      throw new Error('Logout failed');
+    }
+
+    const data = await response.json();
+    console.log('Logout successful:', data);
+    return data;
+  } catch (error) {
+    console.error('Logout error:', error);
+    return null;
+  }
+};
+
 
 export const getUserInfo = async () => {
   try {

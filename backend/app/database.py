@@ -553,6 +553,41 @@ def login(email, password):
     except Exception as e:
         print(f"Error logging in: {e}")
         return {'success': False, 'error': str(e)}
+    
+def login_student(email, password):
+    """
+    Log in a student by verifying credentials from the User table.
+    Uses hashed password comparison.
+    """
+    try:
+        # Fetch only email and hashed password
+        response = supabase \
+            .from_("User") \
+            .select("u_id, u_email, u_name, u_password") \
+            .eq("u_email", email) \
+            .execute()
+
+        if response.data and len(response.data) > 0:
+            student = response.data[0]
+            stored_hashed_password = student["u_password"]
+
+            if check_password_hash(stored_hashed_password, password):
+                return {
+                    'success': True,
+                    'user': {
+                        'id': student['u_id'],
+                        'email': student['u_email'],
+                        'name': student.get('u_name')
+                    }
+                }
+            else:
+                return {'success': False, 'error': 'Invalid email or password'}
+        else:
+            return {'success': False, 'error': 'Invalid email or password'}
+
+    except Exception as e:
+        print(f"Error logging in student: {e}")
+        return {'success': False, 'error': str(e)}
 
 def sign_up(email, password, name=None):
     """
@@ -588,6 +623,45 @@ def sign_up(email, password, name=None):
     except Exception as e:
         print(f"Error signing up: {e}")
         return {'success': False, 'error': str(e)}
+    
+def sign_up_student(email, password, name=None):
+    """
+    Register a new student user by inserting into the User table.
+    """
+    try:
+        # Check if student already exists
+        existing = supabase.from_("User").select("u_id").eq("u_email", email).execute()
+        if existing.data and len(existing.data) > 0:
+            return {'success': False, 'error': 'Email already exists'}
+
+        # Hash the password before storing
+        hashed_password = generate_password_hash(password)
+
+        # Prepare new user data
+        new_user = {
+            'u_email': email,
+            'u_password': hashed_password
+        }
+
+        if name:
+            new_user['u_name'] = name
+
+        # Insert new user
+        response = supabase.from_("User").insert(new_user).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'user': {
+                    'id': response.data[0]['u_id'],
+                    'email': response.data[0]['u_email']
+                }
+            }
+        else:
+            return {'success': False, 'error': 'Failed to sign up'}
+    except Exception as e:
+        print(f"Error signing up student: {e}")
+        return {'success': False, 'error': str(e)}
 
 
 def get_user_by_email(email):
@@ -616,6 +690,33 @@ def get_user_by_email(email):
 
     except Exception as e:
         print(f"Error fetching user by email: {e}")
+        return None
+    
+def get_student_by_email(email):
+    """
+    Fetch a student's public profile details from the User table using email.
+    """
+    try:
+        response = supabase \
+            .from_("User") \
+            .select("u_name, u_email, u_phone, u_birthdate") \
+            .eq("u_email", email) \
+            .limit(1) \
+            .execute()
+
+        if response.data and len(response.data) > 0:
+            user = response.data[0]
+            return {
+                'name': user.get('u_name'),
+                'email': user.get('u_email'),
+                'phone': user.get('u_phone'),
+                'birthdate': user.get('u_birthdate')
+            }
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Error fetching student by email: {e}")
         return None
 
 def update_user_by_email(email, fields):
@@ -655,6 +756,44 @@ def update_user_by_email(email, fields):
         print(f"Error updating user by email: {e}")
         return False
     
+def update_student_by_email(email, fields):
+    """
+    Update a student's profile details in the User table using their email.
+    Only updates fields provided in the `fields` dictionary.
+    """
+    try:
+        # Map internal keys to Supabase column names
+        supabase_fields = {}
+        for key, value in fields.items():
+            if key == 'name':
+                supabase_fields['u_name'] = value
+            elif key == 'birthdate':
+                supabase_fields['u_birthDate'] = value
+            elif key == 'address':
+                supabase_fields['u_address'] = value
+            elif key == 'phone':
+                supabase_fields['u_phone'] = value  # optional
+
+        if not supabase_fields:
+            return False  # Nothing valid to update
+
+        response = supabase \
+            .from_("User") \
+            .update(supabase_fields) \
+            .eq("u_email", email) \
+            .execute()
+
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"Supabase update failed: {response}")
+            return False
+
+    except Exception as e:
+        print(f"Error updating student by email: {e}")
+        return False
+
+    
 def update_user_password(user_email, new_password):
     """
     Update the user's password in the Supabase database.
@@ -687,6 +826,32 @@ def update_user_password(user_email, new_password):
     except Exception as e:
         print(f"Error updating password for user {user_email}: {e}")
         return False
+
+def update_student_password(user_email, new_password):
+    """
+    Update the student's password in the Supabase database.
+    """
+    try:
+        # Hash the new password before storing it
+        hashed_password = generate_password_hash(new_password)
+
+        update_fields = {'u_password': hashed_password}
+
+        response = supabase \
+            .from_("User") \
+            .update(update_fields) \
+            .eq("u_email", user_email) \
+            .execute()
+
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"Supabase update failed: {response}")
+            return False
+
+    except Exception as e:
+        print(f"Error updating student password for {user_email}: {e}")
+        return False
     
 def get_user_password(email):
     """
@@ -711,6 +876,29 @@ def get_user_password(email):
 
     except Exception as e:
         print(f"Error fetching user password by email: {e}")
+        return None
+
+def get_student_password(email):
+    """
+    Fetch the student's password from the Supabase database using their email.
+    Returns the hashed password if found, otherwise returns None.
+    """
+    try:
+        response = supabase \
+            .from_("User") \
+            .select("u_password") \
+            .eq("u_email", email) \
+            .execute()
+
+        if response.data:
+            print(response.data[0]["u_password"])
+            return response.data[0]["u_password"]
+        else:
+            print(f"Student not found for email {email} or query failed.")
+            return None
+
+    except Exception as e:
+        print(f"Error fetching student password by email: {e}")
         return None
     
 
