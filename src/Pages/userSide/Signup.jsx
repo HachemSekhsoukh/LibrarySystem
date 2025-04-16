@@ -1,21 +1,39 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from "/assets/images/logo2.png";
 import "../../styles/UserSignup.css";
-import { signupStudent } from '../../utils/api'; // Make sure to adjust the import path based on where you have the function
+import { TextField, Autocomplete} from "@mui/material";
+import { signupStudent, fetchUserTypes  } from '../../utils/api';
 
 const UserSignUp = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    birthdate: '',
+    phone: '',
+    type: '' 
   });
-
+  const [userTypes, setUserTypes] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // State for loading animation
-  const navigate = useNavigate(); // Initialize navigate
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getUserTypes = async () => {
+      try {
+        const data = await fetchUserTypes();
+        setUserTypes(data);
+      } catch (error) {
+        console.error("Failed to load user types:", error);
+      }
+    };
+
+    getUserTypes();
+  }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,45 +41,50 @@ const UserSignUp = () => {
       ...prevData,
       [name]: value
     }));
+    console.log(formData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Clear previous error messages
     setError('');
     setSuccess('');
-  
-    // Validate all fields
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+
+    const { name, email, password, confirmPassword, birthdate, phone, type } = formData;
+
+    if (!name || !email || !password || !confirmPassword || !birthdate || !phone || !type) {
       setError('All fields are required.');
       return;
     }
-  
-    // Validate email format
+
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailPattern.test(formData.email)) {
+    if (!emailPattern.test(email)) {
       setError('Please enter a valid email address.');
       return;
     }
-  
-    // Validate password match
-    if (formData.password !== formData.confirmPassword) {
+
+    if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
 
-    // Start loading animation
+    const phonePattern = /^[0-9]{8,15}$/;
+    if (!phonePattern.test(phone)) {
+      setError('Please enter a valid phone number.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const response = await signupStudent({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
+        name,
+        email,
+        password,
+        birthdate,
+        phone,
+        type
       });
 
-      // Stop loading animation once the response is received
       setIsLoading(false);
 
       if (response && response.success) {
@@ -72,7 +95,7 @@ const UserSignUp = () => {
         setError(response?.error || 'Signup failed');
       }
     } catch (error) {
-      setIsLoading(false); // Stop loading animation if error occurs
+      setIsLoading(false);
       setError('An error occurred. Please try again.');
     }
   };
@@ -85,12 +108,11 @@ const UserSignUp = () => {
         </div>
         <div className="signup-form">
           <h1 className="signup-title">Sign Up</h1>
-          {/* Divider Line */}
           <div className="divider-container3">
             <hr className="nav-bar-divider3" />
           </div>
 
-          <div className="form-group">
+          <div className="form-group1">
             <label htmlFor="name">Full Name</label>
             <input
               type="text"
@@ -102,7 +124,7 @@ const UserSignUp = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group1">
             <label htmlFor="email">Email</label>
             <input
               type="email"
@@ -114,7 +136,68 @@ const UserSignUp = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group1">
+            <label htmlFor="birthdate">Birthdate</label>
+            <input
+              type="date"
+              id="birthdate"
+              name="birthdate"
+              value={formData.birthdate}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group1">
+            <label htmlFor="phone">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              placeholder="Enter your phone number"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group1">
+                        <label>User Type</label>
+                        <Autocomplete
+                          fullWidth
+                          options={userTypes}
+                          value={formData.type}
+                          onChange={(event, newValue) => {
+                            setFormData((prevData) => ({
+                              ...prevData,
+                              type: newValue
+                            }));
+                          }}                          
+                          getOptionLabel={(option) => {
+                            if (typeof option === 'string') {
+                              return option;
+                            }
+                            return option.name || '';
+                          }}
+                          isOptionEqualToValue={(option, value) => {
+                            if (!option || !value) return false;
+                            if (typeof option === 'object' && typeof value === 'object') {
+                              return option.id === value.id;
+                            }
+                            return option === value;
+                          }}
+                          renderInput={(params) => (
+                            <TextField 
+                              {...params} 
+                              placeholder="Select user type"
+                              variant="outlined"
+                              className="text-field"
+                            />
+                          )}
+                          className="dropdown-field"
+              />
+          </div>
+
+
+          <div className="form-group1">
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -126,7 +209,7 @@ const UserSignUp = () => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="form-group1">
             <label htmlFor="confirm-password">Confirm Password</label>
             <input
               type="password"
@@ -138,7 +221,6 @@ const UserSignUp = () => {
             />
           </div>
 
-          {/* Error or Success Message */}
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
 
@@ -151,7 +233,6 @@ const UserSignUp = () => {
         </div>
       </section>
 
-      {/* Loading Animation */}
       {isLoading && (
         <div className="overlay">
           <div className="loader"></div>

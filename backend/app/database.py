@@ -624,9 +624,10 @@ def sign_up(email, password, name=None):
         print(f"Error signing up: {e}")
         return {'success': False, 'error': str(e)}
     
-def sign_up_student(email, password, name=None):
+def sign_up_student(email, password, name, birthdate, phone, user_type):
     """
     Register a new student user by inserting into the User table.
+    All fields are required.
     """
     try:
         # Check if student already exists
@@ -640,11 +641,12 @@ def sign_up_student(email, password, name=None):
         # Prepare new user data
         new_user = {
             'u_email': email,
-            'u_password': hashed_password
+            'u_password': hashed_password,
+            'u_name': name,
+            'u_birthDate': birthdate,
+            'u_phone': phone,
+            'u_type': user_type
         }
-
-        if name:
-            new_user['u_name'] = name
 
         # Insert new user
         response = supabase.from_("User").insert(new_user).execute()
@@ -654,7 +656,11 @@ def sign_up_student(email, password, name=None):
                 'success': True,
                 'user': {
                     'id': response.data[0]['u_id'],
-                    'email': response.data[0]['u_email']
+                    'email': response.data[0]['u_email'],
+                    'name': response.data[0]['u_name'],
+                    'birthdate': response.data[0].get('u_birthdate', None),
+                    'phone': response.data[0].get('u_phone', None),
+                    'user_type': response.data[0].get('u_type', None)
                 }
             }
         else:

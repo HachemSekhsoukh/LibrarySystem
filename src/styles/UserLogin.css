@@ -16,14 +16,14 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: space-between;
   }
 
   .login-form{
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     background-color: white;
     border-radius: 20px;
@@ -33,6 +33,7 @@
 
   .login-title{
     color: var(--button-color);
+    
   }
 
   .forgot-password {
@@ -51,7 +52,6 @@
   }
   
   .sign-in-button {
-    margin-top: 0.5rem;
     width: 75%;
     padding: 0.75rem;
     background-color: var(--button-color);
@@ -87,6 +87,7 @@
   }
 
   .divider-container2 {
+    margin-bottom: 2rem;
     width: 100%;
     display: flex;
     justify-content: center;
