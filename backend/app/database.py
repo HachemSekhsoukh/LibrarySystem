@@ -34,7 +34,7 @@ def get_readers_by_status(status=1):
             'email': user['u_email'],
             'birthDate': user['u_birthDate'],
             'phone': user['u_phone'],
-            'type': user['User_type']['ut_name'],
+            'type': user['User_type']['ut_name'] if user.get('User_type') else 'No type',
             'status': user['u_status']
         } for user in user_response.data]
         
