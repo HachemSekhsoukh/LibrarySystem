@@ -25,6 +25,20 @@ export const fetchAllResources = async () => {
   }
 };
 
+export const fetchUserTypes = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user-types`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch user types");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in fetchUserTypes:", error);
+    throw error;
+  }
+};
+
 /**
  * Fetches resources from the API with a limit
  * @param {number} limit - Maximum number of resources to fetch

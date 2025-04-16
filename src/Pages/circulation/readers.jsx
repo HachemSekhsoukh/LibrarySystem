@@ -5,7 +5,6 @@ import Button from "../../components/Button";
 import { TextField, Snackbar, Alert, MenuItem, Autocomplete, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import CloseIcon from "@mui/icons-material/Close";
 import "../../CSS/circulation/readers.css";
 
 const Readers = () => {
@@ -481,7 +480,7 @@ const Readers = () => {
           <div className="form-row">
             <div className="form-group">
               <label>Name</label>
-              <TextField fullWidth name="u_name" value={newReader.u_name} onChange={handleInputChange} />
+              <TextField fullWidth type="text" name="u_name" value={newReader.u_name} onChange={handleInputChange} />
             </div>
             <div className="form-group">
               <label>Date of Birth</label>

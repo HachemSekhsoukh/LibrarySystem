@@ -10,7 +10,6 @@
     color: white;
     width: 94vw;
     height: 90vh;
-    margin: 20px auto;
     position: relative;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 43, 85, 0.3);
@@ -24,13 +23,26 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     background-color: white;
     border-radius: 20px;
-    min-height: 85%;
-    width: 35%;
+    min-height: 80%;
+    max-height: 82%;
+    width: 40%;
+    overflow-y: auto;
   }
+  
+  /* Optional: style scrollbar for better UX */
+  .signup-form::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .signup-form::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+  }
+  
 
   .signup-title{
     color: var(--button-color);
@@ -52,7 +64,8 @@
   }
   
   .sign-in-button {
-    margin-top: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
     width: 75%;
     padding: 0.75rem;
     background-color: var(--button-color);
@@ -67,9 +80,9 @@
     background-color: var(--primary-color);
   }
   
-
-  .form-group{
-    width: 75%;
+  .form-group1{
+    margin-top: 1rem;
+    width: 80%;
   }
   
 
