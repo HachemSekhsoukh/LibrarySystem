@@ -24,7 +24,8 @@ const Readers = () => {
     u_birthDate: "", 
     u_email: "", 
     u_phone: "", 
-    u_password: "", 
+    u_password: "",
+    u_status: 1, 
     u_type: "" 
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
