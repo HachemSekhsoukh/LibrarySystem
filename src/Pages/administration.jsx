@@ -21,7 +21,12 @@ import {
   addStaffType
 } from "../utils/api";
 
+// Importing the i18n hook
+import { useTranslation } from "react-i18next";
+
 const Administration = () => {
+  const { t } = useTranslation(); // Get translation function
+  
   const [staffTypesData, setStaffTypesData] = useState([]);
   const [openTypePopup, setOpenTypePopup] = useState(false);
   const [newStaffType, setNewStaffType] = useState({ st_name: "" });
@@ -61,17 +66,17 @@ const Administration = () => {
   };
 
   const staffTypesColumns = [
-    { label: "ID", key: "id" },
-    { label: "Type", key: "name" },
+    { label: t("id"), key: "id" },  // Translated label
+    { label: t("type"), key: "name" },  // Translated label
   ];
 
   const columns = [
-    { label: "ID", key: "id" },
-    { label: "Name", key: "name" },
-    { label: "Email", key: "email" },
-    { label: "Phone Number", key: "phone" },
-    { label: "Address", key: "address" },
-    { label: "Birthdate", key: "birthdate" }
+    { label: t("id"), key: "id" },
+    { label: t("name"), key: "name" },
+    { label: t("email"), key: "email" },
+    { label: t("phone_number"), key: "phone" },
+    { label: t("address"), key: "address" },
+    { label: t("birthdate"), key: "birthdate" }
   ];
 
   const fetchStaffData = async () => {
@@ -110,7 +115,7 @@ const Administration = () => {
       console.error("Error fetching staff types:", error);
       setSnackbar({
         open: true,
-        message: "Failed to fetch staff types",
+        message: t("failed_to_fetch_staff_types"), // Translated error message
         severity: "error"
       });
       setStaffTypesData([]);
@@ -136,14 +141,14 @@ const Administration = () => {
       if (response?.success) {
         setSnackbar({
           open: true,
-          message: "Staff type added successfully!",
+          message: t("staff_type_added_success"), // Translated success message
           severity: "success"
         });
         setNewStaffType({ st_name: "" });
         setOpenTypePopup(false);
         await fetchStaffTypesData();
       } else {
-        throw new Error("Failed to add staff type");
+        throw new Error(t("error_add_staff_type")); // Translated error message
       }
     } catch (error) {
       setSnackbar({
@@ -175,7 +180,7 @@ const Administration = () => {
       if (response?.success) {
         setSnackbar({
           open: true,
-          message: "Staff member added successfully!",
+          message: t("staff_member_added_success"), // Translated success message
           severity: "success"
         });
         setNewStaff({
@@ -190,7 +195,7 @@ const Administration = () => {
         setOpenPopup(false);
         await fetchStaffData();
       } else {
-        throw new Error("Failed to add staff member");
+        throw new Error(t("error_add_staff_member")); // Translated error message
       }
     } catch (error) {
       setSnackbar({
@@ -214,12 +219,12 @@ const Administration = () => {
               columns={columns}
               data={staffData}
               showActions={true}
-              title={"Staff Members"}
+              title={t("staff_members")} // Translated title
             />
             <div className="bottom-buttons">
               <Button
                 onClick={() => setOpenPopup(true)}
-                label="Add Staff Member"
+                label={t("add_staff_member")} // Translated button label
                 lightBackgrnd={false}
                 icon={<AddIcon />}
                 size="large"
@@ -238,12 +243,12 @@ const Administration = () => {
               columns={staffTypesColumns}
               data={staffTypesData}
               showActions={true}
-              title={"Staff Types"}
+              title={t("staff_types")} // Translated title
             />
             <div className="bottom-buttons">
               <Button
                 onClick={() => setOpenTypePopup(true)}
-                label="Add Staff Type"
+                label={t("add_staff_type")} // Translated button label
                 lightBackgrnd={false}
                 icon={<AddIcon />}
                 size="large"
@@ -255,13 +260,13 @@ const Administration = () => {
 
       {/* Add Staff Type Popup */}
       <Popup
-        title="Add Staff Type"
+        title={t("add_staff_type")} // Translated title
         openPopup={openTypePopup}
         setOpenPopup={setOpenTypePopup}
       >
         <div className="add-staff-type-form">
           <div className="form-field">
-            <label>Staff Type Name</label>
+            <label>{t("staff_type_name")}</label> 
             <TextField
               className="text-field"
               name="st_name"
@@ -269,45 +274,45 @@ const Administration = () => {
               onChange={handleTypeChange}
               variant="outlined"
               fullWidth
-              placeholder="Enter staff type name"
+              placeholder={t("enter_staff_type_name")} 
             />
           </div>
 
-    {/* Checkboxes in grid */}
-    <div className="form-field">
-        <label>Privelages:</label>
-        <Grid container spacing={1}>
-          {checkboxOptions.map((option, index) => (
-            <Grid item xs={6} key={index}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name={option}
-                    checked={!!checkboxValues[option]}
-                    onChange={handleCheckboxChange}
+          {/* Checkboxes in grid */}
+          <div className="form-field">
+            <label>{t("privelages")}</label> {/* Translated label */}
+            <Grid container spacing={1}>
+              {checkboxOptions.map((option, index) => (
+                <Grid item xs={6} key={index}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name={option}
+                        checked={!!checkboxValues[option]}
+                        onChange={handleCheckboxChange}
+                      />
+                    }
+                    label={t(option)} 
                   />
-                }
-                label={option}
-              />
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
-      </div>
+          </div>
 
-      <div className="dialog-button-container">
-        <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>
-          Cancel
-        </button>
-        <button className="dialog-save-button" onClick={handleAddStaffType} disabled={loading}>
-          {loading ? <CircularProgress size={24} /> : "Save"}
-        </button>
-      </div>
-    </div>
-  </Popup>
+          <div className="dialog-button-container">
+            <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>
+              {t("cancel")} {/* Translated button label */}
+            </button>
+            <button className="dialog-save-button" onClick={handleAddStaffType} disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : t("Save")} {/* Translated button label */}
+            </button>
+          </div>
+        </div>
+      </Popup>
 
       {/* Add Staff Member Popup */}
       <Popup
-        title="Add Staff Member"
+        title={t("add_staff_member")} // Translated title
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
         className="staff-popup"
@@ -315,7 +320,7 @@ const Administration = () => {
         <div className="add-staff-form">
           <div className="form-field-row">
             <div className="form-field">
-              <label>Name</label>
+              <label>{t("name")}</label> {/* Translated label */}
               <TextField
                 className="text-field"
                 name="name"
@@ -323,12 +328,12 @@ const Administration = () => {
                 onChange={handleChange}
                 variant="outlined"
                 fullWidth
-                placeholder="Enter name"
+                placeholder={t("enter_name")}
               />
             </div>
 
             <div className="form-field">
-              <label>Email</label>
+              <label>{t("email")}</label> {/* Translated label */}
               <TextField
                 className="text-field"
                 name="email"
@@ -336,14 +341,14 @@ const Administration = () => {
                 onChange={handleChange}
                 variant="outlined"
                 fullWidth
-                placeholder="Enter email"
+                placeholder={t("enter_email")}
               />
             </div>
           </div>
 
           <div className="form-field-row">
             <div className="form-field">
-              <label>Password</label>
+              <label>{t("password")}</label> {/* Translated label */}
               <TextField
                 className="text-field"
                 name="password"
@@ -351,12 +356,12 @@ const Administration = () => {
                 onChange={handleChange}
                 variant="outlined"
                 fullWidth
-                placeholder="Enter password"
+                placeholder={t("password_placeholder")}
               />
             </div>
 
             <div className="form-field">
-              <label>Phone Number</label>
+              <label>{t("phone_number")}</label> {/* Translated label */}
               <TextField
                 className="text-field"
                 name="phone"
@@ -364,14 +369,14 @@ const Administration = () => {
                 onChange={handleChange}
                 variant="outlined"
                 fullWidth
-                placeholder="Enter phone number"
+                placeholder={t("enter_phone_number")} 
               />
             </div>
           </div>
 
           <div className="form-field-row">
             <div className="form-field">
-              <label>Address</label>
+              <label>{t("address")}</label> {/* Translated label */}
               <TextField
                 className="text-field"
                 name="address"
@@ -379,12 +384,12 @@ const Administration = () => {
                 onChange={handleChange}
                 variant="outlined"
                 fullWidth
-                placeholder="Enter address"
+                placeholder={t("enter_address")}
               />
             </div>
 
             <div className="form-field">
-              <label>Birthdate</label>
+              <label>{t("birthdate")}</label> {/* Translated label */}
               <TextField
                 className="text-field"
                 name="birthdate"
@@ -398,33 +403,32 @@ const Administration = () => {
             </div>
           </div>
 
-        <div className="form-field">
-          <label>Staff Type</label>
-          <TextField
-            select
-            className="text-field"
-            name="staff_type_id"
-            value={newStaff.staff_type_id}
-            onChange={handleChange}
-            variant="outlined"
-            fullWidth
-            placeholder="Select staff type"
-          >
-            {staffTypesData.map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </div>
-
+          <div className="form-field">
+            <label>{t("staff_type")}</label> {/* Translated label */}
+            <TextField
+              select
+              className="text-field"
+              name="staff_type_id"
+              value={newStaff.staff_type_id}
+              onChange={handleChange}
+              variant="outlined"
+              fullWidth
+              placeholder={t("select_staff_type")}
+            >
+              {staffTypesData.map((type) => (
+                <MenuItem key={type.id} value={type.id}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </div>
 
           <div className="dialog-button-container">
             <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>
-              Cancel
+              {t("cancel")} {/* Translated button label */}
             </button>
             <button className="dialog-save-button" onClick={handleSubmit} disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : "Save"}
+              {loading ? <CircularProgress size={24} /> : t("save")} {/* Translated button label */}
             </button>
           </div>
         </div>
