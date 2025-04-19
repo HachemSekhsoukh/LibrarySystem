@@ -17,27 +17,15 @@ import CirculationAdministration from "./Pages/circulation/administration";
 import Catalogage from "./Pages/catalogage/catalogage";
 import CatalogageAdministration from "./Pages/catalogage/administration";
 import PagesLayout from "./Layouts/PagesLayout";
-import LibraryHome from "./Pages/userSide/LibraryHome";
-import BookDetail from "./Pages/userSide/BookDetail";
-import UserLogin from "./Pages/userSide/Login"; // adjust the path if needed
-import UserSignUp from "./Pages/userSide/Signup";
-import Categories from "./Pages/userSide/Categories";
 import "./App.css";
-import ViewAll from "./Pages/userSide/viewAll";
 import ProtectedRoute from "./components/ProtectedRoute"; // Import your protected route
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       {/* Public Routes */}
-      <Route path="/" element={<Navigate to="/library" replace />} />
-      <Route path="/library" element={<LibraryHome />} />
-      <Route path="/book/:id" element={<BookDetail />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/user/login" element={<UserLogin />} />
-      <Route path="/user/sign-up" element={<UserSignUp />} />
-      <Route path="/view-all" element={<ViewAll />} />
-      <Route path="/categories" element={<Categories />} />
 
       {/* Protected Routes (requires token) */}
       <Route element={<ProtectedRoute />}>
