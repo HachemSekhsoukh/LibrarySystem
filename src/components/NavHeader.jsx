@@ -13,7 +13,7 @@ const NavHeader = () => {
   return (
     <header className="nav-header">
       <div className="logo">
-        <img src="../public/assets/images/logo.png" alt="ENSIA Logo" />
+        <img src="../public/assets/images/logo3.png" alt="ENSIA Logo" />
       </div>
       <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
         {isMobileMenuOpen ? <FaTimes /> : <FaBars />}

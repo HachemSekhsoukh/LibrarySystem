@@ -24,10 +24,7 @@ import UserSignUp from "./Pages/userSide/Signup";
 import Categories from "./Pages/userSide/Categories";
 import "./App.css";
 import ViewAll from "./Pages/userSide/viewAll";
-
 import ProtectedRoute from "./components/ProtectedRoute"; // Import your protected route
-
-import "./App.css";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
