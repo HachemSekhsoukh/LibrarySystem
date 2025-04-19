@@ -1,54 +1,47 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "../../src/CSS/login.css";
 import logo from "/assets/images/logo2.png";
 import bgLogin from "../../public/assets/images/bg-login.png";
-import { loginUser } from  '../utils/api';
-
+import { loginUser } from "../utils/api";
 
 const Login = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
+
     const newErrors = {};
-  
-    // Basic validation
-    if (!email.trim()) newErrors.email = "Email is required";
-    if (!password) newErrors.password = "Password is required";
-  
+    if (!email.trim()) newErrors.email = t("email_required");
+    if (!password) newErrors.password = t("password_required");
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    setLoading(true); // Start loading
+
+    setLoading(true);
+
     try {
-      // Attempt to login with the email and password
       const data = await loginUser(email, password);
-  
-      // Check if login was successful
       if (data && data.success) {
-        // The JWT token is automatically handled by the HTTP-only cookie,
         navigate("/dashboard");
       } else {
-        // Display error message returned from backend
-        setErrors({ password: data?.error || "Login failed" });
+        setErrors({ password: data?.error || t("login_failed") });
       }
     } catch (error) {
       console.error("Login error:", error);
-      setErrors({ password: "Something went wrong. Please try again." });
+      setErrors({ password: t("login_error") });
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
-  
-    
 
   return (
     <>
@@ -57,54 +50,47 @@ const Login = () => {
           <div className="loader"></div>
         </div>
       )}
-        <div className="login-container">
-        <div
-          className="top-section"
-          style={{ backgroundImage: `url(${bgLogin})` }}
-        >
+      <div className="login-container">
+        <div className="top-section" style={{ backgroundImage: `url(${bgLogin})` }}>
           <div className="logo">
             <img src={logo} alt="الوكالة الوطنية للمقاول الذاتي" />
           </div>
 
           <div className="welcome-text">
-            <h1 className="welcome">Welcome!</h1>
-            <h2>This is ENSIA Library Management System</h2>
+            <h1 className="welcome">{t("welcome")}</h1>
+            <h2>{t("system_name")}</h2>
           </div>
         </div>
 
         <div className="bottom-section">
           <div className="login-card">
-            <h2>Sign in</h2>
+            <h2>{t("sign_in")}</h2>
 
             <form className="login-form1" onSubmit={handleLogin}>
               <div className="form-group1">
-                <label>Email</label>
+                <label>{t("email")}</label>
                 <input
                   type="email"
-                  placeholder="Enter Email"
+                  placeholder={t("email_placeholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                {errors.email && (
-                  <p className="error-message">{errors.email}</p>
-                )}
+                {errors.email && <p className="error-message">{errors.email}</p>}
               </div>
 
               <div className="form-group1">
-                <label>Password</label>
+                <label>{t("password")}</label>
                 <input
                   type="password"
-                  placeholder="Enter Password"
+                  placeholder={t("password_placeholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                {errors.password && (
-                  <p className="error-message">{errors.password}</p>
-                )}
+                {errors.password && <p className="error-message">{errors.password}</p>}
               </div>
 
               <button type="submit" className="signin-btn1">
-                Sign in
+                {t("sign_in")}
               </button>
             </form>
           </div>
@@ -112,12 +98,12 @@ const Login = () => {
           <footer>
             <div className="footer-content">
               <div className="footer-left">
-                © 2025, Made with ❤️ by Dr. Djouamaa Team
+                {t("made_with_love")}
               </div>
               <div className="footer-right">
-                <a href="#">Contact us</a>
-                <a href="#">Address</a>
-                <a href="#">License</a>
+                <a href="#">{t("contact_us")}</a>
+                <a href="#">{t("address")}</a>
+                <a href="#">{t("license")}</a>
               </div>
             </div>
           </footer>

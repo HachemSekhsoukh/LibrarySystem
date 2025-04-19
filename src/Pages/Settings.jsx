@@ -4,14 +4,15 @@ import "../../src/CSS/Settings.css";
 import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from '../utils/userContext';
-import React, {useEffect} from 'react';
-import { getUserInfo, updateUserInfo , updateUserPassword } from  '../utils/api';
+import { useTranslation } from "react-i18next";
+import React, { useEffect } from 'react';
+import { getUserInfo, updateUserInfo, updateUserPassword } from  '../utils/api';
 
 const Settings = () => {
+  const { t, i18n } = useTranslation();
   const { user, setUser } = useUser(); // use context
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-
 
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
@@ -25,6 +26,10 @@ const Settings = () => {
     birthdate: "",
     address: "",
   });
+
+  const handleLanguageChange = (e) => {
+    i18n.changeLanguage(e.target.value);
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -51,12 +56,12 @@ const Settings = () => {
     const { oldPassword, newPassword, confirmPassword } = passwordData;
   
     if (!oldPassword || !newPassword || !confirmPassword) {
-      setPasswordError("Please fill in all password fields.");
+      setPasswordError(t("error_empty"));
       return;
     }
   
     if (newPassword !== confirmPassword) {
-      setPasswordError("New passwords do not match.");
+      setPasswordError(t("error_mismatch"));
       return;
     }
   
@@ -68,44 +73,42 @@ const Settings = () => {
     setIsLoading(false);
   
     if (result && result.success) {
-      alert("Password updated successfully.");
+      alert(t("success_password_updated"));
       setPasswordData({
         oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
     } else {
-      setPasswordError("Failed to update password. Please check your current password.");
+      setPasswordError(t("error_update_failed"));
     }
-  };  
+  };
 
   const handleSaveProfile = async () => {
     const { name, email, birthdate, address } = formData;
 
     if (!name || !email || !birthdate || !address) {
-      alert("Please fill in all fields.");
+      alert(t("error_fill_all"));
       return;
     }
     setIsLoading(true); // Start loading
     const updatedUser = await updateUserInfo(formData);
     setIsLoading(false); // Stop loading
-      if (updatedUser) {
-        setUser(updatedUser);
-        alert("Profile updated successfully.");
-      } else {
-        alert("Failed to update profile.");
-      }
+    if (updatedUser) {
+      setUser(updatedUser);
+      alert(t("success_profile_update"));
+    } else {
+      alert(t("error_profile_update"));
+    }
   };
 
   const [activeTab, setActiveTab] = useState("edit-profile");
-  // Add state for password visibility
   const [showPassword, setShowPassword] = useState({
     oldPassword: false,
     newPassword: false,
     confirmPassword: false,
   });
 
-  // Add function to toggle password visibility
   const togglePasswordVisibility = (field) => {
     setShowPassword((prev) => ({
       ...prev,
@@ -120,21 +123,21 @@ const Settings = () => {
         <div className="loader"></div>
       </div>
     )}
-    <div className = "settings-page">
-        <h1 id="title">Settings</h1>
+    <div className="settings-page">
+        <h1 id="title">{t("settings")}</h1>
         <div className="settings-container">
         <div className="tabs">
           <button
             className={`tab ${activeTab === "edit-profile" ? "active" : ""}`}
             onClick={() => setActiveTab("edit-profile")}
           >
-            Edit Profile
+            {t("edit_profile")}
           </button>
           <button
             className={`tab ${activeTab === "security" ? "active" : ""}`}
             onClick={() => setActiveTab("security")}
           >
-            Security
+            {t("security")}
           </button>
         </div>
 
@@ -162,30 +165,38 @@ const Settings = () => {
               </div>
 
               <div className="form-grid">
-              <div className="form-group">
-                <label>Full Name</label>
-                <input type="text" name="name"  value={formData.name}  onChange={handleChange} />
-              </div>
-
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" name="email" disabled style={{ backgroundColor: "#f0f0f0", cursor: "not-allowed" }}  value={formData.email}  onChange={handleChange} />
-              </div>
-
                 <div className="form-group">
-                  <label>Date of Birth</label>
-                  <input type="date" name="birthdate"  value={formData.birthdate}  onChange={handleChange} />
+                  <label>{t("full_name")}</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} />
                 </div>
 
                 <div className="form-group">
-                  <label>Current Address</label>
-                  <input type="text" name="address"  value={formData.address}  onChange={handleChange} />
+                  <label>{t("email")}</label>
+                  <input type="email" name="email" disabled style={{ backgroundColor: "#f0f0f0", cursor: "not-allowed" }} value={formData.email} onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                  <label>{t("date_of_birth")}</label>
+                  <input type="date" name="birthdate" value={formData.birthdate} onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                  <label>{t("current_address")}</label>
+                  <input type="text" name="address" value={formData.address} onChange={handleChange} />
+                </div>
+
+                <div className="language-selector">
+                    <label htmlFor="language">{t("language")}:</label>
+                    <select id="language" onChange={handleLanguageChange} value={i18n.language}>
+                      <option value="en">English</option>
+                      <option value="fr">Français</option>
+                    </select>
                 </div>
               </div>
             </div>
 
             <div className="button-container">
-              <button className="save-btn" onClick={handleSaveProfile}>Save</button>
+              <button className="save-btn" onClick={handleSaveProfile}>{t("save")}</button>
             </div>
           </div>
         )}
@@ -195,11 +206,11 @@ const Settings = () => {
               <div className="form-grid">
                 <div className="security-content">
                   <div className="form-group">
-                    <label>Enter your current password</label>
+                    <label>{t("current_password_label")}</label>
                     <div className="password-wrapper">
                       <input
                         type={showPassword.oldPassword ? "text" : "password"}
-                        placeholder="Enter your current password"
+                        placeholder={t("current_password_placeholder")}
                         value={passwordData.oldPassword}
                         onChange={(e) =>
                           {
@@ -221,11 +232,11 @@ const Settings = () => {
                   </div>
 
                   <div className="form-group">
-                    <label>New Password</label>
+                    <label>{t("new_password_label")}</label>
                     <div className="password-wrapper">
                       <input
                         type={showPassword.newPassword ? "text" : "password"}
-                        placeholder="Enter the new password"
+                        placeholder={t("new_password_placeholder")}
                         value={passwordData.newPassword}
                         onChange={(e) =>{
                           setPasswordData({
@@ -233,8 +244,7 @@ const Settings = () => {
                             newPassword: e.target.value,
                           })
                           setPasswordError(""); // Clear error on input
-                        }
-                        }
+                        }}
                       />
                       <span
                         className="toggle-password"
@@ -246,11 +256,11 @@ const Settings = () => {
                   </div>
 
                   <div className="form-group">
-                    <label>Confirm new password</label>
+                    <label>{t("confirm_password_label")}</label>
                     <div className="password-wrapper">
                       <input
                         type={showPassword.confirmPassword ? "text" : "password"}
-                        placeholder="Confirm the new password"
+                        placeholder={t("confirm_password_placeholder")}
                         value={passwordData.confirmPassword}
                         onChange={(e) =>{
                           setPasswordData({
@@ -258,9 +268,7 @@ const Settings = () => {
                             confirmPassword: e.target.value,
                           })
                           setPasswordError(""); // Clear error on input
-                        }
-                          
-                        }
+                        }}
                       />
                       <span
                         className="toggle-password"
@@ -280,16 +288,13 @@ const Settings = () => {
               )}
 
               <div className="button-container">
-                <button className="save-btn" onClick={handleChangePassword}>
-                  Update
-                </button>
+                <button className="save-btn" onClick={handleChangePassword}>{t("update")}</button>
               </div>
             </div>
           )}
       </div>
     </div>
     </>
-    
   );
 };
 
