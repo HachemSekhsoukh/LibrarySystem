@@ -62,7 +62,7 @@ def api_student_login():
         response.set_cookie(
             'access_token_cookie', access_token, 
             httponly=True,
-            secure=False,
+            secure=True,
             samesite='None',
             path='/'
         )
