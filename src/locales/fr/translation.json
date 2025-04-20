@@ -1,6 +1,6 @@
 {
     "welcome": "Bienvenue !",
-    "system_name": "Ceci est le système de gestion de bibliothèque ENSIA",
+    "system_name": "Dans le système de gestion de bibliothèque de ENSIA",
     "sign_in": "Se connecter",
     "email": "E-mail",
     "email_placeholder": "Entrez l'E-mail",
@@ -71,6 +71,33 @@
     "enter_staff_type_name": "Enter le nom du type de staff",
     "enter_email": "Enter l'email",
     "enter_address": "Enter l'adresse",
-    "enter_phone_number": "Enter le numéro de téléphone"
+    "enter_phone_number": "Enter le numéro de téléphone",
+    "preferences": "préférences",
+
+    "books_available": "Livres disponibles",
+    "books_borrowed": "Livres empruntés",
+    "monthly_borrows": "Emprunts mensuels",
+    "overdue_books": "Livres en retard",
+    "user_type": "Type d'utilisateur",
+    "total_number_of_readers": "Nombre total de lecteurs",
+    "total_number_of_books_available": "Nombre total de livres disponibles",
+    "number_of_books_currently_borrowed": "Nombre de livres actuellement empruntés",
+    "total_number_of_borrows_this_month": "Nombre total d'emprunts ce mois-ci",
+    "total_number_of_overdue_books": "Nombre total de livres en retard",
+    "recent_transactions": "Transactions récentes",
+    "most_borrowed_books": "Livres les plus empruntés",
+    "title": "Titre",
+    "borrower_name": "Nom de l'emprunteur",
+    "date": "Date",
+    "author": "Auteur",
+    "cote": "Cote",
+    "borrows": "Emprunts",
+    "number_of_borrows": "Nombre d'emprunts",
+    "search": "Recherche",
+
+    "manage_your_preferences": "Gérer vos préférences",
+    "add_new_reader": "Ajouter un nouveau lecteur",
+    "verify_new_readers": "Vérifier les nouveaux lecteurs",
+    "category": "Categorie"
   }
   

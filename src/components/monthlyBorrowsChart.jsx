@@ -8,11 +8,13 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from 'react-i18next';
 
 const MonthlyBorrowsChart = ({ data }) => {
+  const { t } = useTranslation();
   return (
     <div className="chart-section">
-      <h3>Monthly Borrows</h3>
+      <h3>{t("monthly_borrows")}</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
           data={data}

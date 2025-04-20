@@ -3,10 +3,11 @@ import DataTable from "react-data-table-component";
 import "../CSS/components/table.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from 'react-i18next';
 
 const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [], onEdit, onDelete }) => {
   const [searchText, setSearchText] = useState("");
-  
+  const { t } = useTranslation();
   // Convert columns to DataTable format while preserving custom renderers
   const formattedColumns = columns.map((col) => {
     // Base column definition
@@ -106,7 +107,7 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
         <div className="search-title">
           <h2>{title}</h2>
           <div className="search-bar">
-            <p>Search: </p>
+            <p>{t("search")}: </p>
             <input
               type="text"
               placeholder="Search..."

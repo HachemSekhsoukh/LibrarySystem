@@ -139,7 +139,14 @@ const Settings = () => {
           >
             {t("security")}
           </button>
+          <button
+            className={`tab ${activeTab === "preferences" ? "active" : ""}`}
+            onClick={() => setActiveTab("preferences")}
+          >
+            {t("preferences")}
+          </button>
         </div>
+
 
         {activeTab === "edit-profile" && (
           <div className="profile-content">
@@ -185,13 +192,6 @@ const Settings = () => {
                   <input type="text" name="address" value={formData.address} onChange={handleChange} />
                 </div>
 
-                <div className="language-selector">
-                    <label htmlFor="language">{t("language")}:</label>
-                    <select id="language" onChange={handleLanguageChange} value={i18n.language}>
-                      <option value="en">English</option>
-                      <option value="fr">Français</option>
-                    </select>
-                </div>
               </div>
             </div>
 
@@ -292,6 +292,19 @@ const Settings = () => {
               </div>
             </div>
           )}
+
+            {activeTab === "preferences" && (
+              <div className="preferences-container">
+                  <div className="language-selector">
+                    <label htmlFor="language">{t("language")}:</label>
+                    <select id="language" onChange={handleLanguageChange} value={i18n.language}>
+                      <option value="en">English</option>
+                      <option value="fr">Français</option>
+                    </select>
+                  </div>
+              </div>
+            )}
+
       </div>
     </div>
     </>

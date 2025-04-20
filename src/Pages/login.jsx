@@ -53,7 +53,7 @@ const Login = () => {
       <div className="login-container">
         <div className="top-section" style={{ backgroundImage: `url(${bgLogin})` }}>
           <div className="logo">
-            <img src={logo} alt="الوكالة الوطنية للمقاول الذاتي" />
+            <img src={logo} alt="logo" />
           </div>
 
           <div className="welcome-text">

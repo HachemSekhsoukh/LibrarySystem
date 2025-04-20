@@ -8,15 +8,15 @@ function PagesLayout() {
 
   // Define titles and subtitles for each route
   const pageTitles = {
-    "/settings": { title: "Settings", subtitle: "Manage your preferences" },
-    "/dashboard": { title: "Dashboard", subtitle: "Dashboard" },
-    "/administration": { title: "Administration", subtitle: "Administration" },
-    "/circulation/readers": { title: "Circulation", subtitle: "Readers" },
-    "/circulation/exemplaires": { title: "Circulation", subtitle: "Exemplaires" },
-    "/circulation/peb": { title: "Circulation", subtitle: "PEB" },
-    "/circulation/administration": { title: "Circulation", subtitle: "Administration" },
-    "/catalogage/catalogage": { title: "Catalogage", subtitle: "Catalogage" },
-    "/catalogage/administration": { title: "Catalogage", subtitle: "Administration" },
+    "/settings": { title: "settings", subtitle: "manage_your_preferences" },
+    "/dashboard": { title: "dashboard", subtitle: "dashboard" },
+    "/administration": { title: "administration", subtitle: "administration" },
+    "/circulation/readers": { title: "circulation", subtitle: "readers" },
+    "/circulation/exemplaires": { title: "circulation", subtitle: "exemplaires" },
+    "/circulation/peb": { title: "circulation", subtitle: "PEB" },
+    "/circulation/administration": { title: "circulation", subtitle: "administration" },
+    "/catalogage/catalogage": { title: "catalogage", subtitle: "catalogage" },
+    "/catalogage/administration": { title: "catalogage", subtitle: "administration" },
   };
   
 
