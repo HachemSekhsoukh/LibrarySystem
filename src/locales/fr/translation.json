@@ -94,10 +94,14 @@
     "borrows": "Emprunts",
     "number_of_borrows": "Nombre d'emprunts",
     "search": "Recherche",
+    "transactions": "Transactions",
+    "add_transaction": "Ajouter une transaction",
 
     "manage_your_preferences": "Gérer vos préférences",
     "add_new_reader": "Ajouter un nouveau lecteur",
     "verify_new_readers": "Vérifier les nouveaux lecteurs",
-    "category": "Categorie"
+    "category": "Categorie",
+    "transaction_type": "Type de la transaction",
+    "document_title": "Titre du document"
   }
   
