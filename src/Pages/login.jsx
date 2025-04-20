@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "../../src/CSS/login.css";
@@ -13,6 +13,19 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+      const saved = localStorage.getItem("darkMode");
+      return saved === "true"; // default to false if null
+    });
+  
+  useEffect(() => {
+      if (isDarkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }, [isDarkMode]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

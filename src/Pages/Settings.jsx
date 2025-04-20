@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "../../src/CSS/Settings.css";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -6,7 +5,7 @@ import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from '../utils/userContext';
 import { useTranslation } from "react-i18next";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getUserInfo, updateUserInfo, updateUserPassword } from  '../utils/api';
 
 const Settings = () => {
