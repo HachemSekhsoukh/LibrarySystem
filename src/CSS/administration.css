@@ -37,20 +37,21 @@
     gap: 3px;
     width: 100%;
   }
+
   
   .form-field-row{
     display: flex;
     gap: 25px;
     flex-direction: row;
   }
-  .add-staff-form .form-field label {
+  .form-field label {
     font-size: 16px;
-    color: #333;
+    color: var(--text-color);
     font-weight: 500;
     margin-bottom: 4px;
   }
   
-  .add-staff-form .dropdown-field {
+   .dropdown-field {
     background-color: #fff;
     border-radius: 20px !important;
   }
@@ -72,10 +73,35 @@
     height: 48px !important;
   }
   
-  .add-staff-form .dropdown-field .MuiOutlinedInput-notchedOutline,
-  .add-staff-form .text-field .MuiOutlinedInput-notchedOutline {
+  .dropdown-field .MuiOutlinedInput-notchedOutline,
+  .text-field .MuiOutlinedInput-notchedOutline {
     border-color: #e0e0e0;
     border-width: 1px;
+    color: var(--text-color);
+  }
+
+  .text-field .MuiInputBase-input,
+.text-field .MuiSelect-select {
+  color: var(--text-color);
+  background-color: var(--secondary-background-color);
+}
+
+.text-field .MuiMenuItem-root {
+  color: var(--text-color);
+  background-color: var(--secondary-background-color);
+}
+
+.text-field .MuiMenuItem-root:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Optional hover effect */
+}
+
+
+  .text-field input{
+    color: var(--text-color);
+  }
+
+  .text-field textarea{
+    color: var(--text-color);
   }
   
   .add-staff-form .dialog-buttons {

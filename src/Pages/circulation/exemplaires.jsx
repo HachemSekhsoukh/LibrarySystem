@@ -112,10 +112,6 @@ const Exemplaires = () => {
 
   const transactionTypes = ["Borrow", "Return", "Renew"];
 
-  const handleChange = (e) => {
-    setTransactionData({ ...transactionData, [e.target.name]: e.target.value });
-  };
-
   const handleAutocompleteChange = (name, value) => {
     setTransactionData({ ...transactionData, [name]: value || "" });
   };
@@ -227,7 +223,7 @@ const Exemplaires = () => {
                   {...params} 
                   placeholder="Select borrower name"
                   variant="outlined"
-                  className="text-field"
+                  className="custom-textfield"
                 />
               )}
               className="dropdown-field"
@@ -247,7 +243,7 @@ const Exemplaires = () => {
                 {...params} 
                 placeholder="Select transaction type"
                 variant="outlined"
-                className="text-field"
+                className="custom-textfield"
               />
             )}
             className="dropdown-field"
@@ -296,7 +292,7 @@ const Exemplaires = () => {
                   {...params} 
                   placeholder="Search by title or author"
                   variant="outlined"
-                  className="text-field"
+                  className="custom-textfield"
                 />
               )}
               className="dropdown-field"

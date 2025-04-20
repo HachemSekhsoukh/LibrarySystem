@@ -1,5 +1,6 @@
 .dialog-paper {
     border-radius: 30px !important;
+    background-color: var(--secondary-background-color) !important;
 }
 
 .dialog-title {
