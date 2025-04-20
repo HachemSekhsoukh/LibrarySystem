@@ -27,7 +27,8 @@ const Catalogage = () => {
     cote: "",
     receivingDate: "",
     status: 1,
-    observation: ""
+    observation: "",
+    description: ""
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [resourceTypes, setResourceTypes] = useState([]);
@@ -35,6 +36,9 @@ const Catalogage = () => {
   const [currentResourceId, setCurrentResourceId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resourceToDelete, setResourceToDelete] = useState(null);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = React.useRef();
 
   useEffect(() => {
     fetch(`${API_BASE_URL}api/resource-types`)  // Ensure full URL with http://
@@ -84,7 +88,8 @@ const Catalogage = () => {
       cote: "",
       receivingDate: "",
       status: 1,
-      observation: ""
+      observation: "",
+      description: ""
     });
     setIsEditing(false);
     setCurrentResourceId(null);
@@ -93,8 +98,8 @@ const Catalogage = () => {
   const handleAddResource = async () => {
     try {
       // Validate required fields
-      if (!bookData.title || !bookData.author || !bookData.inventoryNum) {
-        setSnackbar({ open: true, message: "Title, author, and inventory number are required", severity: "error" });
+      if (!bookData.title || !bookData.author || !bookData.inventoryNum || !bookData.description) {
+        setSnackbar({ open: true, message: "Title, author, inventory number, and description are required", severity: "error" });
         return;
       }
 
@@ -110,6 +115,7 @@ const Catalogage = () => {
         r_status: bookData.status,
         r_observation: bookData.observation,
         r_type: bookData.type,
+        r_description: bookData.description
       };
   
       let response;
@@ -167,7 +173,8 @@ const Catalogage = () => {
       cote: resource.cote,
       receivingDate: resource.receivingDate || "",
       status: resource.status,
-      observation: resource.observation
+      observation: resource.observation,
+      description: resource.description || ""
     });
     setIsEditing(true);
     setOpenPopup(true);
@@ -214,6 +221,59 @@ const Catalogage = () => {
     }
   };
 
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.xlsx')) {
+      setSnackbar({
+        open: true,
+        message: "Please upload an Excel file (.xlsx)",
+        severity: "error"
+      });
+      return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}api/resources/import`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSnackbar({
+          open: true,
+          message: result.message,
+          severity: result.errors ? "warning" : "success"
+        });
+        if (result.errors) {
+          console.error("Import errors:", result.errors);
+        }
+        fetchResources(); // Refresh the list
+      } else {
+        throw new Error(result.error || 'Failed to import file');
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: `Error importing file: ${error.message}`,
+        severity: "error"
+      });
+    } finally {
+      setUploading(false);
+      setUploadDialogOpen(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const columns = [
     { label: "ID", key: "id" },
     { label: "Title", key: "title" },
@@ -237,12 +297,20 @@ const Catalogage = () => {
           />
         </div>
         <div className="bottom-buttons">
+          <input
+            type="file"
+            accept=".xlsx"
+            style={{ display: 'none' }}
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+          />
           <Button
-            onClick={() => {}}
-            label="Import Books"
+            onClick={() => fileInputRef.current.click()}
+            label={uploading ? "Importing..." : "Import Books"}
             lightBackgrnd={true}
             icon={<FileUploadIcon />}
             size="large"
+            disabled={uploading}
           />
           <Button
             onClick={() => {
