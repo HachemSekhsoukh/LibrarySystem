@@ -72,7 +72,7 @@
     "enter_email": "Enter l'email",
     "enter_address": "Enter l'adresse",
     "enter_phone_number": "Enter le numéro de téléphone",
-    "preferences": "préférences",
+    "preferences": "Préférences",
 
     "books_available": "Livres disponibles",
     "books_borrowed": "Livres empruntés",
@@ -106,6 +106,7 @@
     "transaction_type": "Type de la transaction",
     "document_title": "Titre du document",
     "edit_reader_type": "Modifier le type de lecteur",
-    "borrow_limit": "Limite d'emprunts"
+    "borrow_limit": "Limite d'emprunts",
+    "dark_mode": "Mode sombre"
   }
   

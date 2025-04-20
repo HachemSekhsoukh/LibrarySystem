@@ -9,6 +9,9 @@
 
   .inner-table-container{
     height: 85%;
+    border-top-right-radius: 22px;
+    border-top-left-radius: 22px;
+    border: none;
   }
 
   .edit-delete img{
@@ -41,6 +44,8 @@
 
   .search-input{
     border: 1px solid var(--primary-color);
+    background-color: transparent;
+    color: var(--text-color);
     border-radius: 5px;
     font-size: 1rem;
     margin-left: 5px;
