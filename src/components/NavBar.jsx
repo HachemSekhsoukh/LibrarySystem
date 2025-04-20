@@ -1,10 +1,12 @@
 import "../CSS/components/NavBar.css";
 import { Settings, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { logoutUser } from  '../utils/api';
+import { logoutUser } from '../utils/api';
+import { useTranslation } from "react-i18next";
 
 function NavBar() {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   // Inside your component or wherever the logout function is needed
   const handleLogout = async () => {
@@ -17,26 +19,25 @@ function NavBar() {
     }
   };
 
-
   const navItems = [
-      { label: "Dashboard", path: "/dashboard" , icon: "/assets/images/home-icon.png"},
-      { label: "Administration", path: "/administration" , icon: "/assets/images/home-icon.png"},
-      {
-        label: "Circulation",
-        subItems: [
-          { label: "Readers", path: "/circulation/readers", icon: "/assets/images/home-icon.png" },
-          { label: "Exemplaires", path: "/circulation/exemplaires", icon: "/assets/images/home-icon.png" },
-          { label: "PEB", path: "/circulation/peb", icon: "/assets/images/home-icon.png" },
-          { label: "Administration", path: "/circulation/administration", icon: "/assets/images/home-icon.png" },
-        ],
-      },
-      {
-        label: "Catalogage",
-        subItems: [
-          { label: "Catalogage", path: "/catalogage/catalogage", icon: "/assets/images/home-icon.png" },
-          { label: "Administration", path: "/catalogage/administration", icon: "/assets/images/home-icon.png" },
-        ],
-      },
+    { label: t("dashboard"), path: "/dashboard", icon: "/assets/images/home-icon.png" },
+    { label: t("administration"), path: "/administration", icon: "/assets/images/home-icon.png" },
+    {
+      label: t("circulation"),
+      subItems: [
+        { label: t("readers"), path: "/circulation/readers", icon: "/assets/images/home-icon.png" },
+        { label: t("exemplaires"), path: "/circulation/exemplaires", icon: "/assets/images/home-icon.png" },
+        { label: t("peb"), path: "/circulation/peb", icon: "/assets/images/home-icon.png" },
+        { label: t("administration"), path: "/circulation/administration", icon: "/assets/images/home-icon.png" },
+      ],
+    },
+    {
+      label: t("catalogage"),
+      subItems: [
+        { label: t("catalogage"), path: "/catalogage/catalogage", icon: "/assets/images/home-icon.png" },
+        { label: t("administration"), path: "/catalogage/administration", icon: "/assets/images/home-icon.png" },
+      ],
+    },
   ];
   
 
@@ -44,36 +45,30 @@ function NavBar() {
     <div className="navBarContainer">
       {/* Logo and Title */}
       <div className="titleLogo">
-        <img src="/assets/images/logo.png" alt="logo" className="logo"/>
+        <img src="/assets/images/logo.png" alt="logo" className="logo" />
       </div>
 
       {/* Divider Line */}
       <div className="divider-container">
         <hr className="nav-bar-divider" />
       </div>
-      
 
       {/* Navigation Items */}
       <nav className="navItems">
         {navItems.map((item, index) =>
           item.subItems ? (
             <div key={index} className="navSection">
-              {/* <div className="icon-box">
-                    <img src={subItem.icon} alt={subItem.label} className="navIcon" />
-              </div> */}
-              <span className="navSectionTitle">{item.label} :</span>
+              <span className="navSectionTitle">{t(item.label)} :</span>
               {item.subItems.map((subItem, subIndex) => (
                 <NavLink
                   key={subIndex}
                   to={subItem.path}
-                  className={({ isActive }) =>
-                    isActive ? "navItemActive" : "navItem"
-                  }
+                  className={({ isActive }) => (isActive ? "navItemActive" : "navItem")}
                 >
                   <div className="icon-box-inactive">
                     <img src={subItem.icon} alt={subItem.label} className="navIcon" />
                   </div>
-                  <span>{subItem.label}</span>
+                  <span>{t(subItem.label)}</span>
                 </NavLink>
               ))}
             </div>
@@ -81,19 +76,16 @@ function NavBar() {
             <NavLink
               key={index}
               to={item.path}
-              className={({ isActive }) =>
-                isActive ? "navItemActive" : "navItem"
-              }
+              className={({ isActive }) => (isActive ? "navItemActive" : "navItem")}
             >
-            <div className="icon-box-inactive">
-                    <img src={item.icon} alt={item.label} className="navIcon" />
-            </div>
-              <span>{item.label}</span>
+              <div className="icon-box-inactive">
+                <img src={item.icon} alt={item.label} className="navIcon" />
+              </div>
+              <span>{t(item.label)}</span>
             </NavLink>
           )
         )}
       </nav>
-
 
       {/* Bottom Settings and Logout */}
       <div className="bottomNav">
@@ -104,12 +96,11 @@ function NavBar() {
           <div className="icon-box-inactive">
             <Settings size={20} />
           </div>
-          
-          <span>Settings</span>
+          <span>{t("settings")}</span>
         </NavLink>
         <button onClick={handleLogout} className="logoutButton">
           <LogOut className="logout-icon" size={21} />
-          <span>Logout</span>
+          <span>{t("logout")}</span>
         </button>
       </div>
     </div>

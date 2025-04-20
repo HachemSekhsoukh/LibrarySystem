@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Table from "../../components/Table";
 import Button from '../../components/Button';
 import Popup from "../../components/Popup";
+import { useTranslation } from 'react-i18next';
 import { 
   TextField, 
   MenuItem, 
@@ -20,6 +21,7 @@ import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
 
 const Exemplaires = () => {
+  const { t } = useTranslation();
   const [openPopup, setOpenPopup] = useState(false);
   const [transactionData, setTransactionData] = useState({
     borrowerName: "",
@@ -179,12 +181,12 @@ const Exemplaires = () => {
     <>
     <div className="container">
     <div id='table'>
-    <Table columns={columns} data={transactions} showActions={true} title={"Transactions"}/>
+    <Table columns={columns} data={transactions} showActions={true} title={t("transactions")}/>
     </div>
     <div className="bottom-buttons">
       <Button 
         onClick={() => setOpenPopup(true)} 
-        label="Add Transaction" 
+        label={t("add_transaction")} 
         lightBackgrnd={false}
         icon={<AddIcon />}
         size="large"
@@ -193,14 +195,14 @@ const Exemplaires = () => {
     </div>
 
     <Popup 
-      title="Add Transaction" 
+      title={t("add_transaction")} 
       openPopup={openPopup} 
       setOpenPopup={setOpenPopup}
       className="transaction-dialog"
     >
       <div className="add-transaction-form">
         <div className="form-field">
-          <label>Borrower Name</label>
+          <label>{t("borrower_name")}</label>
           {loadingReaders ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
               <CircularProgress size={24} />
@@ -234,7 +236,7 @@ const Exemplaires = () => {
         </div>
 
         <div className="form-field">
-          <label>Transaction Type</label>
+          <label>{t("transaction_type")}</label>
           <Autocomplete
             fullWidth
             options={transactionTypes}
@@ -253,7 +255,7 @@ const Exemplaires = () => {
         </div>
 
         <div className="form-field">
-          <label>Document Title</label>
+          <label>{t("document_title")}</label>
           {loadingResources ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
               <CircularProgress size={24} />

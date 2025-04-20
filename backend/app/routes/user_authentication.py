@@ -16,15 +16,23 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 def api_student_signup():
     data = request.get_json()
 
-    if not data or 'email' not in data or 'password' not in data:
-        return jsonify({'success': False, 'error': 'Email and password are required'}), 400
+    # Ensure the required fields are present
+    required_fields = ['email', 'password', 'name', 'birthdate', 'phone', 'type']
+    if not data or any(field not in data for field in required_fields):
+        return jsonify({'success': False, 'error': 'All fields (email, password, name, birthdate, phone, type) are required'}), 400
 
+    # Extract the data
     email = data['email']
     password = data['password']
-    name = data.get('name')  # Optional field
+    name = data['name']
+    birthdate = data['birthdate']
+    phone = data['phone']
+    user_type = data['type']['id']  # Assuming 'type' is the user type ID or name
 
-    result = sign_up_student(email, password, name)
+    # Pass all fields to the sign-up function
+    result = sign_up_student(email, password, name, birthdate, phone, user_type)
 
+    # Check the result of the sign-up process
     if result['success']:
         return jsonify({
             'success': True,
@@ -54,7 +62,7 @@ def api_student_login():
         response.set_cookie(
             'access_token_cookie', access_token, 
             httponly=True,
-            secure=False,
+            secure=True,
             samesite='None',
             path='/'
         )
