@@ -8,7 +8,8 @@ import {
   getUserInfo,
   fetchStats,
   fetchTransactions,
-  fetchMonthlyBorrows
+  fetchMonthlyBorrows,
+  fetchMostBorrowedBooks, // Importing the function
 } from '../utils/api';
 
 import React, { useEffect, useState } from 'react';
@@ -27,6 +28,7 @@ const Dashboard = () => {
 
   const [transactions, setTransactions] = useState([]);
   const [borrowsChartData, setBorrowsChartData] = useState([]);
+  const [mostBorrowed, setMostBorrowed] = useState([]); // New state
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -47,13 +49,19 @@ const Dashboard = () => {
     const getChartData = async () => {
       const data = await fetchMonthlyBorrows();
       setBorrowsChartData(data);
-      console.log(data)
+    };
+
+    const getMostBorrowed = async () => {
+      const data = await fetchMostBorrowedBooks();
+      console.log(data.data)
+      setMostBorrowed(data.data);
     };
 
     fetchUser();
     getStats();
     getRecentTransactions();
     getChartData();
+    getMostBorrowed();
   }, [setUser]);
 
   const columns = [
@@ -65,35 +73,11 @@ const Dashboard = () => {
   ];
 
   const columns2 = [
-    { label: "ID", key: "id" },
-    { label: "Code", key: "code" },
-    { label: "Title", key: "title" },
-    { label: "Type", key: "type" },
-    { label: "Number of Borrows", key: "numBorrows" },
-  ];
-
-  const data2 = [
-    {
-      id: "1",
-      code: "BK-1001",
-      title: "The Great Gatsby",
-      type: "Book",
-      numBorrows: 15,
-    },
-    {
-      id: "2",
-      code: "BK-1002",
-      title: "Introduction to Machine Learning",
-      type: "Book",
-      numBorrows: 8,
-    },
-    {
-      id: "3",
-      code: "DVD-2001",
-      title: "Avengers: Endgame",
-      type: "DVD",
-      numBorrows: 12,
-    },
+    { label: "ID", key: "r_id" },
+    { label: "Title", key: "r_title" },
+    { label: "Author", key: "r_author" },
+    { label: "Cote", key: "r_cote" },
+    { label: "Number of Borrows", key: "r_num_of_borrows" },
   ];
 
   return (
@@ -119,7 +103,7 @@ const Dashboard = () => {
 
       {/* Most Borrowed Books Table */}
       <div className="recent-transactions-container">
-        <Table columns={columns2} data={data2} showActions={false} title="Most Borrowed Books" />
+        <Table columns={columns2} data={mostBorrowed} showActions={false} title="Most Borrowed Books" />
       </div>
     </div>
   );

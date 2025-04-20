@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../src/CSS/login.css";
-import logo from "/assets/images/logo.png";
+import logo from "/assets/images/logo2.png";
 import bgLogin from "../../public/assets/images/bg-login.png";
 import { loginUser } from  '../utils/api';
 
@@ -76,8 +76,8 @@ const Login = () => {
           <div className="login-card">
             <h2>Sign in</h2>
 
-            <form className="login-form" onSubmit={handleLogin}>
-              <div className="form-group">
+            <form className="login-form1" onSubmit={handleLogin}>
+              <div className="form-group1">
                 <label>Email</label>
                 <input
                   type="email"
@@ -90,7 +90,7 @@ const Login = () => {
                 )}
               </div>
 
-              <div className="form-group">
+              <div className="form-group1">
                 <label>Password</label>
                 <input
                   type="password"
@@ -103,7 +103,7 @@ const Login = () => {
                 )}
               </div>
 
-              <button type="submit" className="signin-btn">
+              <button type="submit" className="signin-btn1">
                 Sign in
               </button>
             </form>

@@ -38,11 +38,6 @@
   margin-right: -260px;
 }
 
-.logo img {
-  height: 50px;
-  width: auto;
-  filter: brightness(0); /* Makes the logo black */
-}
 
 .logo-text {
   font-size: 1.5rem;

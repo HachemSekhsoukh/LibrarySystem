@@ -257,7 +257,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_observation,r_description,r_type, "
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type, "
             "Resource_type(rt_name)"
         ).execute()
         status_map = {
@@ -275,6 +275,7 @@ def get_resources():
             'cote': resource['r_cote'],
             'receivingDate': resource['r_receivingDate'],
             'status': resource['r_status'],
+            'numofborrows': resource['r_num_of_borrows'],
             'observation': resource['r_observation'],
             'type': resource['r_type'],
             'description': resource['r_description'],
@@ -433,43 +434,10 @@ def update_resource(resource_id, resource_data):
             'error': str(e)
         }
 
-def create_transaction(reader_id, book_id, transaction_type='Borrow'):
-    """
-    Create a new transaction (exemplaire) in the database
-    """
-    try:
-        # Create transaction data
-        transaction_data = {
-            'reader_id': reader_id,
-            'book_id': book_id,
-            'transaction_type': transaction_type,
-            'transaction_date': datetime.datetime.now().isoformat()
-        }
-        
-        # Insert into the transactions table
-        # Note: Replace 'transactions' with your actual table name
-        response = supabase.from_("transactions").insert(transaction_data).execute()
-        
-        if response.data:
-            return {
-                'success': True,
-                'transaction': response.data[0]
-            }
-        else:
-            return {
-                'success': False,
-                'error': 'Failed to create transaction'
-            }
-    except Exception as e:
-        print(f"Error creating transaction: {e}")
-        return {
-            'success': False,
-            'error': str(e)
-        }
-
 def create_reservation(user_id, resource_id, transaction_type):
     """
-    Create a new reservation in the database
+    Create a new reservation in the database and increment the
+    number of borrows for the resource in the Resource table.
     """
     try:
         # First, get the latest res_id to increment it
@@ -500,10 +468,43 @@ def create_reservation(user_id, resource_id, transaction_type):
         response = supabase.from_("Reservation").insert(reservation_data).execute()
         
         if response.data:
-            return {
-                'success': True,
-                'reservation': response.data[0]
-            }
+            # If the transaction type is "Borrow", increment the r_num_of_borrows in the Resource table
+            if transaction_type == "Borrow":
+                # Fetch the current number of borrows for the resource
+                resource_data = supabase.from_("Resource").select("r_num_of_borrows").eq('r_id', resource_id).execute()
+
+                if resource_data.data and len(resource_data.data) > 0:
+                    current_borrows = resource_data.data[0]['r_num_of_borrows']
+
+                    # Increment the borrow count
+                    updated_borrows = current_borrows + 1
+
+                    # Update the resource with the new borrow count
+                    update_response = supabase.from_("Resource").update(
+                        {'r_num_of_borrows': updated_borrows}
+                    ).eq('r_id', resource_id).execute()
+
+                    if update_response.data:
+                        return {
+                            'success': True,
+                            'reservation': response.data[0],
+                            'message': 'Reservation created and borrow count updated successfully'
+                        }
+                    else:
+                        return {
+                            'success': False,
+                            'error': 'Failed to update borrow count in Resource table'
+                        }
+                else:
+                    return {
+                        'success': False,
+                        'error': 'Failed to fetch resource data'
+                    }
+            else:
+                return {
+                    'success': True,
+                    'reservation': response.data[0]
+                }
         else:
             return {
                 'success': False,
@@ -514,7 +515,9 @@ def create_reservation(user_id, resource_id, transaction_type):
         return {
             'success': False,
             'error': str(e)
-        } 
+        }
+
+
     
 def login(email, password):
     """
@@ -549,6 +552,41 @@ def login(email, password):
 
     except Exception as e:
         print(f"Error logging in: {e}")
+        return {'success': False, 'error': str(e)}
+    
+def login_student(email, password):
+    """
+    Log in a student by verifying credentials from the User table.
+    Uses hashed password comparison.
+    """
+    try:
+        # Fetch only email and hashed password
+        response = supabase \
+            .from_("User") \
+            .select("u_id, u_email, u_name, u_password") \
+            .eq("u_email", email) \
+            .execute()
+
+        if response.data and len(response.data) > 0:
+            student = response.data[0]
+            stored_hashed_password = student["u_password"]
+
+            if check_password_hash(stored_hashed_password, password):
+                return {
+                    'success': True,
+                    'user': {
+                        'id': student['u_id'],
+                        'email': student['u_email'],
+                        'name': student.get('u_name')
+                    }
+                }
+            else:
+                return {'success': False, 'error': 'Invalid email or password'}
+        else:
+            return {'success': False, 'error': 'Invalid email or password'}
+
+    except Exception as e:
+        print(f"Error logging in student: {e}")
         return {'success': False, 'error': str(e)}
 
 def sign_up(email, password, name=None):
@@ -585,6 +623,45 @@ def sign_up(email, password, name=None):
     except Exception as e:
         print(f"Error signing up: {e}")
         return {'success': False, 'error': str(e)}
+    
+def sign_up_student(email, password, name=None):
+    """
+    Register a new student user by inserting into the User table.
+    """
+    try:
+        # Check if student already exists
+        existing = supabase.from_("User").select("u_id").eq("u_email", email).execute()
+        if existing.data and len(existing.data) > 0:
+            return {'success': False, 'error': 'Email already exists'}
+
+        # Hash the password before storing
+        hashed_password = generate_password_hash(password)
+
+        # Prepare new user data
+        new_user = {
+            'u_email': email,
+            'u_password': hashed_password
+        }
+
+        if name:
+            new_user['u_name'] = name
+
+        # Insert new user
+        response = supabase.from_("User").insert(new_user).execute()
+
+        if response.data:
+            return {
+                'success': True,
+                'user': {
+                    'id': response.data[0]['u_id'],
+                    'email': response.data[0]['u_email']
+                }
+            }
+        else:
+            return {'success': False, 'error': 'Failed to sign up'}
+    except Exception as e:
+        print(f"Error signing up student: {e}")
+        return {'success': False, 'error': str(e)}
 
 
 def get_user_by_email(email):
@@ -613,6 +690,33 @@ def get_user_by_email(email):
 
     except Exception as e:
         print(f"Error fetching user by email: {e}")
+        return None
+    
+def get_student_by_email(email):
+    """
+    Fetch a student's public profile details from the User table using email.
+    """
+    try:
+        response = supabase \
+            .from_("User") \
+            .select("u_name, u_email, u_phone, u_birthdate") \
+            .eq("u_email", email) \
+            .limit(1) \
+            .execute()
+
+        if response.data and len(response.data) > 0:
+            user = response.data[0]
+            return {
+                'name': user.get('u_name'),
+                'email': user.get('u_email'),
+                'phone': user.get('u_phone'),
+                'birthdate': user.get('u_birthdate')
+            }
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Error fetching student by email: {e}")
         return None
 
 def update_user_by_email(email, fields):
@@ -652,6 +756,44 @@ def update_user_by_email(email, fields):
         print(f"Error updating user by email: {e}")
         return False
     
+def update_student_by_email(email, fields):
+    """
+    Update a student's profile details in the User table using their email.
+    Only updates fields provided in the `fields` dictionary.
+    """
+    try:
+        # Map internal keys to Supabase column names
+        supabase_fields = {}
+        for key, value in fields.items():
+            if key == 'name':
+                supabase_fields['u_name'] = value
+            elif key == 'birthdate':
+                supabase_fields['u_birthDate'] = value
+            elif key == 'address':
+                supabase_fields['u_address'] = value
+            elif key == 'phone':
+                supabase_fields['u_phone'] = value  # optional
+
+        if not supabase_fields:
+            return False  # Nothing valid to update
+
+        response = supabase \
+            .from_("User") \
+            .update(supabase_fields) \
+            .eq("u_email", email) \
+            .execute()
+
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"Supabase update failed: {response}")
+            return False
+
+    except Exception as e:
+        print(f"Error updating student by email: {e}")
+        return False
+
+    
 def update_user_password(user_email, new_password):
     """
     Update the user's password in the Supabase database.
@@ -684,6 +826,32 @@ def update_user_password(user_email, new_password):
     except Exception as e:
         print(f"Error updating password for user {user_email}: {e}")
         return False
+
+def update_student_password(user_email, new_password):
+    """
+    Update the student's password in the Supabase database.
+    """
+    try:
+        # Hash the new password before storing it
+        hashed_password = generate_password_hash(new_password)
+
+        update_fields = {'u_password': hashed_password}
+
+        response = supabase \
+            .from_("User") \
+            .update(update_fields) \
+            .eq("u_email", user_email) \
+            .execute()
+
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"Supabase update failed: {response}")
+            return False
+
+    except Exception as e:
+        print(f"Error updating student password for {user_email}: {e}")
+        return False
     
 def get_user_password(email):
     """
@@ -708,6 +876,29 @@ def get_user_password(email):
 
     except Exception as e:
         print(f"Error fetching user password by email: {e}")
+        return None
+
+def get_student_password(email):
+    """
+    Fetch the student's password from the Supabase database using their email.
+    Returns the hashed password if found, otherwise returns None.
+    """
+    try:
+        response = supabase \
+            .from_("User") \
+            .select("u_password") \
+            .eq("u_email", email) \
+            .execute()
+
+        if response.data:
+            print(response.data[0]["u_password"])
+            return response.data[0]["u_password"]
+        else:
+            print(f"Student not found for email {email} or query failed.")
+            return None
+
+    except Exception as e:
+        print(f"Error fetching student password by email: {e}")
         return None
     
 
@@ -1120,3 +1311,25 @@ def update_reader(reader_id, reader_data):
     except Exception as e:
         print(f"Error updating reader: {e}")
         return {'success': False, 'error': str(e)}
+
+
+def get_most_borrowed_resources(limit=5):
+    """
+    Fetch the most borrowed resources from the Resource table.
+    Returns a list of dictionaries with resource info sorted by r_num_of_borrows.
+    """
+    try:
+        response = supabase.table("Resource") \
+            .select("r_id,r_author ,r_title, r_cote, r_type, r_num_of_borrows") \
+            .order("r_num_of_borrows", desc=True) \
+            .limit(limit) \
+            .execute()
+        print(response)
+
+        if response.data:
+            return response.data
+        else:
+            return []
+    except Exception as e:
+        print("Error fetching most borrowed resources:", e)
+        return []
