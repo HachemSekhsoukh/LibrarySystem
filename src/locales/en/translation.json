@@ -101,7 +101,11 @@
     "add_new_reader": "Add new reader",
     "verify_new_readers": "Verify new readers",
     "category": "Category",
+    "add_new_reader_type": "Add new reader type",
+    "reader_type": "Reader type",
     "transaction_type": "Transaction type",
-    "document_title": "Document title"
+    "document_title": "Document title",
+    "edit_reader_type": "Edit reader type",
+    "borrow_limit": "Borrow limit"
   }
   
