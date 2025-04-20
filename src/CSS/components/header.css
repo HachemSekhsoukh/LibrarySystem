@@ -42,3 +42,38 @@
     height: 32px;
     cursor: pointer;
 }
+
+.language-option {
+    display: flex;
+    align-items: center;
+  
+  }
+  
+  .react-select__menu {
+    z-index: 9999 !important;
+  }
+  
+  .custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* In your Settings.css */
+  .language-selector {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .language-selector label {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+  
+  /* Remove default focus outline */
+  .react-select__control--is-focused {
+    box-shadow: none !important;
+    border-color: var(--primary-color) !important;
+  }
+  

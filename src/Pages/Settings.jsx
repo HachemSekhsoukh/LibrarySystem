@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from 'react';
 import { getUserInfo, updateUserInfo, updateUserPassword } from  '../utils/api';
 
+
 const Settings = () => {
   const { t, i18n } = useTranslation();
   const { user, setUser } = useUser(); // use context
@@ -315,14 +316,6 @@ const Settings = () => {
 
           {activeTab === "preferences" && (
             <div className="preferences-container">
-              <div className="language-selector">
-                <label htmlFor="language">{t("language")}:</label>
-                <select id="language" onChange={handleLanguageChange} value={i18n.language}>
-                  <option value="en">English</option>
-                  <option value="fr">Français</option>
-                </select>
-              </div>
-
               <div className="darkmode-toggle">
                 <FormControlLabel
                   control={
