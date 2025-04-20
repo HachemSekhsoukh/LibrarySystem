@@ -147,6 +147,21 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                 </TextField>
             </Grid>
 
+            {/* Description */}
+            <Grid item xs={12}>
+                <TextField
+                    label="Description"
+                    name="description"
+                    value={bookData.description}
+                    onChange={handleChange}
+                    variant="outlined"
+                    fullWidth
+                    multiline
+                    rows={3}
+                    InputLabelProps={{ shrink: true }}
+                />
+            </Grid>
+
             {/* Observation */}
             <Grid item xs={12}>
                 <TextField
