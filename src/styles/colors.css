@@ -19,12 +19,13 @@
 /* Dark mode overrides */
 .dark {
     --white-color: black;
-    --secondary-background-color: black;
-    --background-color: #252525;
+    --primary-color: #053048;
+    --secondary-background-color: rgb(26, 26, 26);
+    --background-color: #0f0f0f;
     --button-color: #0c71ac;
     --table-row-line: rgb(150, 150, 150);
     --table-header-color: #a9d0e6;
     --text-color: #ffffff;
-    --table-background-color: black;
+    --table-background-color: rgb(26, 26, 26);
     --input-disabeled: rgb(85, 85, 85);
 }
