@@ -4,6 +4,7 @@ import "../CSS/components/table.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from 'react-i18next';
+import { BorderBottom } from "@mui/icons-material";
 
 const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [], onEdit, onDelete }) => {
   const [searchText, setSearchText] = useState("");
@@ -70,26 +71,31 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
     rows: {
       style: {
         fontSize: "0.9rem",
-        borderBottom: "1px solid #ddd",
-        backgroundColor: "transparent",
+        backgroundColor: "var(--table-background-color)",
+        color: "var(--text-color)",
       },
-    },
+    },    
     cells: {
       style: {
         padding: "10px",
+        borderBottom: "1px solid var(--table-row-line)", 
       },
     },
+    
     pagination: {
       style: {
         display: "flex",
         justifyContent: "center",
+        color: "var(--text-color)",
         alignItems: "center",
+        backgroundColor: "var(--table-background-color)",
         marginTop: "20px",
       },
     },
     // Make sure checkboxes are visible
     checkbox: {
       style: {
+        color: "var(--text-color)",
         width: "18px",
         height: "18px",
         opacity: "1",
