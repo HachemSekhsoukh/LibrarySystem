@@ -6,10 +6,12 @@ import { TextField, Snackbar, Alert, MenuItem, Autocomplete, Dialog, DialogTitle
 import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import "../../CSS/circulation/readers.css";
+import { useTranslation } from 'react-i18next';
 
 const Readers = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
   const [readers, setReaders] = useState([]);
+  const { t } = useTranslation();
   const [userTypes, setUserTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openPopup, setOpenPopup] = useState(false);
@@ -427,12 +429,12 @@ const Readers = () => {
   };
 
   const columns = [
-    { label: "ID", key: "id" },
-    { label: "Name", key: "name" },
-    { label: "Date of Birth", key: "dob" },
-    { label: "Email", key: "email" },
-    { label: "Phone", key: "phone" },
-    { label: "Category", key: "type" }
+    { label: t("id"), key: "id" },
+    { label: t("name"), key: "name" },
+    { label: t("date_of_birth"), key: "dob" },
+    { label: t("email"), key: "email" },
+    { label: t("phone_number"), key: "phone" },
+    { label: t("category"), key: "type" }
   ];
 
   const pendingColumns = [
@@ -447,11 +449,11 @@ const Readers = () => {
         />
       )
     },
-    { label: "ID", key: "id" },
-    { label: "Name", key: "name" },
-    { label: "Email", key: "email" },
-    { label: "Phone", key: "phone" },
-    { label: "Type", key: "type" },
+    { label: t("id"), key: "id" },
+    { label: t("name"), key: "name" },
+    { label: t("email"), key: "email" },
+    { label: t("phone"), key: "phone" },
+    { label: t("type"), key: "type" }
   ];
 
   return (
@@ -462,15 +464,15 @@ const Readers = () => {
             columns={columns} 
             data={readers} 
             showActions={true} 
-            title={"Readers"} 
+            title={t("readers")} 
             loading={loading} 
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
         </div>
         <div className="bottom-buttons">
-          <Button onClick={() => setVerifyReadersPopup(true)} label="Verify New Readers" lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
-          <Button onClick={() => setOpenPopup(true)} label="Add New Reader" lightBackgrnd={false} icon={<AddIcon />} size="large" />
+          <Button onClick={() => setVerifyReadersPopup(true)} label={t("verify_new_readers")} lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
+          <Button onClick={() => setOpenPopup(true)} label={t("add_new_reader")} lightBackgrnd={false} icon={<AddIcon />} size="large" />
         </div>
       </div>
       
@@ -479,33 +481,33 @@ const Readers = () => {
         <div className="add-reader-form">
           <div className="form-row">
             <div className="form-group">
-              <label>Name</label>
+              <label>{t("name")}</label>
               <TextField fullWidth type="text" name="u_name" value={newReader.u_name} onChange={handleInputChange} />
             </div>
             <div className="form-group">
-              <label>Date of Birth</label>
+              <label>{t("date_of_birth")}</label>
               <TextField fullWidth type="date" name="u_birthDate" value={newReader.u_birthDate} onChange={handleInputChange} />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label>Email</label>
+              <label>{t("email")}</label>
               <TextField fullWidth type="email" name="u_email" value={newReader.u_email} onChange={handleInputChange} />
             </div>
             <div className="form-group">
-              <label>Phone</label>
+              <label>{t("phone_number")}</label>
               <TextField fullWidth type="tel" name="u_phone" value={newReader.u_phone} onChange={handleInputChange} />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label>Password {isEditing && "(leave blank to keep current password)"}</label>
+              <label>{t("password")} {isEditing && "(leave blank to keep current password)"}</label>
               <TextField fullWidth type="password" name="u_password" value={newReader.u_password} onChange={handleInputChange} />
             </div>
             <div className="form-group">
-              <label>User Type</label>
+              <label>{t("user_type")}</label>
               <Autocomplete
                 fullWidth
                 options={userTypes}
@@ -547,7 +549,7 @@ const Readers = () => {
             <button className="dialog-cancel-button" onClick={() => {
               setOpenPopup(false);
               resetForm();
-            }}>Cancel</button>
+            }}>{t("cancel")}</button>
             <button className="dialog-save-button" onClick={handleAddReader}>Save</button>
           </div>
         </div>
@@ -555,7 +557,7 @@ const Readers = () => {
 
       {/* Verify Readers Popup */}
       <Popup
-        title="Verify New Readers"
+        title={t("verify_new_readers")}
         openPopup={verifyReaders}
         setOpenPopup={setVerifyReadersPopup}
         maxWidth="md"
