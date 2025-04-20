@@ -99,9 +99,13 @@
 
     "manage_your_preferences": "Gérer vos préférences",
     "add_new_reader": "Ajouter un nouveau lecteur",
+    "add_new_reader_type": "Ajouter un nouveau type de lecteur",
     "verify_new_readers": "Vérifier les nouveaux lecteurs",
+    "reader_types": "Type de lecteurs",
     "category": "Categorie",
     "transaction_type": "Type de la transaction",
-    "document_title": "Titre du document"
+    "document_title": "Titre du document",
+    "edit_reader_type": "Modifier le type de lecteur",
+    "borrow_limit": "Limite d'emprunts"
   }
   
