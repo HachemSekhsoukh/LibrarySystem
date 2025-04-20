@@ -85,6 +85,8 @@
     "total_number_of_borrows_this_month": "Total Number of Borrows This Month",
     "total_number_of_overdue_books": "Total Number of Overdue Books",
     "recent_transactions": "Recent Transactions",
+    "transactions": "Transactions",
+    "add_transaction": "Add transaction",
     "most_borrowed_books": "Most Borrowed Books",
     "title": "Title",
     "borrower_name": "Borrower Name",
@@ -98,6 +100,8 @@
     "manage_your_preferences": "Manage your preferences",
     "add_new_reader": "Add new reader",
     "verify_new_readers": "Verify new readers",
-    "category": "Category"
+    "category": "Category",
+    "transaction_type": "Transaction type",
+    "document_title": "Document title"
   }
   
