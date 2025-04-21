@@ -102,7 +102,8 @@ def get_student_info():
             'phone': user.get('phone'),
             'birthdate': user.get('birthdate'),
             'address': user.get('address'),
-            'type': user.get('type')
+            'type': user.get('type'),
+            'status': user.get('status')
         }), 200
     return jsonify({'error': 'User not found'}), 404
 

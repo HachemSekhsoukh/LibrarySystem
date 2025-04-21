@@ -448,6 +448,7 @@ def create_reservation(user_id, resource_id, transaction_type):
         # First, get the latest res_id to increment it
         latest_res = supabase.from_("Reservation").select("res_id").order("res_id", desc=True).limit(1).execute()
         
+        
         # Calculate new res_id
         new_res_id = 1  # Default if no existing reservations
         if latest_res.data and len(latest_res.data) > 0:
@@ -471,6 +472,10 @@ def create_reservation(user_id, resource_id, transaction_type):
         
         # Insert into the Reservation table
         response = supabase.from_("Reservation").insert(reservation_data).execute()
+        if transaction_type == "Borrow" or transaction_type == "Renew":
+            update_resource_status(resource_id, 0)
+        if transaction_type == "Return":
+            update_resource_status(resource_id, 1)
         
         if response.data:
             # If the transaction type is "Borrow", increment the r_num_of_borrows in the Resource table
@@ -522,7 +527,16 @@ def create_reservation(user_id, resource_id, transaction_type):
             'error': str(e)
         }
 
-
+def update_resource_status(resource_id, status):
+    """
+    Update the status of a resource in the database.
+    """
+    try:
+        response = supabase.from_("Resource").update({'r_status': status}).eq('r_id', resource_id).execute()
+        return response.data
+    except Exception as e:
+        print(f"Error updating resource status: {e}")
+        return None
     
 def login(email, password):
     """
@@ -711,7 +725,7 @@ def get_student_by_email(email):
     try:
         response = supabase \
             .from_("User") \
-            .select("u_id, u_name, u_email, u_phone, u_birthDate, u_type") \
+            .select("u_id, u_name, u_email, u_phone, u_birthDate, u_type, u_status") \
             .eq("u_email", email) \
             .limit(1) \
             .execute()
@@ -725,7 +739,8 @@ def get_student_by_email(email):
                 'email': user.get('u_email'),
                 'phone': user.get('u_phone'),
                 'birthdate': user.get('u_birthDate'),
-                'type': user.get('u_type')
+                'type': user.get('u_type'),
+                'status': user.get('u_status')
             }
         else:
             return None
