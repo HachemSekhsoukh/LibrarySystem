@@ -34,6 +34,31 @@ const Readers = () => {
   const [currentReaderId, setCurrentReaderId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [readerToDelete, setReaderToDelete] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
+
+
+  const validateForm = () => {
+    const errors = {};
+  
+    if (!newReader.u_name.trim()) errors.u_name = "Name is required";
+    if (!newReader.u_birthDate) errors.u_birthDate = "Date of birth is required";
+    if (!newReader.u_email) {
+      errors.u_email = "Email is required";
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(newReader.u_email)) {
+      errors.u_email = "Invalid email format";
+    }
+    if (!newReader.u_phone) {
+      errors.u_phone = "Phone number is required";
+    } else if (!/^\+?\d{7,15}$/.test(newReader.u_phone)) {
+      errors.u_phone = "Invalid phone number";
+    }
+    if (!isEditing && !newReader.u_password) errors.u_password = "Password is required";
+    if (!newReader.u_type) errors.u_type = "User type is required";
+  
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+  
 
   useEffect(() => {
     const fetchReaders = async () => {
@@ -127,15 +152,15 @@ const Readers = () => {
       u_password: "", 
       u_type: "" 
     });
+    setFormErrors({});
     setIsEditing(false);
     setCurrentReaderId(null);
   };
+  
 
   const handleAddReader = async () => {
-    console.log("New Reader Data:", newReader); // Debugging log
-  
-    if (!newReader.u_name || !newReader.u_birthDate || !newReader.u_email || !newReader.u_phone || (!isEditing && !newReader.u_password) || !newReader.u_type) {
-      setSnackbar({ open: true, message: "All fields are required", severity: "error" });
+    if (!validateForm()) {
+      setSnackbar({ open: true, message: "Please fix the form errors", severity: "error" });
       return;
     }
   
@@ -478,83 +503,120 @@ const Readers = () => {
       
       {/* Add/Edit Reader Popup */}
       <Popup title={isEditing ? "Edit Reader" : "Add New Reader"} openPopup={openPopup} setOpenPopup={setOpenPopup}>
-        <div className="add-reader-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label>{t("name")}</label>
-              <TextField fullWidth type="text" name="u_name" value={newReader.u_name} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>{t("date_of_birth")}</label>
-              <TextField fullWidth type="date" name="u_birthDate" value={newReader.u_birthDate} onChange={handleInputChange} />
-            </div>
-          </div>
+  <div className="add-reader-form">
+    <div className="form-row">
+      <div className="form-group">
+        <label>{t("name")}</label>
+        <TextField
+          fullWidth
+          type="text"
+          name="u_name"
+          value={newReader.u_name}
+          onChange={handleInputChange}
+          error={!!formErrors.u_name}
+          helperText={formErrors.u_name}
+        />
+      </div>
+      <div className="form-group">
+        <label>{t("date_of_birth")}</label>
+        <TextField
+          fullWidth
+          type="date"
+          name="u_birthDate"
+          value={newReader.u_birthDate}
+          onChange={handleInputChange}
+          error={!!formErrors.u_birthDate}
+          helperText={formErrors.u_birthDate}
+        />
+      </div>
+    </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>{t("email")}</label>
-              <TextField fullWidth type="email" name="u_email" value={newReader.u_email} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>{t("phone_number")}</label>
-              <TextField fullWidth type="tel" name="u_phone" value={newReader.u_phone} onChange={handleInputChange} />
-            </div>
-          </div>
+    <div className="form-row">
+      <div className="form-group">
+        <label>{t("email")}</label>
+        <TextField
+          fullWidth
+          type="email"
+          name="u_email"
+          value={newReader.u_email}
+          onChange={handleInputChange}
+          error={!!formErrors.u_email}
+          helperText={formErrors.u_email}
+        />
+      </div>
+      <div className="form-group">
+        <label>{t("phone_number")}</label>
+        <TextField
+          fullWidth
+          type="tel"
+          name="u_phone"
+          value={newReader.u_phone}
+          onChange={handleInputChange}
+          error={!!formErrors.u_phone}
+          helperText={formErrors.u_phone}
+        />
+      </div>
+    </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>{t("password")} {isEditing && "(leave blank to keep current password)"}</label>
-              <TextField fullWidth type="password" name="u_password" value={newReader.u_password} onChange={handleInputChange} />
-            </div>
-            <div className="form-group">
-              <label>{t("user_type")}</label>
-              <Autocomplete
-                fullWidth
-                options={userTypes}
-                value={newReader.u_type}
-                onChange={(event, newValue) => {
-                  if (newValue) {
-                    handleAutocompleteChange("u_type", newValue);
-                  }
-                }}
-                getOptionLabel={(option) => {
-                  if (typeof option === 'string') {
-                    return option;
-                  }
-                  return option.name || '';
-                }}
-                isOptionEqualToValue={(option, value) => {
-                  if (!option || !value) return false;
-                  if (typeof option === 'object' && typeof value === 'object') {
-                    return option.id === value.id;
-                  }
-                  return option === value;
-                }}
-                renderInput={(params) => (
-                  <TextField 
-                    {...params} 
-                    placeholder="Select user type"
-                    variant="outlined"
-                    className="text-field"
-                    error={!newReader.u_type && snackbar.open && snackbar.severity === 'error'}
-                    helperText={!newReader.u_type && snackbar.open && snackbar.severity === 'error' ? 'User type is required' : ''}
-                  />
-                )}
-                className="dropdown-field"
-              />
-            </div>
-          </div>
+    <div className="form-row">
+      <div className="form-group">
+        <label>{t("password")} {isEditing && "(leave blank to keep current password)"}</label>
+        <TextField
+          fullWidth
+          type="password"
+          name="u_password"
+          value={newReader.u_password}
+          onChange={handleInputChange}
+          error={!!formErrors.u_password}
+          helperText={formErrors.u_password}
+        />
+      </div>
+      <div className="form-group">
+        <label>{t("user_type")}</label>
+        <Autocomplete
+          fullWidth
+          options={userTypes}
+          value={newReader.u_type}
+          onChange={(event, newValue) => {
+            if (newValue) {
+              handleAutocompleteChange("u_type", newValue);
+            }
+          }}
+          getOptionLabel={(option) => {
+            if (typeof option === 'string') return option;
+            return option.name || '';
+          }}
+          isOptionEqualToValue={(option, value) => {
+            if (!option || !value) return false;
+            if (typeof option === 'object' && typeof value === 'object') {
+              return option.id === value.id;
+            }
+            return option === value;
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              placeholder="Select user type"
+              variant="outlined"
+              className="text-field"
+              error={!!formErrors.u_type}
+              helperText={formErrors.u_type}
+            />
+          )}
+          className="dropdown-field"
+        />
+      </div>
+    </div>
 
-          <div className="dialog-button-container">
-            <button className="dialog-cancel-button" onClick={() => {
-              setOpenPopup(false);
-              resetForm();
-            }}>{t("cancel")}</button>
-            <button className="dialog-save-button" onClick={handleAddReader}>Save</button>
-          </div>
-        </div>
-      </Popup>
-
+    <div className="dialog-button-container">
+      <button className="dialog-cancel-button" onClick={() => {
+        setOpenPopup(false);
+        resetForm();
+      }}>{t("cancel")}</button>
+      <button className="dialog-save-button" onClick={handleAddReader}>Save</button>
+    </div>
+  </div>
+</Popup>
       {/* Verify Readers Popup */}
       <Popup
         title={t("verify_new_readers")}

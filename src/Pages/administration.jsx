@@ -41,6 +41,19 @@ const Administration = () => {
     birthdate: "",
     staff_type_id: ""
   });
+  const resetStaffForm = () => {
+    setNewStaff({
+      name: "",
+      email: "",
+      password: "",
+      phone: "",
+      address: "",
+      birthdate: "",
+      staff_type_id: ""
+    });
+    setErrors({});
+  };
+  
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -48,7 +61,8 @@ const Administration = () => {
     severity: "success"
   });
 
-  // Example checkbox options
+  const [errors, setErrors] = useState({});
+  
   const checkboxOptions = [
     "Can View",
     "Can Edit",
@@ -66,8 +80,8 @@ const Administration = () => {
   };
 
   const staffTypesColumns = [
-    { label: t("id"), key: "id" },  // Translated label
-    { label: t("type"), key: "name" },  // Translated label
+    { label: t("id"), key: "id" },
+    { label: t("type"), key: "name" },
   ];
 
   const columns = [
@@ -100,7 +114,6 @@ const Administration = () => {
     setLoading(true);
     try {
       const result = await fetchStaffTypes();
-
       if (Array.isArray(result)) {
         const formatted = result.map((type) => ({
           id: type.id,
@@ -115,7 +128,7 @@ const Administration = () => {
       console.error("Error fetching staff types:", error);
       setSnackbar({
         open: true,
-        message: t("failed_to_fetch_staff_types"), // Translated error message
+        message: t("failed_to_fetch_staff_types"),
         severity: "error"
       });
       setStaffTypesData([]);
@@ -137,18 +150,17 @@ const Administration = () => {
     setLoading(true);
     try {
       const response = await addStaffType(newStaffType);
-
       if (response?.success) {
         setSnackbar({
           open: true,
-          message: t("staff_type_added_success"), // Translated success message
+          message: t("staff_type_added_success"),
           severity: "success"
         });
         setNewStaffType({ st_name: "" });
         setOpenTypePopup(false);
         await fetchStaffTypesData();
       } else {
-        throw new Error(t("error_add_staff_type")); // Translated error message
+        throw new Error(t("failed_add_staff_type"));
       }
     } catch (error) {
       setSnackbar({
@@ -172,15 +184,57 @@ const Administration = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const validateInputs = () => {
+    const validationErrors = {};
+
+    // Name validation
+    if (!newStaff.name) validationErrors.name = t("name_required");
+
+    // Email validation
+    if (!newStaff.email) {
+        validationErrors.email = t("email_required");
+    } else if (!/\S+@\S+\.\S+/.test(newStaff.email)) {
+        validationErrors.email = t("email_invalid");
+    }
+
+    // Password validation
+    if (!newStaff.password) validationErrors.password = t("password_required");
+
+    // Phone number validation (only digits allowed)
+    if (!newStaff.phone) {
+        validationErrors.phone = t("phone_required");
+    } else if (!/^\d+$/.test(newStaff.phone)) {
+        validationErrors.phone = t("phone_invalid");
+    }
+
+    // Address validation
+    if (!newStaff.address) validationErrors.address = t("address_required");
+
+    // Birthdate validation (in correct format, e.g., YYYY-MM-DD)
+    if (!newStaff.birthdate) {
+        validationErrors.birthdate = t("birthdate_required");
+    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(newStaff.birthdate)) {
+        validationErrors.birthdate = t("birthdate_invalid_format");
+    }
+
+    // Staff type validation
+    if (!newStaff.staff_type_id) validationErrors.staff_type_id = t("staff_type_required");
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+
+
   const handleSubmit = async () => {
+    if (!validateInputs()) return;
+
     setLoading(true);
     try {
       const response = await addStaffMember(newStaff);
-
       if (response?.success) {
         setSnackbar({
           open: true,
-          message: t("staff_member_added_success"), // Translated success message
+          message: t("staff_member_added_success"),
           severity: "success"
         });
         setNewStaff({
@@ -195,7 +249,7 @@ const Administration = () => {
         setOpenPopup(false);
         await fetchStaffData();
       } else {
-        throw new Error(t("error_add_staff_member")); // Translated error message
+        throw new Error(t("failed_add_staff_member"));
       }
     } catch (error) {
       setSnackbar({
@@ -219,12 +273,12 @@ const Administration = () => {
               columns={columns}
               data={staffData}
               showActions={true}
-              title={t("staff_members")} // Translated title
+              title={t("staff_members")}
             />
             <div className="bottom-buttons">
               <Button
                 onClick={() => setOpenPopup(true)}
-                label={t("add_staff_member")} // Translated button label
+                label={t("add_staff_member")}
                 lightBackgrnd={false}
                 icon={<AddIcon />}
                 size="large"
@@ -243,12 +297,12 @@ const Administration = () => {
               columns={staffTypesColumns}
               data={staffTypesData}
               showActions={true}
-              title={t("staff_types")} // Translated title
+              title={t("staff_types")}
             />
             <div className="bottom-buttons">
               <Button
                 onClick={() => setOpenTypePopup(true)}
-                label={t("add_staff_type")} // Translated button label
+                label={t("add_staff_type")}
                 lightBackgrnd={false}
                 icon={<AddIcon />}
                 size="large"
@@ -260,13 +314,13 @@ const Administration = () => {
 
       {/* Add Staff Type Popup */}
       <Popup
-        title={t("add_staff_type")} // Translated title
+        title={t("add_staff_type")}
         openPopup={openTypePopup}
         setOpenPopup={setOpenTypePopup}
       >
         <div className="add-staff-type-form">
           <div className="form-field">
-            <label>{t("staff_type_name")}</label> 
+            <label>{t("staff_type_name")}</label>
             <TextField
               className="text-field"
               name="st_name"
@@ -274,13 +328,12 @@ const Administration = () => {
               onChange={handleTypeChange}
               variant="outlined"
               fullWidth
-              placeholder={t("enter_staff_type_name")} 
+              placeholder={t("enter_staff_type_name")}
             />
           </div>
 
-          {/* Checkboxes in grid */}
           <div className="form-field">
-            <label>{t("privelages")}</label> {/* Translated label */}
+            <label>{t("privelages")}</label>
             <Grid container spacing={1}>
               {checkboxOptions.map((option, index) => (
                 <Grid item xs={6} key={index}>
@@ -292,7 +345,7 @@ const Administration = () => {
                         onChange={handleCheckboxChange}
                       />
                     }
-                    label={t(option)} 
+                    label={t(option)}
                   />
                 </Grid>
               ))}
@@ -301,10 +354,10 @@ const Administration = () => {
 
           <div className="dialog-button-container">
             <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>
-              {t("cancel")} {/* Translated button label */}
+              {t("cancel")}
             </button>
             <button className="dialog-save-button" onClick={handleAddStaffType} disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : t("Save")} {/* Translated button label */}
+              {loading ? <CircularProgress size={24} /> : t("Save")}
             </button>
           </div>
         </div>
@@ -312,7 +365,7 @@ const Administration = () => {
 
       {/* Add Staff Member Popup */}
       <Popup
-        title={t("add_staff_member")} // Translated title
+        title={t("add_staff_member")}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
         className="staff-popup"
@@ -320,7 +373,7 @@ const Administration = () => {
         <div className="add-staff-form">
           <div className="form-field-row">
             <div className="form-field">
-              <label>{t("name")}</label> {/* Translated label */}
+              <label>{t("name")}</label>
               <TextField
                 className="text-field"
                 name="name"
@@ -329,11 +382,13 @@ const Administration = () => {
                 variant="outlined"
                 fullWidth
                 placeholder={t("enter_name")}
+                error={!!errors.name}
+                helperText={errors.name}
               />
             </div>
 
             <div className="form-field">
-              <label>{t("email")}</label> {/* Translated label */}
+              <label>{t("email")}</label>
               <TextField
                 className="text-field"
                 name="email"
@@ -342,13 +397,15 @@ const Administration = () => {
                 variant="outlined"
                 fullWidth
                 placeholder={t("enter_email")}
+                error={!!errors.email}
+                helperText={errors.email}
               />
             </div>
           </div>
 
           <div className="form-field-row">
             <div className="form-field">
-              <label>{t("password")}</label> {/* Translated label */}
+              <label>{t("password")}</label>
               <TextField
                 className="text-field"
                 name="password"
@@ -357,11 +414,13 @@ const Administration = () => {
                 variant="outlined"
                 fullWidth
                 placeholder={t("password_placeholder")}
+                error={!!errors.password}
+                helperText={errors.password}
               />
             </div>
 
             <div className="form-field">
-              <label>{t("phone_number")}</label> {/* Translated label */}
+              <label>{t("phone_number")}</label>
               <TextField
                 className="text-field"
                 name="phone"
@@ -369,14 +428,16 @@ const Administration = () => {
                 onChange={handleChange}
                 variant="outlined"
                 fullWidth
-                placeholder={t("enter_phone_number")} 
+                placeholder={t("enter_phone_number")}
+                error={!!errors.phone}
+                helperText={errors.phone}
               />
             </div>
           </div>
 
           <div className="form-field-row">
             <div className="form-field">
-              <label>{t("address")}</label> {/* Translated label */}
+              <label>{t("address")}</label>
               <TextField
                 className="text-field"
                 name="address"
@@ -385,11 +446,13 @@ const Administration = () => {
                 variant="outlined"
                 fullWidth
                 placeholder={t("enter_address")}
+                error={!!errors.address}
+                helperText={errors.address}
               />
             </div>
 
             <div className="form-field">
-              <label>{t("birthdate")}</label> {/* Translated label */}
+              <label>{t("birthdate")}</label>
               <TextField
                 className="text-field"
                 name="birthdate"
@@ -399,12 +462,14 @@ const Administration = () => {
                 fullWidth
                 type="date"
                 InputLabelProps={{ shrink: true }}
+                error={!!errors.birthdate}
+                helperText={errors.birthdate}
               />
             </div>
           </div>
 
           <div className="form-field">
-            <label>{t("staff_type")}</label> {/* Translated label */}
+            <label>{t("staff_type")}</label>
             <TextField
               select
               className="text-field"
@@ -414,6 +479,8 @@ const Administration = () => {
               variant="outlined"
               fullWidth
               placeholder={t("select_staff_type")}
+              error={!!errors.staff_type_id}
+              helperText={errors.staff_type_id}
             >
               {staffTypesData.map((type) => (
                 <MenuItem key={type.id} value={type.id}>
@@ -424,11 +491,11 @@ const Administration = () => {
           </div>
 
           <div className="dialog-button-container">
-            <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>
-              {t("cancel")} {/* Translated button label */}
+            <button className="dialog-cancel-button" onClick={() =>{ setOpenPopup(false); resetStaffForm();}}>
+              {t("cancel")}
             </button>
             <button className="dialog-save-button" onClick={handleSubmit} disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : t("save")} {/* Translated button label */}
+              {loading ? <CircularProgress size={24} /> : t("save")}
             </button>
           </div>
         </div>
