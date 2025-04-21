@@ -30,13 +30,13 @@
     "confirm_password_label": "Confirmer le nouveau mot de passe",
     "confirm_password_placeholder": "Confirmer le nouveau mot de passe",
     "update": "Mettre à jour",
-    "error_empty": "Veuillez remplir tous les champs du mot de passe.",
-    "error_mismatch": "Les nouveaux mots de passe ne correspondent pas.",
-    "error_update_failed": "Échec de la mise à jour du mot de passe. Veuillez vérifier votre mot de passe actuel.",
+    "empty": "Veuillez remplir tous les champs du mot de passe.",
+    "mismatch": "Les nouveaux mots de passe ne correspondent pas.",
+    "update_failed": "Échec de la mise à jour du mot de passe. Veuillez vérifier votre mot de passe actuel.",
     "success_password_updated": "Mot de passe mis à jour avec succès.",
     "success_profile_update": "Profil mis à jour avec succès.",
-    "error_profile_update": "Échec de la mise à jour du profil.",
-    "error_fill_all": "Veuillez remplir tous les champs.",
+    "profile_update": "Échec de la mise à jour du profil.",
+    "fill_all": "Veuillez remplir tous les champs.",
 
     "dashboard": "Tableau de bord",
     "administration": "Administration",
@@ -57,8 +57,8 @@
     "staff_type_name": "Nom du type de personnel",
     "privileges": "Privilèges",
     "cancel": "Annuler",
-    "error_add_staff_member": "Échec de l'ajout du membre du personnel",
-    "error_add_staff_type": "Échec de l'ajout du type de personnel",
+    "failed_add_staff_member": "Échec de l'ajout du membre du personnel",
+    "failed_add_staff_type": "Échec de l'ajout du type de personnel",
     "staff_type_added_success": "Type de personnel ajouté avec succès !",
     "staff_member_added_success": "Membre du personnel ajouté avec succès !",
     "failed_to_fetch_staff_types": "Échec de la récupération des types de personnel",
@@ -107,6 +107,17 @@
     "document_title": "Titre du document",
     "edit_reader_type": "Modifier le type de lecteur",
     "borrow_limit": "Limite d'emprunts",
-    "dark_mode": "Mode sombre"
+    "dark_mode": "Mode sombre",
+
+    "name_required": "Le nom est requis.",
+    "email_invalid": "Veuillez entrer une adresse email valide.",
+    "phone_required": "Le numéro de téléphone est requis.",
+    "phone_invalid": "Veuillez entrer un numéro de téléphone valide.",
+    "address_required": "L'adresse est requise.",
+    "birthdate_required": "La date de naissance est requise.",
+    "staff_type_required": "Le type de personnel est requis.",
+    "password_mismatch": "Les mots de passe ne correspondent pas.",
+    "form_incomplete": "Veuillez remplir tous les champs correctement.",
+    "password_strength": "Le mot de passe doit contenir au moins 8 caractères, incluant des majuscules, des minuscules, des chiffres et des caractères spéciaux."
   }
   
