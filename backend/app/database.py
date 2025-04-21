@@ -250,6 +250,20 @@ def get_transactions():
         print(f"Error fetching transactions: {e}")
         return []
 
+def get_transactions_by_user(user_id):
+    """
+    Retrieve all transactions for a specific user by their user ID.
+    """
+    try:
+        response = supabase.from_("Reservation").select(
+            "res_id, res_type, res_date,"
+            "Resource(r_id, r_title)"
+        ).eq("res_user_id", user_id).execute()
+
+        return response.data
+    except Exception as e:
+        print(f"Error fetching transactions: {e}")
+        return []
 
 def get_resources():
     """
