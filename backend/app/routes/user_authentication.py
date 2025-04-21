@@ -87,6 +87,7 @@ def student_logout():
 @app.route('/api/student/user/me', methods=['GET'])
 @jwt_required()
 def get_student_info():
+    print("get_student_info")
     access_token = request.cookies.get('access_token_cookie')
     if not access_token:
         return jsonify({"error": "Missing token in cookies"}), 401
@@ -95,11 +96,13 @@ def get_student_info():
     user = get_student_by_email(user_email)
     if user:
         return jsonify({
+            'id': user['id'],
             'name': user['name'],
             'email': user['email'],
             'phone': user.get('phone'),
             'birthdate': user.get('birthdate'),
-            'address': user.get('address')
+            'address': user.get('address'),
+            'type': user.get('type')
         }), 200
     return jsonify({'error': 'User not found'}), 404
 

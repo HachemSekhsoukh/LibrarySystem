@@ -20,7 +20,10 @@ def create_transaction_endpoint():
     API endpoint to create a new reservation
     """
     data = request.json
-    
+    print("create_transaction_endpoint")
+    print(data)
+    print("--------------------------------")
+
     # Validate required fields
     if not data.get('readerId'):
         return jsonify({"error": "Reader ID is required"}), 400
