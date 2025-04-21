@@ -29,7 +29,7 @@ const MonthlyBorrowsChart = ({ data }) => {
             labelStyle={{ color: "var(--text-color)" }}
             itemStyle={{ color: "var(--button-color)" }}
           />
-          <Bar dataKey="borrows" fill="var(--primary-color)" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="borrows" fill="var(--chart-color)" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
