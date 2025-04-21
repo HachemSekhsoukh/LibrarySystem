@@ -224,7 +224,7 @@ def get_transactions():
     """
     try:
         response = supabase.from_("Reservation").select(
-            "res_id, res_status, res_date,"
+            "res_id, res_type, res_date,"
             "User(u_id, u_name), "
             "Resource(r_id, r_title)"
         ).execute()
@@ -232,7 +232,7 @@ def get_transactions():
         if not response.data:
             return []
         
-        status_map = {
+        type_map = {
             1:"Borrow",  # You can adjust these status codes based on your needs
             2:"Return",
             3:"Renew"
@@ -241,7 +241,7 @@ def get_transactions():
             'id': transaction['res_id'],
             'borrower_name': transaction['User']['u_name'],  # Using email as identifier
             'title': transaction['Resource']['r_title'],
-            'type': status_map.get(transaction['res_status']),  # Assuming all are reservations
+            'type': type_map.get(transaction['res_type']),  # Assuming all are reservations
             'date': transaction['res_date']  # Add actual date if available
         } for transaction in response.data]
 
@@ -440,6 +440,11 @@ def create_reservation(user_id, resource_id, transaction_type):
     number of borrows for the resource in the Resource table.
     """
     try:
+        print("create_reservation")
+        print(user_id)
+        print(resource_id)
+        print(transaction_type)
+        print("--------------------------------")
         # First, get the latest res_id to increment it
         latest_res = supabase.from_("Reservation").select("res_id").order("res_id", desc=True).limit(1).execute()
         
@@ -448,9 +453,9 @@ def create_reservation(user_id, resource_id, transaction_type):
         if latest_res.data and len(latest_res.data) > 0:
             new_res_id = latest_res.data[0]['res_id'] + 1
 
-        # Map transaction types to status codes
-        status_map = {
-            "Borrow": 1,  # You can adjust these status codes based on your needs
+        # Map transaction types to types codes
+        type_map = {
+            "Borrow": 1,  # You can adjust these type codes based on your needs
             "Return": 2,
             "Renew": 3
         }
@@ -461,7 +466,7 @@ def create_reservation(user_id, resource_id, transaction_type):
             'res_user_id': user_id,
             'res_resource_id': resource_id,
             'res_staff_id': None,  # Setting to None as requested
-            'res_status': status_map.get(transaction_type, 1)  # Default to 1 if type not found
+            'res_type': type_map.get(transaction_type, 1)  # Default to 1 if type not found
         }
         
         # Insert into the Reservation table
@@ -677,7 +682,7 @@ def get_user_by_email(email):
     try:
         response = supabase \
             .from_("Staff") \
-            .select("s_name, s_email, s_phone, s_birthdate, s_address") \
+            .select("s_id, s_name, s_email, s_phone, s_birthdate, s_address") \
             .eq("s_email", email) \
             .limit(1) \
             .execute()
@@ -685,6 +690,7 @@ def get_user_by_email(email):
         if response.data and len(response.data) > 0:
             user = response.data[0]
             return {
+                'id': user.get('s_id'),
                 'name': user.get('s_name'),
                 'email': user.get('s_email'),
                 'phone': user.get('s_phone'),
@@ -705,18 +711,21 @@ def get_student_by_email(email):
     try:
         response = supabase \
             .from_("User") \
-            .select("u_name, u_email, u_phone, u_birthdate") \
+            .select("u_id, u_name, u_email, u_phone, u_birthDate, u_type") \
             .eq("u_email", email) \
             .limit(1) \
             .execute()
 
+
         if response.data and len(response.data) > 0:
             user = response.data[0]
             return {
+                'id': user.get('u_id'),
                 'name': user.get('u_name'),
                 'email': user.get('u_email'),
                 'phone': user.get('u_phone'),
-                'birthdate': user.get('u_birthdate')
+                'birthdate': user.get('u_birthDate'),
+                'type': user.get('u_type')
             }
         else:
             return None
@@ -1221,12 +1230,12 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
             update_data['res_resource_id'] = resource_id
             
         if transaction_type is not None:
-            status_map = {
+            type_map = {
                 "Borrow": 1,
                 "Return": 2,
                 "Renew": 3
             }
-            update_data['res_status'] = status_map.get(transaction_type, 1)
+            update_data['res_type'] = type_map.get(transaction_type, 1)
         
         # Only update if we have data to update
         if not update_data:
