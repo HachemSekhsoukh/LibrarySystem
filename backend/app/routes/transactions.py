@@ -4,7 +4,7 @@ Routes related to transactions (borrowing and reservations)
 
 from flask import jsonify, request
 from app import app
-from app.database import get_transactions, create_reservation, update_reservation, delete_reservation
+from app.database import get_transactions, create_reservation, update_reservation, delete_reservation, get_transactions_by_user
 
 @app.route('/api/transactions', methods=['GET'])
 def transactions():
@@ -20,7 +20,10 @@ def create_transaction_endpoint():
     API endpoint to create a new reservation
     """
     data = request.json
-    
+    print("create_transaction_endpoint")
+    print(data)
+    print("--------------------------------")
+
     # Validate required fields
     if not data.get('readerId'):
         return jsonify({"error": "Reader ID is required"}), 400
@@ -99,3 +102,14 @@ def delete_transaction(transaction_id):
             "success": False,
             "error": result.get('error', 'An unknown error occurred')
         }), 400 
+    
+@app.route('/api/transactions/user/<int:user_id>', methods=['GET'])
+def get_user_transactions_endpoint(user_id):
+    """
+    API endpoint to get all transactions for a specific user
+    """
+    transaction_list = get_transactions_by_user(user_id)
+    print("transaction_list")
+    print(transaction_list)
+    print("--------------------------------")
+    return jsonify(transaction_list)

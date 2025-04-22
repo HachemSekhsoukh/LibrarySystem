@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Table from "../../components/Table";
 import Button from '../../components/Button';
 import Popup from "../../components/Popup";
+import { useTranslation } from 'react-i18next';
 import { 
   TextField, 
   MenuItem, 
@@ -22,6 +23,7 @@ import "../../CSS/circulation/transactions.css";
 
 const CirculationAdministration = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
+  const { t } = useTranslation();
   const [readerTypes, setReaderTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openPopup, setOpenPopup] = useState(false);
@@ -166,9 +168,9 @@ const CirculationAdministration = () => {
   };
 
   const columns = [
-    { label: "ID", key: "id" },
-    { label: "Name", key: "name" },
-    { label: "Borrow Limit", key: "borrow" }
+    { label: t("id"), key: "id" },
+    { label: t("name"), key: "name" },
+    { label: t("borrow_limit"), key: "borrow" }
   ];
 
   return (
@@ -179,7 +181,7 @@ const CirculationAdministration = () => {
             columns={columns} 
             data={readerTypes} 
             showActions={true} 
-            title={"Reader Types"} 
+            title={t("reader_types")} 
             loading={loading}
             onEdit={handleEdit}
             onDelete={handleDelete}
@@ -191,7 +193,7 @@ const CirculationAdministration = () => {
               resetForm();
               setOpenPopup(true);
             }} 
-            label="Add New Reader Type" 
+            label= {t("add_new_reader_type")} 
             lightBackgrnd={false} 
             icon={<AddIcon />} 
             size="large" 
@@ -200,11 +202,11 @@ const CirculationAdministration = () => {
       </div>
       
       {/* Add/Edit Reader Type Popup */}
-      <Popup title={isEditing ? "Edit Reader Type" : "Add New Reader Type"} openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <Popup title={isEditing ? t("edit_reader_type") : t("add_new_reader_type") } openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <div className="add-reader-type-form">
           <div className="form-row">
             <div className="form-group">
-              <label>Name</label>
+              <label>{t("name")}</label>
               <TextField 
                 fullWidth 
                 name="ut_name" 
@@ -215,11 +217,11 @@ const CirculationAdministration = () => {
               />
             </div>
             <div className="form-group">
-              <label>Borrow Limit</label>
+              <label>{t("borrow_limit")}</label>
               <TextField 
                 fullWidth 
                 type="number"
-                name="ut_borrow" 
+                name="ut_borrow"
                 value={newReaderType.ut_borrow} 
                 onChange={handleInputChange}
                 InputProps={{ inputProps: { min: 0 } }}

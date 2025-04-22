@@ -2,6 +2,7 @@ import NavBar from "../components/NavBar";
 import Header from "../components/Header";
 import "./PagesLayout.css";
 import { Outlet, useLocation  } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
 
 function PagesLayout() {
   const location = useLocation();
@@ -25,6 +26,19 @@ function PagesLayout() {
     title: "Page Not Found",
     subtitle: "The page you are looking for does not exist.",
   };
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem("darkMode");
+    return saved === "true"; // default to false if null
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
 
   return (
     <div className="pageLayoutContainer">

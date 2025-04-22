@@ -13,10 +13,18 @@
   margin-bottom: 2%;
 }
 
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
 .settings-container {
   border-radius: 25px;
   background-color: var(--secondary-background-color);
-  width: 95%;
+  width: 100%;
   font-weight: bold;
   font-style: bold;
   font-family: "Inter";
@@ -41,11 +49,18 @@
   font-size: 14px;
   cursor: pointer;
   position: relative;
-  color: #666;
+  color: var(--text-color);
+}
+
+.preferences-container{
+  color: var(--text-color);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 .tab.active {
-  color: var(--primary-color);
+  color: var(--button-color);
 }
 
 .tab.active::after {
@@ -108,13 +123,14 @@
 
 .form-group label {
   font-size: 14px;
-  color: #374151;
+  color: var(--text-color);
   font-weight: 500;
 }
 
 .form-group input {
   padding: 0.75rem;
   border: 1px solid #e5e7eb;
+  color: var(--text-color);
   border-radius: 6px;
   font-size: 14px;
   background: var(--secondary-background-color);

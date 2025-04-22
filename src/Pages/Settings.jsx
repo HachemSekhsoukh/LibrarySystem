@@ -1,19 +1,40 @@
-import { useState } from "react";
 import "../../src/CSS/Settings.css";
-// import photoProfile from "../../../assets/images/profile.png";
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from '../utils/userContext';
 import { useTranslation } from "react-i18next";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getUserInfo, updateUserInfo, updateUserPassword } from  '../utils/api';
+
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
   const { user, setUser } = useUser(); // use context
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem("darkMode");
+    return saved === "true"; // default to false if null
+  });
 
+  const handleDarkModeToggle = (event) => {
+    const enabled = event.target.checked;
+    setIsDarkMode(enabled);
+    localStorage.setItem("darkMode", enabled);
+    document.documentElement.classList.toggle("dark", enabled);
+  };
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
+  
+  
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
     newPassword: "",
@@ -179,7 +200,7 @@ const Settings = () => {
 
                 <div className="form-group">
                   <label>{t("email")}</label>
-                  <input type="email" name="email" disabled style={{ backgroundColor: "#f0f0f0", cursor: "not-allowed" }} value={formData.email} onChange={handleChange} />
+                  <input type="email" name="email" disabled style={{ backgroundColor: "var(--input-disabeled)", cursor: "not-allowed" }} value={formData.email} onChange={handleChange} />
                 </div>
 
                 <div className="form-group">
@@ -293,18 +314,22 @@ const Settings = () => {
             </div>
           )}
 
-            {activeTab === "preferences" && (
-              <div className="preferences-container">
-                  <div className="language-selector">
-                    <label htmlFor="language">{t("language")}:</label>
-                    <select id="language" onChange={handleLanguageChange} value={i18n.language}>
-                      <option value="en">English</option>
-                      <option value="fr">Français</option>
-                    </select>
-                  </div>
+          {activeTab === "preferences" && (
+            <div className="preferences-container">
+              <div className="darkmode-toggle">
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={isDarkMode}
+                      onChange={handleDarkModeToggle}
+                      color="primary"
+                    />
+                  }
+                  label={t("dark_mode")}
+                />
               </div>
-            )}
-
+            </div>
+          )}
       </div>
     </div>
     </>

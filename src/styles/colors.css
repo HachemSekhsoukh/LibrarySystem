@@ -1,15 +1,33 @@
-/* src/styles/colors.css */
 :root {
     --primary-color: #084C74;
     --secondary-color: #ffffff;
     --background-color: #e9eef5;
     --secondary-background-color: white;
     --table-header-color: #084c7414;
+    --table-background-color: white;
     --white-color: white;
+    --chart-color: #084C74;
     --button-color: #063754;
     --button-color-light: #084c74cc;
     --text-color: #333;
+    --table-row-line: rgb(236, 236, 236);
+    --input-disabeled: rgb(231, 231, 231);
     --success-color: #28A745;
     --warning-color: #FFC107;
     --danger-color: #DC3545;
+}
+
+/* Dark mode overrides */
+.dark {
+    --white-color: black;
+    --primary-color: #053048;
+    --secondary-background-color: rgb(34, 34, 34);
+    --background-color: #0f0f0f;
+    --chart-color: #a9d0e6;
+    --button-color: #0c71ac;
+    --table-row-line: rgb(150, 150, 150);
+    --table-header-color: #a9d0e6;
+    --text-color: #ffffff;
+    --table-background-color: rgb(26, 26, 26);
+    --input-disabeled: rgb(85, 85, 85);
 }

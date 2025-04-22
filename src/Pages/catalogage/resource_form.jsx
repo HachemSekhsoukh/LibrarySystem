@@ -1,12 +1,13 @@
 import { Grid, TextField, MenuItem } from "@mui/material";
+import "../../CSS/catalogage/resource_form.css";
 
 const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
     return (
-        
         <Grid container spacing={2}>
             {/* Inventory Number */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     label="Inventory Number"
                     name="inventoryNum"
                     value={bookData.inventoryNum}
@@ -20,6 +21,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Document Type */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     select
                     label="Document Type"
                     name="type"
@@ -40,6 +42,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Title */}
             <Grid item xs={12}>
                 <TextField
+                    className="custom-textfield"
                     label="Title"
                     name="title"
                     value={bookData.title}
@@ -53,6 +56,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Author */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     label="Author"
                     name="author"
                     value={bookData.author}
@@ -66,6 +70,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Editor */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     label="Editor"
                     name="editor"
                     value={bookData.editor}
@@ -93,6 +98,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* ISBN */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     label="ISBN"
                     name="isbn"
                     value={bookData.isbn}
@@ -106,6 +112,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Price */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     label="Price"
                     name="price"
                     type="number"
@@ -120,6 +127,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Cote */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     label="Cote"
                     name="cote"
                     value={bookData.cote}
@@ -133,6 +141,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Receiving Date */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     label="Receiving Date"
                     name="receivingDate"
                     type="date"
@@ -147,6 +156,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Status */}
             <Grid item xs={6}>
                 <TextField
+                    className="custom-textfield"
                     select
                     label="Status"
                     name="status"
@@ -164,6 +174,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Description */}
             <Grid item xs={12}>
                 <TextField
+                    className="custom-textfield"
                     label="Description"
                     name="description"
                     value={bookData.description}
@@ -179,6 +190,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             {/* Observation */}
             <Grid item xs={12}>
                 <TextField
+                    className="custom-textfield"
                     label="Observation"
                     name="observation"
                     value={bookData.observation}

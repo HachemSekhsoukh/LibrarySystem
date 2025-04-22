@@ -1,0 +1,12 @@
+.custom-textfield input,
+.custom-textfield textarea {
+  color: var(--text-color);
+}
+
+.custom-textfield .MuiInputLabel-root {
+  color: var(--text-color);
+}
+
+.custom-textfield .MuiOutlinedInput-notchedOutline {
+  border-color: var(--text-color);
+}

@@ -89,13 +89,12 @@
 
 .add-transaction-form .form-field label {
   font-size: 16px;
-  color: #333;
+  color: var(--text-color);
   font-weight: 500;
   margin-bottom: 4px;
 }
 
 .add-transaction-form .dropdown-field {
-  background-color: #fff;
   border-radius: 12px !important;
 }
 
@@ -116,12 +115,10 @@
 
 .add-transaction-form .dropdown-field .MuiOutlinedInput-notchedOutline,
 .add-transaction-form .text-field .MuiOutlinedInput-notchedOutline {
-  border-color: #e0e0e0;
   border-width: 1px;
 }
 
 .add-transaction-form .text-field {
-  background-color: #fff;
   border-radius: 12px;
 }
 
@@ -208,3 +205,27 @@
   align-items: center !important;
   padding: 0 14px !important;
 } 
+
+.custom-textfield input,
+.custom-textfield .MuiInputBase-root {
+  background-color: var(--secondary-background-color);
+  color: var(--text-color);
+}
+
+.custom-textfield label,
+.custom-textfield .MuiInputLabel-root {
+  color: var(--text-color);
+}
+
+.custom-textfield .MuiOutlinedInput-notchedOutline {
+  border-color: var(--text-color);
+}
+
+.custom-textfield .MuiAutocomplete-inputRoot {
+  background-color: var(--secondary-background-color);
+  color: var(--text-color);
+}
+
+.custom-textfield .MuiAutocomplete-endAdornment {
+  color: var(--text-color);
+}

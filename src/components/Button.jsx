@@ -13,7 +13,7 @@ function Button({ onClick, label, lightBackgrnd, icon, size = "medium" }) {
     <button
       className={`button ${sizeClasses[size]}`}
       onClick={onClick}
-      style={{ backgroundColor: lightBackgrnd ? "#084c74cc" : "#063754"}}
+      style={{ backgroundColor: lightBackgrnd ? "var(--button-color-light)" : "var(--button-color)"}}
     >
       {icon && <span className="button-icon">{icon}</span>}
       <span className="button-label">{label}</span>

@@ -42,6 +42,38 @@ const Exemplaires = () => {
     message: '',
     severity: 'success'
   });
+  const [errors, setErrors] = useState({
+    borrowerName: '',
+    transactionType: '',
+    documentTitle: ''
+  });
+  
+  const validateForm = () => {
+    let tempErrors = {
+      borrowerName: '',
+      transactionType: '',
+      documentTitle: ''
+    };
+    let isValid = true;
+  
+    if (!transactionData.borrowerName || transactionData.borrowerName === '') {
+      tempErrors.borrowerName = 'Borrower name is required';
+      isValid = false;
+    }
+  
+    if (!transactionData.transactionType || transactionData.transactionType === '') {
+      tempErrors.transactionType = 'Transaction type is required';
+      isValid = false;
+    }
+  
+    if (!transactionData.documentTitle || transactionData.documentTitle === '') {
+      tempErrors.documentTitle = 'Document title is required';
+      isValid = false;
+    }
+  
+    setErrors(tempErrors);
+    return isValid;
+  };  
 
   useEffect(() => {
     const loadReaders = async () => {
@@ -112,10 +144,6 @@ const Exemplaires = () => {
 
   const transactionTypes = ["Borrow", "Return", "Renew"];
 
-  const handleChange = (e) => {
-    setTransactionData({ ...transactionData, [e.target.name]: e.target.value });
-  };
-
   const handleAutocompleteChange = (name, value) => {
     setTransactionData({ ...transactionData, [name]: value || "" });
   };
@@ -126,18 +154,10 @@ const Exemplaires = () => {
   };
 
   const handleSubmit = async () => {
+    if (!validateForm()) return;
     try {
       const readerId = transactionData.borrowerName?.id;
       const bookId = transactionData.documentTitle?.id;
-
-      if (!readerId || !bookId) {
-        setSnackbar({
-          open: true,
-          message: !readerId ? 'Please select a borrower' : 'Please select a document',
-          severity: 'error'
-        });
-        return;
-      }
 
       const payload = {
         readerId,
@@ -227,7 +247,9 @@ const Exemplaires = () => {
                   {...params} 
                   placeholder="Select borrower name"
                   variant="outlined"
-                  className="text-field"
+                  className="custom-textfield"
+                  error={!!errors.borrowerName}
+                  helperText={errors.borrowerName}
                 />
               )}
               className="dropdown-field"
@@ -247,7 +269,9 @@ const Exemplaires = () => {
                 {...params} 
                 placeholder="Select transaction type"
                 variant="outlined"
-                className="text-field"
+                className="custom-textfield"
+                error={!!errors.transactionType}
+                helperText={errors.transactionType}
               />
             )}
             className="dropdown-field"
@@ -296,7 +320,9 @@ const Exemplaires = () => {
                   {...params} 
                   placeholder="Search by title or author"
                   variant="outlined"
-                  className="text-field"
+                  className="custom-textfield"
+                  error={!!errors.documentTitle}
+                  helperText={errors.documentTitle}
                 />
               )}
               className="dropdown-field"
