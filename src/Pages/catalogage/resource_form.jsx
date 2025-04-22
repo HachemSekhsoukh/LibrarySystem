@@ -80,6 +80,20 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                     InputLabelProps={{ shrink: true }}
                 />
             </Grid>
+            
+            <Grid item xs={12} sm={6}>
+            <TextField
+                label="Edition (Year)"
+                name="edition"
+                type="number"
+                inputProps={{ min: 1000, max: 9999 }}
+                value={bookData.edition}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+            />
+            </Grid>
 
             {/* ISBN */}
             <Grid item xs={6}>
@@ -184,6 +198,19 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                     variant="outlined"
                     fullWidth
                     multiline
+                    rows={3}
+                    InputLabelProps={{ shrink: true }}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <TextField
+                    label="Résumé"
+                    name="resume"
+                    value={bookData.resume}
+                    onChange={handleChange}
+                    multiline
+                    variant="outlined"
+                    fullWidth
                     rows={3}
                     InputLabelProps={{ shrink: true }}
                 />

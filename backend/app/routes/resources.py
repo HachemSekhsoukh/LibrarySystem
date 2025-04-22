@@ -24,7 +24,7 @@ def add_resource_endpoint():
     data = request.json
 
     # Validate required fields
-    required_fields = ["r_inventoryNum", "r_title", "r_author", "r_editor", "r_ISBN", "r_price", "r_cote", "r_receivingDate", "r_status", "r_observation", "r_type", "r_description"]
+    required_fields = ["r_inventoryNum", "r_title", "r_author", "r_editor", "r_ISBN", "r_price", "r_cote", "r_receivingDate", "r_status", "r_observation", "r_type", "r_description","r_edition",  "r_resume"]
     
     missing_fields = [field for field in required_fields if field not in data]
     
@@ -60,7 +60,7 @@ def update_resource_endpoint(resource_id):
     data = request.json
     
     # Validate required fields
-    required_fields = ["r_inventoryNum", "r_title", "r_author", "r_editor", "r_ISBN", "r_price", "r_cote", "r_receivingDate", "r_status", "r_observation", "r_type"]
+    required_fields = ["r_inventoryNum", "r_title", "r_author", "r_editor", "r_ISBN", "r_price", "r_cote", "r_receivingDate", "r_status", "r_observation", "r_type", "r_description","r_edition",  "r_resume"]
     
     missing_fields = [field for field in required_fields if field not in data]
     
@@ -160,6 +160,8 @@ def import_resources():
                     "r_title": str(row["title"]),
                     "r_author": str(row["author"]),
                     "r_editor": str(row["editor"]),
+                    "r_edition": str(row["edition"]),
+                    "r_resume": str(row["resume"]),
                     "r_ISBN": str(row["ISBN"]),
                     "r_price": price_value,  # Using the cleaned price value
                     "r_cote": str(row["cote"]),

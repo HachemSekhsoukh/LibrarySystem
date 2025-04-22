@@ -271,7 +271,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type, "
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote,r_edition, r_resume, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type, "
             "Resource_type(rt_name)"
         ).execute()
         status_map = {
@@ -284,6 +284,8 @@ def get_resources():
             'title': resource['r_title'],
             'author': resource['r_author'],
             'editor': resource['r_editor'],
+            'edition': resource['r_edition'],
+            'resume': resource['r_resume'],
             'isbn': resource['r_ISBN'],
             'price': resource['r_price'],
             'cote': resource['r_cote'],
