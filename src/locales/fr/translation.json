@@ -102,6 +102,25 @@
     "verify_new_readers": "Vérifier les nouveaux lecteurs",
     "category": "Categorie",
     "transaction_type": "Type de la transaction",
-    "document_title": "Titre du document"
+    "document_title": "Titre du document",
+    "status": "Statut",
+    "import_books": "Importer des livres",
+    "add_new_book": "Ajouter un nouveau livre",
+    "document_type": "Type de document",
+    "editor": "Éditeur",
+    "edition": "Édition",
+    "price": "Prix",
+    "description": "Description",
+    "observation": "Observation",
+    "resume": "Résumé",
+    "add": "Ajouter",
+    "books": "Livres",
+    "resource_type": "Type de ressource",
+    "reader_type": "Type de lecteur",
+    "borrow_limit": "Limite d'emprunt",
+    "add_new_reader_type": "Ajouter un nouveau type de lecteur",
+    "add_new_book_type": "Ajouter un nouveau type de livre"
+
+
   }
   
