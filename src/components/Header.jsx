@@ -69,7 +69,7 @@ const Header = ({ title, subtitle }) => {
           <span className="sub-sub-title">{t(subtitle)}</span>
         </div>
         <div className="language-selector">
-                    <label>{t("language")}:</label>
+                    {/* <label>{t("language")}:</label> */}
                         <ReactSelect
                             options={languageOptions}
                             value={selectedLanguage}

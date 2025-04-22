@@ -109,6 +109,15 @@
     "borrow_limit": "Borrow limit",
     "dark_mode": "Dark mode",
 
+    "error_empty": "All fields must be filled",
+    "error_mismatch": "Passwords do not match",
+    "status": "Status",
+    "books": "Books",
+    "add_new_book": "Add New Book",
+    "edit_book": "Edit book",
+    "import_books": "Import Books",
+    "importing...": "Importing...",
+
     "name_required": "Name is required.",
     "email_invalid": "Please enter a valid email address.",
     "phone_required": "Phone number is required.",
