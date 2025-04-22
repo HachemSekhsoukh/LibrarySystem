@@ -95,7 +95,6 @@
 }
 
 .add-transaction-form .dropdown-field {
-  background-color: #fff;
   border-radius: 12px !important;
 }
 
@@ -116,12 +115,10 @@
 
 .add-transaction-form .dropdown-field .MuiOutlinedInput-notchedOutline,
 .add-transaction-form .text-field .MuiOutlinedInput-notchedOutline {
-  border-color: #e0e0e0;
   border-width: 1px;
 }
 
 .add-transaction-form .text-field {
-  background-color: #fff;
   border-radius: 12px;
 }
 

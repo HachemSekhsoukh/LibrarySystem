@@ -109,6 +109,15 @@
     "borrow_limit": "Limite d'emprunts",
     "dark_mode": "Mode sombre",
 
+    "error_empty": "Tous les champs doivent être remplis.",
+    "error_mismatch": "Les mots de passe ne correspondent pas.",
+    "status": "État",
+    "books": "Livres",
+    "add_new_book": "Ajouter un nouveau livre",
+    "edit_book": "Modifier le livre",
+    "import_books": "Importer des livres",
+    "importing...": "Importation en cours...",
+
     "name_required": "Le nom est requis.",
     "email_invalid": "Veuillez entrer une adresse email valide.",
     "phone_required": "Le numéro de téléphone est requis.",

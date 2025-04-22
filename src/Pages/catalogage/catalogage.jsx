@@ -7,12 +7,12 @@ import "./resource_form";
 import { TextField, MenuItem, Grid, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
 import AddResourceForm from "./resource_form";
+import { useTranslation } from 'react-i18next';
 
 const Catalogage = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
+  const { t } = useTranslation();
   const [openPopup, setOpenPopup] = useState(false);
   const [resources, setResources] = useState([]);
   const [bookData, setBookData] = useState({
@@ -275,12 +275,12 @@ const Catalogage = () => {
   };
 
   const columns = [
-    { label: "ID", key: "id" },
-    { label: "Title", key: "title" },
-    { label: "Author", key: "author" },
-    { label: "Type", key: "type_name" },
-    { label: "Status", key: "status_name" },
-    { label: "ISBN", key: "isbn" },
+    { label: t("id"), key: "id" },
+    { label: t("title"), key: "title" },
+    { label: t("author"), key: "author" },
+    { label: t("type"), key: "type_name" },
+    { label: t("status"), key: "status_name" },
+    { label: t("ISBN"), key: "isbn" },
   ];
 
   return (
@@ -291,7 +291,7 @@ const Catalogage = () => {
             columns={columns} 
             data={resources} 
             showActions={true} 
-            title={"Books"} 
+            title={t("books")} 
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
@@ -306,7 +306,7 @@ const Catalogage = () => {
           />
           <Button
             onClick={() => fileInputRef.current.click()}
-            label={uploading ? "Importing..." : "Import Books"}
+            label={uploading ? t("importing...") : t("import_books")}
             lightBackgrnd={true}
             icon={<FileUploadIcon />}
             size="large"
@@ -317,7 +317,7 @@ const Catalogage = () => {
               resetForm();
               setOpenPopup(true);
             }}
-            label="Add New Book"
+            label= {t("add_new_book")}
             lightBackgrnd={false}
             icon={<AddIcon />}
             size="large"
@@ -325,7 +325,7 @@ const Catalogage = () => {
         </div>
       </div>
       
-      <Popup title={isEditing ? "Edit Book" : "Add Book"} openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <Popup title={isEditing ? t("edit_book") : t("add_new_book")} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <AddResourceForm bookData={bookData} handleChange={handleChange} resourceTypes={resourceTypes} />
         {/* Buttons */}
         <div className="form-buttons">
@@ -342,10 +342,10 @@ const Catalogage = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the book "{resourceToDelete?.title}"?
+            {t("sure_to_delete")} "{resourceToDelete?.title}"?
           </Typography>
         </DialogContent>
         <DialogActions>
