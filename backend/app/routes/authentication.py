@@ -63,7 +63,7 @@ def get_user_info():
     user = get_user_by_email(user_email)
     if user:
         return jsonify({
-            'id': user['u_id'],
+            'id': user['id'],
             'name': user['name'],
             'email': user['email'],
             'phone': user.get('phone'),  # Use .get in case it's optional

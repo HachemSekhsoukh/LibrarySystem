@@ -30,7 +30,7 @@
   }
 
   .search-title h2{
-    color: var(--button-color)
+    color: var(--title-color)
   }
 
   .search-bar{
@@ -39,7 +39,7 @@
     align-items: center;
     font-size: 1.4rem;
     font-weight: light;
-    color: var(--button-color)
+    color: var(--title-color)
   }
 
   .search-input{

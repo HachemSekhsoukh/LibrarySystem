@@ -18,10 +18,12 @@ import {
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/Circulation/transactions.css";
+import { useTranslation } from "react-i18next";
 
 
 const CatalogageAdministration = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
+  const { t } = useTranslation(); // Get translation function
   const [resourceTypes, setResourceTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openPopup, setOpenPopup] = useState(false);
@@ -166,9 +168,9 @@ const CatalogageAdministration = () => {
   };
 
   const columns = [
-    { label: "ID", key: "id" },
-    { label: "Name", key: "name" },
-    { label: "Borrow Limit", key: "borrow" }
+    { label: t("id"), key: "id" },
+    { label: t("name"), key: "name" },
+    { label: t("borrow_limit"), key: "borrow" }
   ];
 
   return (
@@ -179,7 +181,7 @@ const CatalogageAdministration = () => {
             columns={columns} 
             data={resourceTypes} 
             showActions={true} 
-            title={"Resource Types"} 
+            title={t("resource_types")} 
             loading={loading}
             onEdit={handleEdit}
             onDelete={handleDelete}
@@ -191,7 +193,7 @@ const CatalogageAdministration = () => {
               resetForm();
               setOpenPopup(true);
             }} 
-            label="Add New Resource Type" 
+            label= {t("add_new_resource_type")} 
             lightBackgrnd={false} 
             icon={<AddIcon />} 
             size="large" 
@@ -200,11 +202,11 @@ const CatalogageAdministration = () => {
       </div>
       
       {/* Add/Edit New Resource Type Popup */}
-      <Popup title={isEditing ? "Edit Resource Type" : "Add New Resource Type"} openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <Popup title={isEditing ? t("edit_resource_type") : t("add_new_resource_type")} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <div className="add-resource-type-form">
           <div className="form-row">
             <div className="form-group">
-              <label>Name</label>
+              <label>{t("name")}</label>
               <TextField 
                 fullWidth 
                 name="rt_name" 
@@ -215,7 +217,7 @@ const CatalogageAdministration = () => {
               />
             </div>
             <div className="form-group">
-              <label>Borrow Limit</label>
+              <label>{t("borrow_limit")}</label>
               <TextField 
                 fullWidth 
                 type="number"
@@ -231,9 +233,9 @@ const CatalogageAdministration = () => {
             <button className="dialog-cancel-button" onClick={() => {
               resetForm();
               setOpenPopup(false);
-            }}>Cancel</button>
+            }}>{t("cancel")}</button>
             <button className="dialog-save-button" onClick={handleAddResourceType}>
-              {isEditing ? 'Update' : 'Save'}
+              {isEditing ? t('update') : t('save')}
             </button>
           </div>
         </div>
