@@ -8,6 +8,7 @@
     --white-color: white;
     --chart-color: #084C74;
     --button-color: #063754;
+    --title-color: #063754;
     --button-color-light: #084c74cc;
     --text-color: #333;
     --table-row-line: rgb(236, 236, 236);
@@ -23,7 +24,8 @@
     --primary-color: #053048;
     --secondary-background-color: rgb(34, 34, 34);
     --background-color: #0f0f0f;
-    --chart-color: #a9d0e6;
+    --chart-color: #118cd4;
+    --title-color: #118cd4;
     --button-color: #0c71ac;
     --table-row-line: rgb(150, 150, 150);
     --table-header-color: #a9d0e6;

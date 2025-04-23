@@ -117,6 +117,11 @@
     "edit_book": "Modifier le livre",
     "import_books": "Importer des livres",
     "importing...": "Importation en cours...",
+    
+    "resource_types": "Types de ressources",
+    "add_new_resource": "Ajouter une nouvelle ressource",
+    "add_new_resource_type": "Ajouter un nouveau type de ressource",
+    "edit_resource_type": "Editer le type de resource",
 
     "name_required": "Le nom est requis.",
     "email_invalid": "Veuillez entrer une adresse email valide.",

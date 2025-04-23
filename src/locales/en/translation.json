@@ -118,6 +118,14 @@
     "import_books": "Import Books",
     "importing...": "Importing...",
 
+    "reader_types": "Reader types",
+
+    "resource_types": "Resource types",
+    "add_new_resource": "Add New Resource",
+    "add_new_resource_type": "Add New Resource Type",
+    "edit_resource_type": "Edit resource type",
+
+
     "name_required": "Name is required.",
     "email_invalid": "Please enter a valid email address.",
     "phone_required": "Phone number is required.",

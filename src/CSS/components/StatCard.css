@@ -19,7 +19,7 @@
 }
 
 .stat-card-title{
-    color: var(--button-color);
+    color: var(--title-color);
     font-size: 1.1rem;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .stat-card-number{
-    color: var(--button-color);
+    color: var(--title-color);
     font-size: 1.3rem;
     font-weight: bold;
 }
@@ -40,6 +40,6 @@
     border: none;
     width: 80%;
     height: 2px;
-    background: linear-gradient(to right, transparent, var(--button-color), transparent);
+    background: linear-gradient(to right, transparent, var(--title-color), transparent);
   }
   
