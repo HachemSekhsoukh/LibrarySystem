@@ -32,6 +32,7 @@ const Exemplaires = () => {
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [transactionError, setTransactionError] = useState(null);
   const [readers, setReaders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [resources, setResources] = useState([]);
   const [loadingReaders, setLoadingReaders] = useState(false);
   const [loadingResources, setLoadingResources] = useState(false);
@@ -135,6 +136,7 @@ const Exemplaires = () => {
       setTransactionError("Failed to load transactions. Please try again.");
     } finally {
       setLoadingTransactions(false);
+      setLoading(false);
     }
   };
 
@@ -200,18 +202,24 @@ const Exemplaires = () => {
   return (
     <>
     <div className="container">
-    <div id='table'>
-    <Table columns={columns} data={transactions} showActions={true} title={t("transactions")}/>
-    </div>
-    <div className="bottom-buttons">
-      <Button 
-        onClick={() => setOpenPopup(true)} 
-        label={t("add_transaction")} 
-        lightBackgrnd={false}
-        icon={<AddIcon />}
-        size="large"
-      />
-    </div>
+    {loading ? (
+          <div className="loader"></div>
+        ) : (
+          <>
+            <div id='table'>
+              <Table columns={columns} data={transactions} showActions={true} title={t("transactions")}/>
+            </div>
+            <div className="bottom-buttons">
+              <Button 
+                onClick={() => setOpenPopup(true)} 
+                label={t("add_transaction")} 
+                lightBackgrnd={false}
+                icon={<AddIcon />}
+                size="large"
+              />
+            </div>
+        </>)}
+        
     </div>
 
     <Popup 

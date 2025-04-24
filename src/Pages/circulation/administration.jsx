@@ -176,29 +176,35 @@ const CirculationAdministration = () => {
   return (
     <div className="circulation-administration-page">
       <div className="container">
-        <div id="table">
-          <Table 
-            columns={columns} 
-            data={readerTypes} 
-            showActions={true} 
-            title={t("reader_types")} 
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </div>
-        <div className="bottom-buttons">
-          <Button 
-            onClick={() => {
-              resetForm();
-              setOpenPopup(true);
-            }} 
-            label= {t("add_new_reader_type")} 
-            lightBackgrnd={false} 
-            icon={<AddIcon />} 
-            size="large" 
-          />
-        </div>
+      {loading ? (
+          <div className="loader"></div>
+        ) : (
+        <>
+            <div id="table">
+              <Table 
+                columns={columns} 
+                data={readerTypes} 
+                showActions={true} 
+                title={t("reader_types")} 
+                loading={loading}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            </div>
+            <div className="bottom-buttons">
+              <Button 
+                onClick={() => {
+                  resetForm();
+                  setOpenPopup(true);
+                }} 
+                label= {t("add_new_reader_type")} 
+                lightBackgrnd={false} 
+                icon={<AddIcon />} 
+                size="large" 
+              />
+            </div>
+        </>)}
+        
       </div>
       
       {/* Add/Edit Reader Type Popup */}

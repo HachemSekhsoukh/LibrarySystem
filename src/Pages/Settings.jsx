@@ -54,6 +54,7 @@ const Settings = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoading(true);
       const fetchedUser = await getUserInfo();
       if (fetchedUser) {
         setUser(fetchedUser);
@@ -64,6 +65,7 @@ const Settings = () => {
           address: fetchedUser.address || "",
         });
       }
+      setIsLoading(false);
     };
     fetchUser();
   }, [setUser]);
