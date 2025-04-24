@@ -176,29 +176,34 @@ const CatalogageAdministration = () => {
   return (
     <div className="Catalogage-administration-page">
       <div className="container">
-        <div id="table">
-          <Table 
-            columns={columns} 
-            data={resourceTypes} 
-            showActions={true} 
-            title={t("resource_types")} 
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </div>
-        <div className="bottom-buttons">
-          <Button 
-            onClick={() => {
-              resetForm();
-              setOpenPopup(true);
-            }} 
-            label= {t("add_new_resource_type")} 
-            lightBackgrnd={false} 
-            icon={<AddIcon />} 
-            size="large" 
-          />
-        </div>
+      {loading ? (
+          <div className="loader"></div>
+        ) : (
+        <>
+          <div id="table">
+            <Table 
+              columns={columns} 
+              data={resourceTypes} 
+              showActions={true} 
+              title={t("resource_types")} 
+              loading={loading}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          </div>
+          <div className="bottom-buttons">
+            <Button 
+              onClick={() => {
+                resetForm();
+                setOpenPopup(true);
+              }} 
+              label= {t("add_new_resource_type")} 
+              lightBackgrnd={false} 
+              icon={<AddIcon />} 
+              size="large" 
+            />
+          </div>
+        </>)}
       </div>
       
       {/* Add/Edit New Resource Type Popup */}

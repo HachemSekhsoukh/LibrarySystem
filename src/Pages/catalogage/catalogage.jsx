@@ -39,6 +39,7 @@ const Catalogage = () => {
   const [resourceToDelete, setResourceToDelete] = useState(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const fileInputRef = React.useRef();
 
   useEffect(() => {
@@ -66,6 +67,7 @@ const Catalogage = () => {
       console.error("API Error:", error);
       setSnackbar({ open: true, message: "Error fetching resources", severity: "error" });
     }
+    setLoading(false);
   };
 
   const handleChange = (e) => {
@@ -291,43 +293,48 @@ const Catalogage = () => {
   return (
     <div className="books-page">
       <div className="container">
-        <div id="table">
-          <Table 
-            columns={columns} 
-            data={resources} 
-            showActions={true} 
-            title={t("books")} 
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </div>
-        <div className="bottom-buttons">
-          <input
-            type="file"
-            accept=".xlsx"
-            style={{ display: 'none' }}
-            onChange={handleFileUpload}
-            ref={fileInputRef}
-          />
-          <Button
-            onClick={() => fileInputRef.current.click()}
-            label={uploading ? t("importing...") : t("import_books")}
-            lightBackgrnd={true}
-            icon={<FileUploadIcon />}
-            size="large"
-            disabled={uploading}
-          />
-          <Button
-            onClick={() => {
-              resetForm();
-              setOpenPopup(true);
-            }}
-            label= {t("add_new_book")}
-            lightBackgrnd={false}
-            icon={<AddIcon />}
-            size="large"
-          />
-        </div>
+      {loading ? (
+          <div className="loader"></div>
+        ) : (
+          <>
+                <div id="table">
+              <Table 
+                columns={columns} 
+                data={resources} 
+                showActions={true} 
+                title={t("books")} 
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            </div>
+            <div className="bottom-buttons">
+              <input
+                type="file"
+                accept=".xlsx"
+                style={{ display: 'none' }}
+                onChange={handleFileUpload}
+                ref={fileInputRef}
+              />
+              <Button
+                onClick={() => fileInputRef.current.click()}
+                label={uploading ? t("importing...") : t("import_books")}
+                lightBackgrnd={true}
+                icon={<FileUploadIcon />}
+                size="large"
+                disabled={uploading}
+              />
+              <Button
+                onClick={() => {
+                  resetForm();
+                  setOpenPopup(true);
+                }}
+                label= {t("add_new_book")}
+                lightBackgrnd={false}
+                icon={<AddIcon />}
+                size="large"
+              />
+            </div>
+          </>)}
       </div>
       
       <Popup title={isEditing ? t("edit_book") : t("add_new_book")} openPopup={openPopup} setOpenPopup={setOpenPopup}>

@@ -484,6 +484,10 @@ const Readers = () => {
   return (
     <div className="readers-page">
       <div className="container">
+      {loading ? (
+          <div className="loader"></div>
+        ) : (
+        <>
         <div id="table">
           <Table 
             columns={columns} 
@@ -499,6 +503,8 @@ const Readers = () => {
           <Button onClick={() => setVerifyReadersPopup(true)} label={t("verify_new_readers")} lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
           <Button onClick={() => setOpenPopup(true)} label={t("add_new_reader")} lightBackgrnd={false} icon={<AddIcon />} size="large" />
         </div>
+      </>)}
+       
       </div>
       
       {/* Add/Edit Reader Popup */}
