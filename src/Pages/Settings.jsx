@@ -11,13 +11,14 @@ import { getUserInfo, updateUserInfo, updateUserPassword } from  '../utils/api';
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
-  const { user, setUser } = useUser(); // use context
+  const { user, setUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem("darkMode");
     return saved === "true"; // default to false if null
   });
+  const [initialFormData, setInitialFormData] = useState(null);
 
   const handleDarkModeToggle = (event) => {
     const enabled = event.target.checked;
@@ -48,10 +49,6 @@ const Settings = () => {
     address: "",
   });
 
-  const handleLanguageChange = (e) => {
-    i18n.changeLanguage(e.target.value);
-  };
-
   useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true);
@@ -59,6 +56,12 @@ const Settings = () => {
       if (fetchedUser) {
         setUser(fetchedUser);
         setFormData({
+          name: fetchedUser.name || "",
+          email: fetchedUser.email || "",
+          birthdate: fetchedUser.birthdate || "",
+          address: fetchedUser.address || "",
+        });
+        setInitialFormData({
           name: fetchedUser.name || "",
           email: fetchedUser.email || "",
           birthdate: fetchedUser.birthdate || "",
@@ -73,6 +76,15 @@ const Settings = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const isFormChanged = () => {
+    if (!initialFormData) return false;
+    return (
+      formData.name.trim() !== initialFormData.name.trim() ||
+      formData.birthdate.trim() !== initialFormData.birthdate.trim() ||
+      formData.address.trim() !== initialFormData.address.trim()
+    );
   };
 
   const handleChangePassword = async () => {
@@ -108,22 +120,31 @@ const Settings = () => {
   };
 
   const handleSaveProfile = async () => {
-    const { name, email, birthdate, address } = formData;
-
-    if (!name || !email || !birthdate || !address) {
+    const trimmedData = {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      birthdate: formData.birthdate.trim(),
+      address: formData.address.trim(),
+    };
+  
+    if (!trimmedData.name || !trimmedData.email || !trimmedData.birthdate || !trimmedData.address) {
       alert(t("error_fill_all"));
       return;
     }
-    setIsLoading(true); // Start loading
-    const updatedUser = await updateUserInfo(formData);
-    setIsLoading(false); // Stop loading
+  
+    setIsLoading(true);
+    const updatedUser = await updateUserInfo(trimmedData);
+    setIsLoading(false);
+  
     if (updatedUser) {
       setUser(updatedUser);
       alert(t("success_profile_update"));
+      setInitialFormData(trimmedData); // update reference for future changes
     } else {
       alert(t("error_profile_update"));
     }
   };
+  
 
   const [activeTab, setActiveTab] = useState("edit-profile");
   const [showPassword, setShowPassword] = useState({
@@ -219,7 +240,12 @@ const Settings = () => {
             </div>
 
             <div className="button-container">
-              <button className="save-btn" onClick={handleSaveProfile}>{t("save")}</button>
+              <button className="save-btn"  disabled={!isFormChanged()}
+                      style={{
+                        opacity: isFormChanged() ? 1 : 0.6,
+                        cursor: isFormChanged() ? 'pointer' : 'not-allowed'
+                      }} 
+                      onClick={handleSaveProfile}>{t("save")}</button>
             </div>
           </div>
         )}
