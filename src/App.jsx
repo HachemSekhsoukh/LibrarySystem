@@ -9,6 +9,7 @@ import {
 import Login from "./Pages/login";
 import Settings from "./Pages/Settings";
 import Dashboard from "./Pages/dashboard";
+import Logs from "./Pages/logs";
 import Readers from "./Pages/circulation/readers";
 import Exemplaires from "./Pages/circulation/exemplaires";
 import Administration from "./Pages/administration";
@@ -32,6 +33,7 @@ const router = createBrowserRouter(
         <Route element={<PagesLayout />}>
           <Route path="/settings" element={<Settings />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/logs" element={<Logs />} />
           <Route path="/administration" element={<Administration />} />
           <Route path="/circulation/readers" element={<Readers />} />
           <Route
