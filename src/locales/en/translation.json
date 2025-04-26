@@ -45,7 +45,7 @@
     "logout": "Logout",
     "readers": "Readers",
     "exemplaires": "Copies",
-    "peb": "PEB",
+    "late": "Late Returners",
     "administration_section": "Administration",
     "catalogage_section": "Cataloguing",
 
@@ -102,7 +102,7 @@
     "verify_new_readers": "Verify new readers",
     "category": "Category",
     "add_new_reader_type": "Add new reader type",
-    "reader_type": "Reader type",
+    "reader_types": "Reader type",
     "transaction_type": "Transaction type",
     "document_title": "Document title",
     "edit_reader_type": "Edit reader type",

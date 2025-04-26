@@ -142,7 +142,7 @@ const Exemplaires = () => {
     loadTransactions();
   }, []);
 
-  const transactionTypes = ["Borrow", "Return", "Renew"];
+  const transactionTypes = ["Borrow", "Return", "Renew","Late"];
 
   const handleAutocompleteChange = (name, value) => {
     setTransactionData({ ...transactionData, [name]: value || "" });
