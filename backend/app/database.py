@@ -107,7 +107,7 @@ def get_user_types():
         print(f"Error fetching readers: {e}")
         return []
 
-def add_user_type(user_type_data):
+def add_user_type(user_email, user_type_data):
     """
     Add a new user type to the database.
     :param user_type_data: Dictionary containing user type details.
@@ -451,7 +451,7 @@ def update_resource(resource_id, resource_data):
             'error': str(e)
         }
 
-def create_reservation(user_id, resource_id, transaction_type):
+def create_reservation(user_email, user_id, resource_id, transaction_type):
     """
     Create a new reservation in the database and increment the
     number of borrows for the resource in the Resource table.
@@ -465,7 +465,6 @@ def create_reservation(user_id, resource_id, transaction_type):
         # First, get the latest res_id to increment it
         latest_res = supabase.from_("Reservation").select("res_id").order("res_id", desc=True).limit(1).execute()
         
-        
         # Calculate new res_id
         new_res_id = 1  # Default if no existing reservations
         if latest_res.data and len(latest_res.data) > 0:
@@ -473,7 +472,7 @@ def create_reservation(user_id, resource_id, transaction_type):
 
         # Map transaction types to types codes
         type_map = {
-            "Borrow": 1,  # You can adjust these type codes based on your needs
+            "Borrow": 1,
             "Return": 2,
             "Renew": 3,
             "Late": 4
@@ -484,8 +483,8 @@ def create_reservation(user_id, resource_id, transaction_type):
             'res_id': new_res_id,
             'res_user_id': user_id,
             'res_resource_id': resource_id,
-            'res_staff_id': None,  # Setting to None as requested
-            'res_type': type_map.get(transaction_type, 1)  # Default to 1 if type not found
+            'res_staff_id': None,
+            'res_type': type_map.get(transaction_type, 1)
         }
         
         # Insert into the Reservation table
@@ -496,6 +495,9 @@ def create_reservation(user_id, resource_id, transaction_type):
             update_resource_status(resource_id, 1)
         
         if response.data:
+            # Log reservation creation
+            add_log(user_email, f"Created a transaction of type: {transaction_type} for resource ID: {resource_id}")
+
             # If the transaction type is "Borrow", increment the r_num_of_borrows in the Resource table
             if transaction_type == "Borrow":
                 # Fetch the current number of borrows for the resource
@@ -545,6 +547,7 @@ def create_reservation(user_id, resource_id, transaction_type):
             'error': str(e)
         }
 
+
 def update_resource_status(resource_id, status):
     """
     Update the status of a resource in the database.
@@ -560,6 +563,7 @@ def login(email, password):
     """
     Log in a staff user by verifying credentials from the Staff table.
     Uses hashed password comparison.
+    Adds a login log on successful login.
     """
     try:
         # Fetch only email and hashed password
@@ -574,14 +578,19 @@ def login(email, password):
             stored_hashed_password = staff["s_password"]
 
             if check_password_hash(stored_hashed_password, password):
-                return {
-                    'success': True,
-                    'user': {
-                        'id': staff['s_id'],
-                        'email': staff['s_email'],
-                        'name': staff.get('s_name')
+                # Successful login, add a log using add_log
+                if add_log(staff['s_email'], f"{staff['s_email']} logged in successfully."):
+                    return {
+                        'success': True,
+                        'user': {
+                            'id': staff['s_id'],
+                            'email': staff['s_email'],
+                            'name': staff.get('s_name')
+                        }
                     }
-                }
+                else:
+                    return {'success': False, 'error': 'Failed to log login event'}
+
             else:
                 return {'success': False, 'error': 'Invalid email or password'}
         else:
@@ -590,7 +599,8 @@ def login(email, password):
     except Exception as e:
         print(f"Error logging in: {e}")
         return {'success': False, 'error': str(e)}
-    
+
+   
 def login_student(email, password):
     """
     Log in a student by verifying credentials from the User table.
@@ -771,6 +781,7 @@ def update_user_by_email(email, fields):
     """
     Update a user's profile details in the Staff table using their email.
     Only updates fields provided in the `fields` dictionary.
+    Adds a log when the update is successful.
     """
     try:
         # Map internal keys to Supabase column names
@@ -794,15 +805,30 @@ def update_user_by_email(email, fields):
             .eq("s_email", email) \
             .execute()
 
-        if response.status_code == 200:
+        if response.data:  # If there's returned data, update was successful
+            # Successful update, now insert a log
+            try:
+                user = get_user_by_email(email)
+                if user:
+                    supabase \
+                        .from_("Logs") \
+                        .insert({
+                            's_id': user['id'],
+                            'message': f"User {user['email']} updated their profile."
+                        }) \
+                        .execute()
+            except Exception as log_error:
+                print(f"Failed to insert update log: {log_error}")
+
             return True
         else:
-            print(f"Supabase update failed: {response}")
+            print(f"Supabase update failed: No data returned.")
             return False
 
     except Exception as e:
         print(f"Error updating user by email: {e}")
         return False
+
     
 def update_student_by_email(email, fields):
     """
@@ -845,8 +871,8 @@ def update_student_by_email(email, fields):
 def update_user_password(user_email, new_password):
     """
     Update the user's password in the Supabase database.
+    Adds a log when the password is successfully updated.
     """
-
     try:
         # Hash the new password before storing it
         hashed_password = generate_password_hash(new_password)
@@ -864,11 +890,24 @@ def update_user_password(user_email, new_password):
             .eq("s_email", user_email) \
             .execute()
 
-        # Check the response status
-        if response.status_code == 200:
+        # Check if update was successful
+        if response.data:
+            try:
+                user = get_user_by_email(user_email)
+                if user:
+                    supabase \
+                        .from_("Logs") \
+                        .insert({
+                            's_id': user['id'],
+                            'message': f"User {user['email']} changed their password."
+                        }) \
+                        .execute()
+            except Exception as log_error:
+                print(f"Failed to insert password change log: {log_error}")
+
             return True
         else:
-            print(f"Supabase update failed: {response}")
+            print(f"Supabase update failed: No data returned.")
             return False
 
     except Exception as e:
@@ -994,7 +1033,7 @@ def get_staff_types():
         return []
 
 
-def add_staff_type(staff_type_data):
+def add_staff_type(user_email, staff_type_data):
     """
     Add a new staff type to the database.
     :param staff_type_data: Dictionary containing staff type details.
@@ -1003,12 +1042,17 @@ def add_staff_type(staff_type_data):
         response = supabase.from_("Staff_type").insert(staff_type_data).execute()
 
         if response.data:
+            # Log the staff type creation
+            type_name = staff_type_data.get('st_name', 'Unknown')
+            add_log(user_email, f"Added a new staff type: {type_name}")
+
             return {'success': True, 'staff_type': response.data[0]}
         else:
             return {'success': False, 'error': 'Failed to add staff type'}
     except Exception as e:
         print(f"Error adding staff type: {e}")
         return {'success': False, 'error': str(e)}
+
 
 def delete_staff_type(staff_type_id):
     """
@@ -1053,66 +1097,12 @@ def update_staff_type(staff_type_id, staff_type_data):
             'error': str(e)
         }
 
-
-def add_staff_member(data):
+def add_staff_member(user_email, data):
     """
     Add a new staff member to the Staff table.
     Checks for existing email before inserting.
     Expects `data` to be a dictionary with keys:
-    'email', 'password', 'name', 'phone', 'address', 'bdate', 'type'.
-    """
-    try:
-        email = data.get('email')
-        password = data.get('password')
-        name = data.get('name')
-        phone = data.get('phone')
-        address = data.get('address')
-        bdate = data.get('bdate')
-        s_type = data.get('type')
-
-        if not email or not password:
-            return {'success': False, 'error': 'Email and password are required'}
-
-        # Check if user already exists
-        existing = supabase.from_("Staff").select("s_id").eq("s_email", email).execute()
-        if existing.data and len(existing.data) > 0:
-            return {'success': False, 'error': 'Email already exists'}
-
-        # Build new staff object
-        new_staff = {
-            's_email': email,
-            's_password': password,
-            's_name': name,
-            's_phone': phone,
-            's_address': address,
-            's_birthdate': bdate,
-            's_type': s_type
-        }
-
-        # Insert into Staff table
-        response = supabase.from_("Staff").insert(new_staff).execute()
-
-        if response.data:
-            return {
-                'success': True,
-                'user': {
-                    'id': response.data[0]['s_id'],
-                    'email': response.data[0]['s_email']
-                }
-            }
-        else:
-            return {'success': False, 'error': 'Failed to add staff member'}
-
-    except Exception as e:
-        print(f"Error adding staff member: {e}")
-        return {'success': False, 'error': str(e)}
-
-def add_staff_member(data):
-    """
-    Add a new staff member to the Staff table.
-    Checks for existing email before inserting.
-    Expects `data` to be a dictionary with keys:
-    'email', 'password', 'name', 'phone', 'address', 'bdate', 'type'.
+    'email', 'password', 'name', 'phone', 'address', 'birthdate', 'staff_type_id'.
     """
     try:
         email = data.get('email')
@@ -1149,6 +1139,9 @@ def add_staff_member(data):
         response = supabase.from_("Staff").insert(new_staff).execute()
 
         if response.data:
+            # Log the staff creation
+            add_log(user_email, f"Added a new staff member with email: {email}")
+            
             return {
                 'success': True,
                 'user': {
@@ -1163,6 +1156,7 @@ def add_staff_member(data):
     except Exception as e:
         print(f"Error adding staff member: {e}")
         return {'success': False, 'error': str(e)}, 500
+
     
 def get_total_users():
     try:
@@ -1381,4 +1375,73 @@ def get_most_borrowed_resources(limit=5):
             return []
     except Exception as e:
         print("Error fetching most borrowed resources:", e)
+        return []
+
+def add_log(email, message):
+    """
+    Add a log entry for a staff user based on their email and a message.
+    """
+    try:
+        user = get_user_by_email(email)
+        if user:
+            s_id = user['id']
+            response = supabase \
+                .from_("Logs") \
+                .insert({
+                    's_id': s_id,
+                    'message': message
+                }) \
+                .execute()
+            return True
+        else:
+            print("User not found. Cannot insert log.")
+            return False
+    except Exception as e:
+        print(f"Error inserting log: {e}")
+        return False
+    
+def get_user_email_by_id(staff_id):
+    """
+    Fetch the email of a user based on their staff ID.
+    Returns the email or None if not found.
+    """
+    try:
+        response = supabase \
+            .from_("Staff") \
+            .select("s_email") \
+            .eq("s_id", staff_id) \
+            .execute()
+        
+        if response.data and len(response.data) > 0:
+            return response.data[0]['s_email']
+        else:
+            return None
+    except Exception as e:
+        print(f"Error fetching email for staff ID {staff_id}: {e}")
+        return None
+
+
+def get_logs():
+    """
+    Fetch logs from the Logs table.
+    Returns a list of logs with added staff email or an empty list if none found.
+    """
+    try:
+        response = supabase \
+            .from_("Logs") \
+            .select("id, message, created_at, s_id") \
+            .order("created_at", desc=True) \
+            .execute()
+
+        logs = []
+        
+        if response.data:
+            for log in response.data:
+                staff_email = get_user_email_by_id(log['s_id'])  # Get email for staff ID
+                log['staff_email'] = staff_email  # Add email to the log entry
+                logs.append(log)
+        
+        return logs if logs else []
+    except Exception as e:
+        print(f"Error fetching logs: {e}")
         return []

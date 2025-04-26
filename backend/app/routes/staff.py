@@ -15,9 +15,10 @@ def get_all_staff():
 @app.route('/api/staff/add', methods=['POST'])
 @jwt_required()
 def handle_add_staff():
+    user_email = get_jwt_identity()
     data = request.get_json()
     print(data)
-    result, status_code = add_staff_member(data)
+    result, status_code = add_staff_member(user_email,data)
     return jsonify(result), status_code
 
 
@@ -37,6 +38,7 @@ def add_staff_type_endpoint():
     API endpoint to add a new staff type
     """
     data = request.json
+    user_email = get_jwt_identity()
     
     if not data:
         return jsonify({'success': False, 'error': 'No data provided'}), 400
@@ -49,7 +51,7 @@ def add_staff_type_endpoint():
         return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
     
     # Add the resource type
-    result = add_staff_type(data)
+    result = add_staff_type(user_email,data)
     
     if result['success']:
         return jsonify(result), 201

@@ -588,6 +588,7 @@ export const createTransaction = async (payload) => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 
@@ -633,3 +634,25 @@ export const fetchMostBorrowedBooks = async () => {
   }
 };
 
+export const fetchLogs = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/logs`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // In case authentication is required
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch logs');
+    }
+
+    const data = await response.json();
+    console.log('Fetched logs:', data.logs);
+    return data.logs;
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    return [];
+  }
+};

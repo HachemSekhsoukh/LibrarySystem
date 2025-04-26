@@ -4,6 +4,7 @@ Routes related to transactions (borrowing and reservations)
 
 from flask import jsonify, request
 from app import app
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 from app.database import get_transactions, create_reservation, update_reservation, delete_reservation, get_transactions_by_user
 
 @app.route('/api/transactions', methods=['GET'])
@@ -15,10 +16,12 @@ def transactions():
     return jsonify(transaction_list)
 
 @app.route('/api/transactions', methods=['POST'])
+@jwt_required()
 def create_transaction_endpoint():
     """
     API endpoint to create a new reservation
     """
+    user_email = get_jwt_identity()
     data = request.json
     print("create_transaction_endpoint")
     print(data)
@@ -33,6 +36,7 @@ def create_transaction_endpoint():
     
     # Call the database function to create the reservation
     result = create_reservation(
+        user_email,
         user_id=data.get('readerId'),
         resource_id=data.get('bookId'),
         transaction_type=data.get('transactionType', 'Borrow')
