@@ -235,7 +235,8 @@ def get_transactions():
         type_map = {
             1:"Borrow",  # You can adjust these status codes based on your needs
             2:"Return",
-            3:"Renew"
+            3:"Renew",
+            4:"Late"
         }
         transactions = [{
             'id': transaction['res_id'],
@@ -474,7 +475,8 @@ def create_reservation(user_id, resource_id, transaction_type):
         type_map = {
             "Borrow": 1,  # You can adjust these type codes based on your needs
             "Return": 2,
-            "Renew": 3
+            "Renew": 3,
+            "Late": 4
         }
 
         # Create reservation data
@@ -1264,7 +1266,8 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
             type_map = {
                 "Borrow": 1,
                 "Return": 2,
-                "Renew": 3
+                "Renew": 3,
+                "Late": 4
             }
             update_data['res_type'] = type_map.get(transaction_type, 1)
         

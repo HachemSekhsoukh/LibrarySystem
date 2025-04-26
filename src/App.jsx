@@ -12,7 +12,7 @@ import Dashboard from "./Pages/dashboard";
 import Readers from "./Pages/circulation/readers";
 import Exemplaires from "./Pages/circulation/exemplaires";
 import Administration from "./Pages/administration";
-import Peb from "./Pages/circulation/peb";
+import Late from "./Pages/circulation/late";
 import CirculationAdministration from "./Pages/circulation/administration";
 import Catalogage from "./Pages/catalogage/catalogage";
 import CatalogageAdministration from "./Pages/catalogage/administration";
@@ -38,7 +38,7 @@ const router = createBrowserRouter(
             path="/circulation/transactions"
             element={<Navigate to="/circulation/exemplaires" replace />}
           />
-          <Route path="/circulation/peb" element={<Peb />} />
+          <Route path="/circulation/late" element={<Late />} />
           <Route path="/circulation/exemplaires" element={<Exemplaires />} />
           <Route
             path="/circulation/administration"

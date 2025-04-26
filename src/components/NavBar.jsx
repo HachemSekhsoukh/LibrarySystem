@@ -27,7 +27,7 @@ function NavBar() {
       subItems: [
         { label: t("readers"), path: "/circulation/readers", icon: "/assets/images/home-icon.png" },
         { label: t("exemplaires"), path: "/circulation/exemplaires", icon: "/assets/images/home-icon.png" },
-        { label: t("peb"), path: "/circulation/peb", icon: "/assets/images/home-icon.png" },
+        { label: t("late"), path: "/circulation/late", icon: "/assets/images/home-icon.png" },
         { label: t("administration"), path: "/circulation/administration", icon: "/assets/images/home-icon.png" },
       ],
     },
