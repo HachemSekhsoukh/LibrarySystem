@@ -606,6 +606,7 @@ export const createTransaction = async (payload) => {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 
@@ -650,7 +651,6 @@ export const fetchMostBorrowedBooks = async () => {
     return [];
   }
 };
-
 // Reader-related API calls
 export const fetchReaderTransactions = async (readerId) => {
   try {
@@ -918,6 +918,29 @@ export const deleteResourceType = async (id) => {
   } catch (error) {
     console.error('Error deleting resource type:', error);
     throw error;
+  }
+};
+
+export const fetchLogs = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/logs`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // In case authentication is required
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch logs');
+    }
+
+    const data = await response.json();
+    console.log('Fetched logs:', data.logs);
+    return data.logs;
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    return [];
   }
 };
 

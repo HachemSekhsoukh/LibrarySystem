@@ -91,6 +91,7 @@ const CirculationAdministration = () => {
       response = await fetch(endpoint, {
         method: method,
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(newReaderType),
       });
       

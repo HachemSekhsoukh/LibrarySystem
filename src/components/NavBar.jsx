@@ -8,7 +8,6 @@ function NavBar() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
-  // Inside your component or wherever the logout function is needed
   const handleLogout = async () => {
     const data = await logoutUser();
     if (data) {
@@ -22,6 +21,7 @@ function NavBar() {
   const navItems = [
     { label: t("dashboard"), path: "/dashboard", icon: "/assets/images/home-icon.png" },
     { label: t("administration"), path: "/administration", icon: "/assets/images/home-icon.png" },
+    { label: t("logs"), path: "/logs", icon: "/assets/images/home-icon.png" },
     {
       label: t("circulation"),
       subItems: [
