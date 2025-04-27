@@ -35,10 +35,17 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
       name: "Action",
       cell: (row) => (
         <div className="edit-delete">
-          <button className="view-details-button" onClick={() => handleViewDetails && handleViewDetails(row)}>
-            <VisibilityIcon style={{ fontSize: "20px", color: "#065AA3" }} />
-          </button>
-          <div className="splitter"></div>
+          {handleViewDetails ? (
+              <>
+                <button 
+                  className="view-details-button" 
+                  onClick={() => handleViewDetails(row)}
+                >
+                  <VisibilityIcon style={{ fontSize: "20px", color: "#065AA3" }} />
+                </button>
+                <div className="splitter"></div>
+              </>
+            ) : null}
           <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
             <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
           </button>
