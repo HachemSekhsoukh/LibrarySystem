@@ -1,7 +1,7 @@
 from flask import jsonify, request
 import supabase
 from app import app
-from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type
+from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type, get_reader_history, get_resource_history
 
 @app.route('/api/readers', methods=['GET'])
 def readers():
@@ -50,6 +50,44 @@ def add_new_user_type():
     else:
         return jsonify(result), 400
 
+@app.route('/api/user-types/<int:user_type_id>', methods=['PUT'])
+def update_user_type_endpoint(user_type_id):
+    """
+    API endpoint to update a user type.
+    Expects JSON data with 'ut_name' and 'ut_borrow'.
+    """
+    data = request.get_json()
+    
+    # Check if data is provided
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    # Check for required fields
+    required_fields = ['ut_name', 'ut_borrow']
+    missing_fields = [field for field in required_fields if field not in data or not data[field]]
+    
+    if missing_fields:
+        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+
+    # Update the user type
+    result = update_user_type(user_type_id, data)
+    
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
+
+@app.route('/api/user-types/<int:user_type_id>', methods=['DELETE'])
+def delete_user_type_endpoint(user_type_id):
+    """
+    API endpoint to delete a user type.
+    """
+    result = delete_user_type(user_type_id)
+    
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
 
 @app.route('/api/add-resource-types', methods=['POST'])
 def add_new_resource_type():
@@ -151,4 +189,44 @@ def update_reader_endpoint(reader_id):
         return jsonify(result), 200
     else:
         return jsonify(result), 400
+
+@app.route('/api/history', methods=['GET'])
+def get_history():
+    try:
+        user_id = request.args.get('user_id')
+        print(f"Received request for history with user_id: {user_id}")
+        
+        if not user_id:
+            print("Error: No user_id provided")
+            return jsonify({'error': 'User ID is required'}), 400
+
+        print(f"Fetching history for user {user_id}")
+        history = get_reader_history(user_id)
+        print(f"Retrieved history data: {history}")
+        
+        return jsonify(history)
+
+    except Exception as e:
+        print(f"Error in get_history route: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/resource-history', methods=['GET'])
+def get_resource_history():
+    try:
+        resource_id = request.args.get('resource_id')
+        print(f"Received request for resource history with resource_id: {resource_id}")
+        
+        if not resource_id:
+            print("Error: No resource_id provided")
+            return jsonify({'error': 'Resource ID is required'}), 400
+
+        print(f"Fetching history for resource {resource_id}")
+        history = get_resource_history(resource_id)
+        print(f"Retrieved history data: {history}")
+        
+        return jsonify(history)
+
+    except Exception as e:
+        print(f"Error in get_resource_history route: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 

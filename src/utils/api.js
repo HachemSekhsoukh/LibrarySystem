@@ -27,14 +27,16 @@ export const fetchAllResources = async () => {
 
 export const fetchUserTypes = async () => {
   try {
+    console.log("Fetching user types from:", `${API_BASE_URL}/user-types`);
     const response = await fetch(`${API_BASE_URL}/user-types`);
     if (!response.ok) {
-      throw new Error("Failed to fetch user types");
+      throw new Error(`Failed to fetch user types: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
+    console.log("Fetched user types data:", data);
     return data;
   } catch (error) {
-    console.error("Error in fetchUserTypes:", error);
+    console.error('Error fetching user types:', error);
     throw error;
   }
 };
@@ -566,11 +568,27 @@ export const fetchStats = async () => {
 
 
 export const fetchReaders = async () => {
-  const response = await fetch(`${API_BASE_URL}/readers`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch readers');
+  try {
+    console.log("Fetching readers from:", `${API_BASE_URL}/readers`);
+    const response = await fetch(`${API_BASE_URL}/readers`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch readers: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log("Fetched readers data:", data);
+    return data.map(reader => ({
+      id: reader.id,
+      name: reader.name,
+      dob: reader.birthDate,
+      email: reader.email,
+      phone: reader.phone,
+      type: reader.type,
+      status: reader.status
+    }));
+  } catch (error) {
+    console.error('Error fetching readers:', error);
+    throw error;
   }
-  return await response.json();
 };
 
 
@@ -633,6 +651,275 @@ export const fetchMostBorrowedBooks = async () => {
     return [];
   }
 };
+// Reader-related API calls
+export const fetchReaderTransactions = async (readerId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}api/transactions?reader_id=${readerId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch reader transactions');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching reader transactions:', error);
+    throw error;
+  }
+};
+
+export const addReader = async (readerData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}api/add-readers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(readerData)
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to add reader');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding reader:', error);
+    throw error;
+  }
+};
+
+export const updateReader = async (readerId, readerData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}api/readers/${readerId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(readerData)
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update reader');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating reader:', error);
+    throw error;
+  }
+};
+
+export const deleteReader = async (readerId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}api/readers/${readerId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to delete reader');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting reader:', error);
+    throw error;
+  }
+};
+
+export const updateReaderStatus = async (readerId, status) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update reader status');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating reader status:', error);
+    throw error;
+  }
+};
+
+export const fetchPendingReaders = async () => {
+  try {
+    console.log("Fetching pending readers from:", `${API_BASE_URL}api/pending-readers`);
+    const response = await fetch(`${API_BASE_URL}api/pending-readers`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch pending readers: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log("Fetched pending readers data:", data);
+    return data.map(reader => ({
+      id: reader.id,
+      name: reader.name,
+      dob: reader.birthDate,
+      email: reader.email,
+      phone: reader.phone,
+      type: reader.type,
+      status: reader.status
+    }));
+  } catch (error) {
+    console.error('Error fetching pending readers:', error);
+    throw error;
+  }
+};
+
+export const fetchReaderHistory = async (userId) => {
+  try {
+    const url = `${API_BASE_URL}/history?user_id=${userId}`;
+    console.log("Fetching reader history from:", url);
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch reader history: ${response.status} ${response.statusText}`);
+    }
+    
+    const historyData = await response.json();
+    return processHistoryData(historyData);
+  } catch (error) {
+    console.error('Error fetching reader history:', error);
+    throw error;
+  }
+};
+
+// Helper function to process history data
+const processHistoryData = (historyData) => {
+    console.log("Processing history data:", historyData);
+    
+    // If the data is already in the correct format, return it directly
+    if (Array.isArray(historyData) && historyData.length > 0 && historyData[0].reservation_id) {
+        console.log("Data already in correct format, returning as is");
+        return historyData;
+    }
+
+    // Group by reservation ID
+    const groupedByReservation = historyData.reduce((acc, record) => {
+        if (!acc[record.h_res_id]) {
+            acc[record.h_res_id] = [];
+        }
+        acc[record.h_res_id].push(record);
+        return acc;
+    }, {});
+
+    console.log("Grouped by reservation:", groupedByReservation);
+
+    // Process each group
+    const processed = Object.values(groupedByReservation).map(group => {
+        // Sort by date
+        group.sort((a, b) => new Date(a.h_date) - new Date(b.h_date));
+
+        // Find the relevant records
+        const reservation = group.find(r => r.h_status === 0);
+        const borrow = group.find(r => r.h_status === 1);
+        const returnRecord = group.find(r => r.h_status === 2);
+        const lateRecord = group.find(r => r.h_status === 4);
+
+        const processedRecord = {
+            id: group[0].h_id,
+            reservation_id: group[0].h_res_id,
+            document_title: reservation?.Reservation?.Resource?.r_title || 'Unknown Resource',
+            reservation_date: reservation?.h_date || null,
+            borrow_date: borrow?.h_date || null,
+            due_date: borrow?.due_date || null,
+            return_date: returnRecord?.h_date || null,
+            status: getStatus(borrow, returnRecord, lateRecord),
+            is_late: lateRecord !== undefined
+        };
+
+        console.log("Processed record:", processedRecord);
+        return processedRecord;
+    });
+
+    console.log("Final processed data:", processed);
+    return processed;
+};
+
+// Helper function to determine the current status
+const getStatus = (borrow, returnRecord, lateRecord) => {
+    if (returnRecord) return 'Returned';
+    if (lateRecord) return 'Late';
+    if (borrow) return 'Borrowed';
+    return 'Reserved';
+};
+
+export const fetchResourceHistory = async (resourceId) => {
+  try {
+    const url = `${API_BASE_URL}/api/resource-history?resource_id=${resourceId}`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch resource history: ${response.status} ${response.statusText}`);
+    }
+    
+    const historyData = await response.json();
+    return processHistoryData(historyData);
+  } catch (error) {
+    console.error('Error fetching resource history:', error);
+    throw error;
+  }
+};
+
+export const fetchResourceTypes = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resource-types`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch resource types: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching resource types:', error);
+    throw error;
+  }
+};
+
+export const addResourceType = async (data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resource-types`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to add resource type: ${response.status} ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding resource type:', error);
+    throw error;
+  }
+};
+
+export const updateResourceType = async (id, data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resource-types/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update resource type: ${response.status} ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating resource type:', error);
+    throw error;
+  }
+};
+
+export const deleteResourceType = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resource-types/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete resource type: ${response.status} ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting resource type:', error);
+    throw error;
+  }
+};
 
 export const fetchLogs = async () => {
   try {
@@ -656,3 +943,4 @@ export const fetchLogs = async () => {
     return [];
   }
 };
+

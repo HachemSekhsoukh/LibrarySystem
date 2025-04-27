@@ -84,7 +84,7 @@ const CirculationAdministration = () => {
       let response;
       let endpoint = isEditing 
         ? `${API_BASE_URL}api/user-types/${currentReaderTypeId}` 
-        : `${API_BASE_URL}api/user-types`;
+        : `${API_BASE_URL}api/add-user-types`;
 
       let method = isEditing ? "PUT" : "POST";
       

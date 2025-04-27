@@ -4,11 +4,15 @@ import Button from '../../components/Button';
 import Popup from "../../components/Popup";
 import "../../CSS/form.css";
 import "./resource_form";
-import { TextField, MenuItem, Grid, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
+import { TextField, MenuItem, Grid, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Typography, TableHead, TableBody, TableRow, TableCell, Chip } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AddResourceForm from "./resource_form";
 import { useTranslation } from 'react-i18next';
+import { fetchResources, fetchResourceTypes, addResourceType, updateResourceType, deleteResourceType, fetchResourceHistory } from '../../utils/api';
 
 const Catalogage = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
@@ -41,9 +45,12 @@ const Catalogage = () => {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const fileInputRef = React.useRef();
+  const [history, setHistory] = useState([]);
+  const [selectedResource, setSelectedResource] = useState(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}api/resource-types`)  // Ensure full URL with http://
+    fetch(`${API_BASE_URL}api/resource-types`)
       .then(res => res.json())
       .then(data => {
         setResourceTypes(data);
@@ -101,7 +108,6 @@ const Catalogage = () => {
 
   const handleAddResource = async () => {
     try {
-      // Validate required fields
       if (!bookData.title || !bookData.author || !bookData.inventoryNum || !bookData.description) {
         setSnackbar({ open: true, message: "Title, author, inventory number, and description are required", severity: "error" });
         return;
@@ -126,14 +132,12 @@ const Catalogage = () => {
   
       let response;
       if (isEditing) {
-        // Update existing resource
         response = await fetch(`${API_BASE_URL}api/resources/${currentResourceId}`, { 
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formattedData),
         });
       } else {
-        // Add new resource
         response = await fetch(`${API_BASE_URL}api/resources`, { 
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -156,8 +160,6 @@ const Catalogage = () => {
       
       // Reset form data
       resetForm();
-      
-      // Refresh the resources list
       fetchResources();
     } catch (error) {
       console.error("Error saving resource:", error);
@@ -211,7 +213,7 @@ const Catalogage = () => {
           message: "Resource deleted successfully!",
           severity: "success"
         });
-        fetchResources(); // Refresh the list
+        fetchResources();
       } else {
         throw new Error(result.error || "Failed to delete resource");
       }
@@ -262,7 +264,7 @@ const Catalogage = () => {
         if (result.errors) {
           console.error("Import errors:", result.errors);
         }
-        fetchResources(); // Refresh the list
+        fetchResources();
       } else {
         throw new Error(result.error || 'Failed to import file');
       }
@@ -281,6 +283,22 @@ const Catalogage = () => {
     }
   };
 
+  const handleViewHistory = async (resource) => {
+    try {
+      setSelectedResource(resource);
+      const historyData = await fetchResourceHistory(resource.id);
+      setHistory(historyData);
+      setHistoryDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching resource history:', error);
+      setSnackbar({ 
+        open: true, 
+        message: 'Failed to fetch resource history', 
+        severity: 'error' 
+      });
+    }
+  };
+
   const columns = [
     { label: t("id"), key: "id" },
     { label: t("title"), key: "title" },
@@ -293,11 +311,11 @@ const Catalogage = () => {
   return (
     <div className="books-page">
       <div className="container">
-      {loading ? (
+        {loading ? (
           <div className="loader"></div>
         ) : (
           <>
-                <div id="table">
+            <div id="table">
               <Table 
                 columns={columns} 
                 data={resources} 
@@ -305,6 +323,7 @@ const Catalogage = () => {
                 title={t("books")} 
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                handleViewDetails={handleViewHistory}
               />
             </div>
             <div className="bottom-buttons">
@@ -328,18 +347,18 @@ const Catalogage = () => {
                   resetForm();
                   setOpenPopup(true);
                 }}
-                label= {t("add_new_book")}
+                label={t("add_new_book")}
                 lightBackgrnd={false}
                 icon={<AddIcon />}
                 size="large"
               />
             </div>
-          </>)}
+          </>
+        )}
       </div>
       
       <Popup title={isEditing ? t("edit_book") : t("add_new_book")} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <AddResourceForm bookData={bookData} handleChange={handleChange} resourceTypes={resourceTypes} />
-        {/* Buttons */}
         <div className="form-buttons">
           <Button onClick={() => {
             resetForm();
@@ -349,7 +368,6 @@ const Catalogage = () => {
         </div>
       </Popup>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
@@ -363,6 +381,56 @@ const Catalogage = () => {
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
           <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={historyDialogOpen}
+        onClose={() => setHistoryDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          History for {selectedResource?.title}
+        </DialogTitle>
+        <DialogContent>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Document Title</TableCell>
+                <TableCell>Reservation Date</TableCell>
+                <TableCell>Borrow Date</TableCell>
+                <TableCell>Due Date</TableCell>
+                <TableCell>Return Date</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {history.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell>{record.document_title}</TableCell>
+                  <TableCell>{record.reservation_date}</TableCell>
+                  <TableCell>{record.borrow_date}</TableCell>
+                  <TableCell>{record.due_date}</TableCell>
+                  <TableCell>{record.return_date}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={record.status}
+                      color={
+                        record.status === 'Late' ? 'error' :
+                        record.status === 'Borrowed' ? 'warning' :
+                        record.status === 'Returned' ? 'success' :
+                        'info'
+                      }
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setHistoryDialogOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
 

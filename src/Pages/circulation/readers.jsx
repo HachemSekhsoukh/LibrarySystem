@@ -7,6 +7,20 @@ import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import "../../CSS/circulation/readers.css";
 import { useTranslation } from 'react-i18next';
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { 
+  fetchReaders, 
+  fetchReaderTransactions, 
+  addReader, 
+  updateReader, 
+  deleteReader, 
+  updateReaderStatus,
+  fetchUserTypes,
+  fetchPendingReaders,
+  fetchReaderHistory
+} from "../../utils/api";
 
 const Readers = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
@@ -19,6 +33,10 @@ const Readers = () => {
   const [pendingReaders, setPendingReaders] = useState([]);
   const [pendingReadersLoading, setPendingReadersLoading] = useState(false);
   const [selectedReaders, setSelectedReaders] = useState([]);
+  const [readerDetailsPopup, setReaderDetailsPopup] = useState(false);
+  const [selectedReader, setSelectedReader] = useState(null);
+  const [readerTransactions, setReaderTransactions] = useState([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
   
   const [newReader, setNewReader] = useState({ 
     u_name: "", 
@@ -61,75 +79,57 @@ const Readers = () => {
   
 
   useEffect(() => {
-    const fetchReaders = async () => {
+    const loadInitialData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(`${API_BASE_URL}api/readers`);
-        const data = await response.json();
-        const formattedData = data.map(reader => ({
-          id: reader.id,
-          name: reader.name,
-          dob: reader.birthDate,
-          email: reader.email,
-          phone: reader.phone,
-          type: reader.type,
-          status: reader.status
-        }));
-        setReaders(formattedData);
+        console.log("Starting to load initial data...");
+        const [readersData, userTypesData] = await Promise.all([
+          fetchReaders(),
+          fetchUserTypes()
+        ]);
+        console.log("Successfully loaded data:", { readersData, userTypesData });
+        setReaders(readersData);
+        setUserTypes(userTypesData);
       } catch (error) {
-        console.error("Error fetching readers:", error);
+        console.error("Error loading initial data:", error);
+        setSnackbar({ 
+          open: true, 
+          message: `Failed to load data: ${error.message}`, 
+          severity: "error" 
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    const fetchUserTypes = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}api/user-types`);
-        const data = await response.json();
-        setUserTypes(data);
-      } catch (error) {
-        console.error("Error fetching user types:", error);
-      }
-    };
-
-    fetchReaders();
-    fetchUserTypes();
+    loadInitialData();
   }, []);
 
   // Fetch pending readers when verification popup opens
   useEffect(() => {
     if (verifyReaders) {
-      fetchPendingReaders();
+      const loadPendingReaders = async () => {
+        setPendingReadersLoading(true);
+        try {
+          console.log("Loading pending readers...");
+          const data = await fetchPendingReaders();
+          console.log("Successfully loaded pending readers:", data);
+          setPendingReaders(data);
+        } catch (error) {
+          console.error("Error loading pending readers:", error);
+          setSnackbar({ 
+            open: true, 
+            message: `Failed to load pending readers: ${error.message}`, 
+            severity: "error" 
+          });
+        } finally {
+          setPendingReadersLoading(false);
+        }
+      };
+
+      loadPendingReaders();
     }
   }, [verifyReaders]);
-
-  const fetchPendingReaders = async () => {
-    setPendingReadersLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}api/pending-readers`);
-      const data = await response.json();
-  
-      // 🔍 Debug log to inspect the raw data from the backend
-      console.log("Fetched pending readers (raw):", data);
-  
-      const formattedData = data.map(reader => ({
-        id: reader.id,
-        name: reader.name,
-        dob: reader.birthDate,
-        email: reader.email,
-        phone: reader.phone,
-        type: reader.type,
-        status: reader.status
-      }));
-  
-      setPendingReaders(formattedData);
-      setPendingReadersLoading(false);
-    } catch (error) {
-      console.error("Error fetching readers:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleInputChange = (e) => {
     setNewReader({ ...newReader, [e.target.name]: e.target.value });
@@ -453,13 +453,49 @@ const Readers = () => {
     }
   };
 
+  const handleViewDetails = async (reader) => {
+    setSelectedReader(reader);
+    setLoadingTransactions(true);
+    try {
+      const history = await fetchReaderHistory(reader.id);
+      setReaderTransactions(history);
+    } catch (error) {
+      console.error("Error fetching reader history:", error);
+      setSnackbar({
+        open: true,
+        message: "Failed to fetch reader's history",
+        severity: "error"
+      });
+    } finally {
+      setLoadingTransactions(false);
+      setReaderDetailsPopup(true);
+    }
+  };
+
+  const transactionColumns = [
+    { label: t("document_title"), key: "document_title" },
+    { label: t("reservation_date"), key: "reservation_date" },
+    { label: t("borrow_date"), key: "borrow_date" },
+    { label: t("due_date"), key: "due_date" },
+    { label: t("return_date"), key: "return_date" },
+    { 
+      label: t("status"), 
+      key: "status",
+      render: (value, row) => (
+        <span className={row.is_late ? "status-late" : "status-normal"}>
+          {value}
+        </span>
+      )
+    }
+  ];
+
   const columns = [
     { label: t("id"), key: "id" },
     { label: t("name"), key: "name" },
     { label: t("date_of_birth"), key: "dob" },
     { label: t("email"), key: "email" },
     { label: t("phone_number"), key: "phone" },
-    { label: t("category"), key: "type" }
+    { label: t("category"), key: "type" },
   ];
 
   const pendingColumns = [
@@ -497,6 +533,7 @@ const Readers = () => {
             loading={loading} 
             onEdit={handleEdit}
             onDelete={handleDelete}
+            handleViewDetails={handleViewDetails}
           />
         </div>
         <div className="bottom-buttons">
@@ -700,6 +737,74 @@ const Readers = () => {
           <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
         </DialogActions>
       </Dialog>
+
+      {/* Reader Details Popup */}
+      <Popup
+        title={t("reader_details")}
+        openPopup={readerDetailsPopup}
+        setOpenPopup={setReaderDetailsPopup}
+        maxWidth="xl"
+        PaperProps={{
+          sx: {
+            minWidth: '1200px',
+            maxHeight: '80vh'
+          }
+        }}
+      >
+        <div className="popup-header">
+          <button 
+            className="close-button"
+            onClick={() => setReaderDetailsPopup(false)}
+          >
+            &times;
+          </button>
+        </div>
+        {selectedReader && (
+          <div className="reader-details-container">
+            <div className="reader-info">
+              <h3>{t("personal_information")}</h3>
+              <div className="info-grid">
+                <div className="info-item">
+                  <label>{t("name")}:</label>
+                  <span>{selectedReader.name}</span>
+                </div>
+                <div className="info-item">
+                  <label>{t("email")}:</label>
+                  <span>{selectedReader.email}</span>
+                </div>
+                <div className="info-item">
+                  <label>{t("phone_number")}:</label>
+                  <span>{selectedReader.phone}</span>
+                </div>
+                <div className="info-item">
+                  <label>{t("date_of_birth")}:</label>
+                  <span>{selectedReader.dob}</span>
+                </div>
+                <div className="info-item">
+                  <label>{t("category")}:</label>
+                  <span>{selectedReader.type}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="transaction-history">
+              <h3>{t("transaction_history")}</h3>
+              {loadingTransactions ? (
+                <div className="loading-message">Loading transactions...</div>
+              ) : readerTransactions.length === 0 ? (
+                <div className="no-transactions-message">{t("no_transactions")}</div>
+              ) : (
+                <Table
+                  columns={transactionColumns}
+                  data={readerTransactions}
+                  showActions={false}
+                  title={t("transactions")}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </Popup>
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity={snackbar.severity}>{snackbar.message}</Alert>

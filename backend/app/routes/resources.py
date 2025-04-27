@@ -4,7 +4,7 @@ Routes related to resources (books and other library items)
 
 from flask import jsonify, request
 from app import app
-from app.database import get_resources, add_resource, delete_resource, update_resource
+from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history
 import pandas as pd
 import io
 
@@ -192,3 +192,26 @@ def import_resources():
     except Exception as e:
         print(f"Global error in import: {str(e)}")
         return jsonify({"error": f"Error processing file: {str(e)}"}), 500
+
+@app.route('/api/resource-history', methods=['GET'])
+def get_resource_history_route():
+    """
+    API endpoint to retrieve the history of a resource
+    """
+    try:
+        resource_id = request.args.get('resource_id')
+        print(f"Received request for resource history with resource_id: {resource_id}")
+        
+        if not resource_id:
+            print("Error: No resource_id provided")
+            return jsonify({'error': 'Resource ID is required'}), 400
+
+        print(f"Fetching history for resource {resource_id}")
+        history = get_resource_history(resource_id)
+        print(f"Retrieved history data: {history}")
+        
+        return jsonify(history)
+
+    except Exception as e:
+        print(f"Error in get_resource_history route: {str(e)}")
+        return jsonify({'error': str(e)}), 500
