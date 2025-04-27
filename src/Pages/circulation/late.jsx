@@ -96,7 +96,7 @@ const Late = () => {
           columns={columns} 
           data={transactions} 
           showActions={false} 
-          title={t("Late_returns")} 
+          title={t("late")} 
           loading={loadingTransactions}
         />
         {transactionError && (
@@ -107,12 +107,12 @@ const Late = () => {
 
         {/* Button to open popup */}
         <div className="bottom-buttons">
-                  <Button onClick={() => setVerifyPopupOpen(true)} label={t("Verify_late_returns")} lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
+                  <Button onClick={() => setVerifyPopupOpen(true)} label={t("verify_late_returns")} lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
         </div>
 
         {/* Popup */}
         <Popup
-          title={t("Verify_Late_Returns")}
+          title={t("verify_late_returns")}
           openPopup={verifyPopupOpen}
           setOpenPopup={setVerifyPopupOpen}
           maxWidth="md"

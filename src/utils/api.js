@@ -936,7 +936,6 @@ export const fetchLogs = async () => {
     }
 
     const data = await response.json();
-    console.log('Fetched logs:', data.logs);
     return data.logs;
   } catch (error) {
     console.error('Error fetching logs:', error);
