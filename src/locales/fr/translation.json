@@ -14,6 +14,11 @@
     "contact_us": "Contactez-nous",
     "address": "Adresse",
     "license": "Licence",
+
+    "staff_email": "Email du staff",
+    "message": "Message",
+    "date_and_time": "Date et temps",
+    "logs": "Registre",
   
     "settings": "Paramètres",
     "edit_profile": "Modifier le profil",
@@ -48,6 +53,8 @@
     "late": "Retardateurs",
     "administration_section": "Administration",
     "catalogage_section": "Catalogage",
+
+    "verify_late_returns": "Verifier les retardateurs",
 
     "add_staff_member": "Ajouter un membre du personnel",
     "add_staff_type": "Ajouter un type de personnel",

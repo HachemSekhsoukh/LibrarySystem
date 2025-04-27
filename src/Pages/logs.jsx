@@ -31,9 +31,9 @@ const Logs = () => {
 
   const columns = [
     // { label: t("Staff ID"), key: "s_id" },
-    { label: t("Staff Email"), key: "staff_email" },
-    { label: t("Message"), key: "message" },
-    { label: t("Date and Time"), key: "created_at" }
+    { label: t("staff_email"), key: "staff_email" },
+    { label: t("message"), key: "message" },
+    { label: t("date_and_time"), key: "created_at" }
   ];
 
   return (

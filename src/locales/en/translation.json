@@ -38,6 +38,13 @@
     "profile_update": "Failed to update profile.",
     "fill_all": "Please fill in all fields.",
 
+    "verify_late_returns": "Verify Late Returns",
+
+    "staff_email": "Staff Email",
+    "message": "Message",
+    "date_and_time": "Date and time",
+    "logs": "Logs",
+
     "dashboard": "Dashboard",
     "administration": "Administration",
     "circulation": "Circulation",
@@ -117,8 +124,6 @@
     "edit_book": "Edit book",
     "import_books": "Import Books",
     "importing...": "Importing...",
-
-    "reader_types": "Reader types",
 
     "resource_types": "Resource types",
     "add_new_resource": "Add New Resource",
