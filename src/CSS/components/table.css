@@ -130,14 +130,15 @@
     border-radius: 7px;
     overflow: hidden; /* Ensures corners are rounded */
     height: 55%;
-    width: 80%;
+    width: 100%;
   }
   
   /* Action Buttons */
   .edit-btn,
-  .delete-btn {
+  .delete-btn,
+  .view-details-button {
     border: none;
-    padding: 5px 10px;
+    padding: 5px 5px;
     cursor: pointer;
     margin: 0;
     font-size: 14px;
@@ -157,14 +158,21 @@
     width: 49.75%;
     color: white;
   }
+
+  .view-details-button{background-color: #083e7416;
+    width: 49.75%;
+    color: white;
+  }
   
-  .edit-btn:hover {
+  .edit-btn:hover,
+  .view-details-button:hover {
     background-color: #083e74a9;
   }
   
   .delete-btn:hover {
     background-color: rgba(211, 47, 47, 0.2);
   }
+
   
   /* Make sure the table cells have proper padding */
 .verify-readers-table td {

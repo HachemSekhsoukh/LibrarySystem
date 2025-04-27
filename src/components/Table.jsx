@@ -3,10 +3,11 @@ import DataTable from "react-data-table-component";
 import "../CSS/components/table.css";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useTranslation } from 'react-i18next';
 import { BorderBottom } from "@mui/icons-material";
 
-const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [], onEdit, onDelete }) => {
+const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [],handleViewDetails ,onEdit, onDelete }) => {
   const [searchText, setSearchText] = useState("");
   const { t } = useTranslation();
   // Convert columns to DataTable format while preserving custom renderers
@@ -34,6 +35,10 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
       name: "Action",
       cell: (row) => (
         <div className="edit-delete">
+          <button className="view-details-button" onClick={() => handleViewDetails && handleViewDetails(row)}>
+            <VisibilityIcon style={{ fontSize: "20px", color: "#065AA3" }} />
+          </button>
+          <div className="splitter"></div>
           <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
             <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
           </button>

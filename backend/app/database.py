@@ -1,7 +1,7 @@
 import os
 from supabase import create_client
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, timedelta
 import calendar
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -1381,4 +1381,148 @@ def get_most_borrowed_resources(limit=5):
             return []
     except Exception as e:
         print("Error fetching most borrowed resources:", e)
+        return []
+
+def get_reader_history(user_id):
+    """
+    Get the complete history of a reader including reservations, borrows, and returns.
+    Also calculates due dates based on resource type borrow limits or user type limits.
+    """
+    try:
+        print(f"\nFetching history for user_id: {user_id}")
+        
+        # First get the user's type to get the borrow limit
+        user_response = supabase.from_("User") \
+            .select("u_type, User_type(ut_borrow)") \
+            .eq("u_id", user_id) \
+            .single() \
+            .execute()
+
+        print("User response:", user_response.data)
+        user_type_borrow_limit = user_response.data.get('User_type', {}).get('ut_borrow') if user_response.data else None
+        print("User type borrow limit:", user_type_borrow_limit)
+
+        # Get all history records for the user
+        response = supabase.from_("History") \
+            .select("h_id, h_res_id, h_user_id, h_status, h_date, " \
+                   "Reservation(res_id, res_resource_id, " \
+                   "Resource(r_title, r_type, " \
+                   "Resource_type(rt_borrow)))") \
+            .eq("h_user_id", user_id) \
+            .order("h_date", desc=True) \
+            .execute()
+
+        print("\nRaw history response:", response.data)
+        print(f"Number of history records: {len(response.data) if response.data else 0}")
+
+        if not response.data:
+            return []
+
+        # Create a dictionary to track each reservation's lifecycle
+        reservations = {}
+
+        # First pass: Create all reservations
+        for record in response.data:
+            if record['h_status'] == 0:  # Reservation
+                res_id = record['h_res_id']
+                if res_id not in reservations:
+                    reservations[res_id] = {
+                        'reservation_id': res_id,
+                        'document_title': record['Reservation']['Resource']['r_title'] if record.get('Reservation', {}).get('Resource') else 'Unknown Resource',
+                        'reservation_date': record['h_date'],
+                        'borrow_date': None,
+                        'due_date': None,
+                        'return_date': None,
+                        'status': 'Reserved'
+                    }
+                    print(f"Created reservation {res_id}: {reservations[res_id]}")
+
+        # Second pass: Update reservations with borrows and returns
+        for record in response.data:
+            res_id = record['h_res_id']
+            if res_id in reservations:
+                if record['h_status'] == 1:  # Borrow
+                    reservations[res_id]['borrow_date'] = record['h_date']
+                    # Calculate due date
+                    borrow_limit = record.get('Reservation', {}).get('Resource', {}).get('Resource_type', {}).get('rt_borrow') or user_type_borrow_limit
+                    if borrow_limit:
+                        due_date = datetime.fromisoformat(record['h_date']) + timedelta(days=borrow_limit)
+                        reservations[res_id]['due_date'] = due_date.isoformat()
+                    reservations[res_id]['status'] = 'Borrowed'
+                    print(f"Updated reservation {res_id} to borrowed: {reservations[res_id]}")
+                
+                elif record['h_status'] == 2:  # Return
+                    reservations[res_id]['return_date'] = record['h_date']
+                    reservations[res_id]['status'] = 'Returned'
+                    if reservations[res_id]['due_date'] and record['h_date'] > reservations[res_id]['due_date']:
+                        reservations[res_id]['status'] = 'Late'
+                    print(f"Updated reservation {res_id} to returned: {reservations[res_id]}")
+                
+                elif record['h_status'] == 4:  # Late
+                    reservations[res_id]['status'] = 'Late'
+                    print(f"Updated reservation {res_id} to late: {reservations[res_id]}")
+
+        # Convert dictionary to list and sort by reservation date
+        processed_history = list(reservations.values())
+        processed_history.sort(key=lambda x: x['reservation_date'], reverse=True)
+
+        print(f"\nFinal processed history: {processed_history}")
+        return processed_history
+
+    except Exception as e:
+        print(f"Error in get_reader_history: {str(e)}")
+        raise
+
+def get_resource_history(resource_id):
+    """
+    Get the complete history of a resource including all reservations, borrows, and returns.
+    """
+    try:
+        # Get the resource's borrow limit from its type
+        resource_type_query = supabase.table('Resource_type').select('rt_borrow').eq('rt_id', resource_id).execute()
+        borrow_limit = resource_type_query.data[0]['rt_borrow'] if resource_type_query.data else 7  # Default to 7 days
+
+        # Get all history records for this resource
+        history_query = supabase.table('History') \
+            .select('*, Reservation(*, Resource(*, Resource_type(*)))') \
+            .eq('h_res_id', resource_id) \
+            .order('h_date', desc=True) \
+            .execute()
+
+        if not history_query.data:
+            return []
+
+        # Process the records to track the lifecycle of each reservation
+        reservations = {}
+        for record in history_query.data:
+            res_id = record['h_res_id']
+            if res_id not in reservations:
+                reservations[res_id] = {
+                    'id': record['h_id'],
+                    'reservation_id': res_id,
+                    'document_title': record['Reservation']['Resource']['r_title'] if record['Reservation'] and record['Reservation']['Resource'] else 'Unknown Resource',
+                    'reservation_date': record['h_date'],
+                    'borrow_date': None,
+                    'due_date': None,
+                    'return_date': None,
+                    'status': 'Reserved',
+                    'is_late': False
+                }
+
+            # Update status based on history record
+            if record['h_status'] == 1:  # Borrowed
+                reservations[res_id]['borrow_date'] = record['h_date']
+                reservations[res_id]['due_date'] = (datetime.fromisoformat(record['h_date'].replace('Z', '+00:00')) + timedelta(days=borrow_limit)).isoformat()
+                reservations[res_id]['status'] = 'Borrowed'
+            elif record['h_status'] == 2:  # Returned
+                reservations[res_id]['return_date'] = record['h_date']
+                reservations[res_id]['status'] = 'Returned'
+            elif record['h_status'] == 4:  # Late
+                reservations[res_id]['status'] = 'Late'
+                reservations[res_id]['is_late'] = True
+
+        return list(reservations.values())
+
+    except Exception as e:
+        print(f"Error in get_resource_history: {str(e)}")
         return []
