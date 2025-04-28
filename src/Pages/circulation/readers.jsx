@@ -183,6 +183,7 @@ const Readers = () => {
         });
       } else {
         // Add new reader
+        console.log(readerDataToSend);
         response = await fetch(`${API_BASE_URL}api/add-readers`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
