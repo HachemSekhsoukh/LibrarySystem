@@ -135,12 +135,14 @@ const Catalogage = () => {
         response = await fetch(`${API_BASE_URL}api/resources/${currentResourceId}`, { 
           method: "PUT",
           headers: { "Content-Type": "application/json" },
+          credentials: 'include',
           body: JSON.stringify(formattedData),
         });
       } else {
         response = await fetch(`${API_BASE_URL}api/resources`, { 
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: 'include',
           body: JSON.stringify(formattedData),
         });
       }
@@ -197,7 +199,8 @@ const Catalogage = () => {
   const confirmDelete = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}api/resources/${resourceToDelete.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -250,6 +253,7 @@ const Catalogage = () => {
     try {
       const response = await fetch(`${API_BASE_URL}api/resources/import`, {
         method: 'POST',
+        credentials: 'include',
         body: formData
       });
 

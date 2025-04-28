@@ -593,7 +593,7 @@ export const fetchReaders = async () => {
 
 
 export const fetchTransactions = async () => {
-  const response = await fetch(`${API_BASE_URL}/transactions`);
+  const response = await fetch(`${API_BASE_URL}/transactions`, {credentials: 'include'});
   if (!response.ok) {
     throw new Error("Failed to fetch transactions");
   }
@@ -704,7 +704,8 @@ export const updateReader = async (readerId, readerData) => {
 export const deleteReader = async (readerId) => {
   try {
     const response = await fetch(`${API_BASE_URL}api/readers/${readerId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      credentials: 'include'
     });
     if (!response.ok) {
       const errorData = await response.json();
@@ -875,6 +876,7 @@ export const addResourceType = async (data) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify(data),
     });
     if (!response.ok) {
@@ -910,6 +912,7 @@ export const deleteResourceType = async (id) => {
   try {
     const response = await fetch(`${API_BASE_URL}/resource-types/${id}`, {
       method: 'DELETE',
+      credentials: 'include'
     });
     if (!response.ok) {
       throw new Error(`Failed to delete resource type: ${response.status} ${response.statusText}`);

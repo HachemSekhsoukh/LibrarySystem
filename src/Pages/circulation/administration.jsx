@@ -43,7 +43,7 @@ const CirculationAdministration = () => {
 
   const fetchReaderTypes = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}api/user-types`);
+      const response = await fetch(`${API_BASE_URL}api/user-types`, {credentials: "include"});
       if (!response.ok) {
         throw new Error("Failed to fetch reader types");
       }
@@ -137,7 +137,8 @@ const CirculationAdministration = () => {
   const confirmDelete = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}api/user-types/${readerTypeToDelete.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: "include"
       });
       
       if (!response.ok) {
