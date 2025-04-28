@@ -27,8 +27,7 @@ export const fetchAllResources = async () => {
 
 export const fetchUserTypes = async () => {
   try {
-    console.log("Fetching user types from:", `${API_BASE_URL}/user-types`);
-    const response = await fetch(`${API_BASE_URL}/user-types`);
+    const response = await fetch(`${API_BASE_URL}/user-types` , {credentials: 'include'});
     if (!response.ok) {
       throw new Error(`Failed to fetch user types: ${response.status} ${response.statusText}`);
     }
@@ -427,7 +426,7 @@ export const fetchAllStaff = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      credentials: "include", // If you're using cookies for auth
+      credentials: "include", 
     });
 
     const data = await response.json();
@@ -569,8 +568,7 @@ export const fetchStats = async () => {
 
 export const fetchReaders = async () => {
   try {
-    console.log("Fetching readers from:", `${API_BASE_URL}/readers`);
-    const response = await fetch(`${API_BASE_URL}/readers`);
+    const response = await fetch(`${API_BASE_URL}/readers`, {credentials: 'include'});
     if (!response.ok) {
       throw new Error(`Failed to fetch readers: ${response.status} ${response.statusText}`);
     }
@@ -685,7 +683,7 @@ export const addReader = async (readerData) => {
 
 export const updateReader = async (readerId, readerData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}api/readers/${readerId}`, {
+    const response = await fetch(`${API_BASE_URL}/readers/${readerId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(readerData)
@@ -738,8 +736,7 @@ export const updateReaderStatus = async (readerId, status) => {
 
 export const fetchPendingReaders = async () => {
   try {
-    console.log("Fetching pending readers from:", `${API_BASE_URL}api/pending-readers`);
-    const response = await fetch(`${API_BASE_URL}api/pending-readers`);
+    const response = await fetch(`${API_BASE_URL}/pending-readers`, {credentials: 'include'});
     if (!response.ok) {
       throw new Error(`Failed to fetch pending readers: ${response.status} ${response.statusText}`);
     }
