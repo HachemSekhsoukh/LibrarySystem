@@ -116,7 +116,9 @@ def add_user_type(user_email, user_type_data):
         response = supabase.from_("User_type").insert(user_type_data).execute()
 
         if response.data:
+            add_log(user_email,f"Added a user type: {user_type_data['ut_name']}")
             return {'success': True, 'user_type': response.data[0]}
+            
         else:
             return {'success': False, 'error': 'Failed to add user type'}
     except Exception as e:
