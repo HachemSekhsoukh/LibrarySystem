@@ -6,6 +6,7 @@ from flask import jsonify, request
 from app import app
 from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history
 import pandas as pd
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 import io
 
 @app.route('/api/resources', methods=['GET'])
@@ -17,6 +18,7 @@ def resources():
     return jsonify(resource_list)
 
 @app.route('/api/resources', methods=['POST'])
+@jwt_required()
 def add_resource_endpoint():
     """
     API endpoint to add a new resource (book)
@@ -45,6 +47,7 @@ def add_resource_endpoint():
         }), 500
 
 @app.route('/api/resources/<int:resource_id>', methods=['DELETE'])
+@jwt_required()
 def remove_resource(resource_id):
     """
     API endpoint to delete a resource by ID.
@@ -53,6 +56,7 @@ def remove_resource(resource_id):
     return jsonify(result), (200 if result['success'] else 400)
 
 @app.route('/api/resources/<int:resource_id>', methods=['PUT'])
+@jwt_required()
 def update_resource_endpoint(resource_id):
     """
     API endpoint to update a resource by ID.

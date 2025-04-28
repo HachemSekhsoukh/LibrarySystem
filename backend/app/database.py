@@ -892,15 +892,7 @@ def update_user_password(user_email, new_password):
         # Check if update was successful
         if response.data:
             try:
-                user = get_user_by_email(user_email)
-                if user:
-                    supabase \
-                        .from_("Logs") \
-                        .insert({
-                            's_id': user['id'],
-                            'message': f"User {user['email']} changed their password."
-                        }) \
-                        .execute()
+                add_log(user_email, f"user changed their password.")
             except Exception as log_error:
                 print(f"Failed to insert password change log: {log_error}")
 

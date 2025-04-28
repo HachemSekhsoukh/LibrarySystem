@@ -8,6 +8,7 @@ from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identit
 from app.database import get_transactions, create_reservation, update_reservation, delete_reservation, get_transactions_by_user
 
 @app.route('/api/transactions', methods=['GET'])
+@jwt_required()
 def transactions():
     """
     API endpoint to retrieve all reservations (transactions)

@@ -21,6 +21,7 @@ def pending_readers():
     return jsonify(pending_reader_list)
 
 @app.route("/api/user-types", methods=["GET"])
+@jwt_required()
 def user_types():
     return jsonify(get_user_types())
 
@@ -53,6 +54,7 @@ def add_new_user_type():
         return jsonify(result), 400
 
 @app.route('/api/user-types/<int:user_type_id>', methods=['PUT'])
+@jwt_required()
 def update_user_type_endpoint(user_type_id):
     """
     API endpoint to update a user type.
@@ -80,6 +82,7 @@ def update_user_type_endpoint(user_type_id):
         return jsonify(result), 400
 
 @app.route('/api/user-types/<int:user_type_id>', methods=['DELETE'])
+@jwt_required()
 def delete_user_type_endpoint(user_type_id):
     """
     API endpoint to delete a user type.
@@ -91,32 +94,6 @@ def delete_user_type_endpoint(user_type_id):
     else:
         return jsonify(result), 400
 
-@app.route('/api/add-resource-types', methods=['POST'])
-def add_new_resource_type():
-    """
-    API endpoint to add a new user type.
-    Expects JSON data with 'u_type' and 'u_description'.
-    """
-    data = request.get_json()
-    
-    # Check if data is provided
-    if not data:
-        return jsonify({'success': False, 'error': 'No data provided'}), 400
-    
-    # Check for required fields
-    required_fields = ['rt_name', 'rt_borrow']
-    missing_fields = [field for field in required_fields if field not in data or not data[field]]
-    
-    if missing_fields:
-        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
-
-    # Add the user type
-    result = add_resource_type(data)
-    
-    if result['success']:
-        return jsonify(result), 200
-    else:
-        return jsonify(result), 400
 
 @app.route('/api/add-readers', methods=['POST'])
 def add_new_reader():
