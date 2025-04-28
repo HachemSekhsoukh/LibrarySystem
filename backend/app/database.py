@@ -116,7 +116,7 @@ def add_user_type(user_email, user_type_data):
         response = supabase.from_("User_type").insert(user_type_data).execute()
 
         if response.data:
-            add_log(user_email,f"Added a user type: {user_type_data['ut_name']}")
+            add_log(user_email,f"added a user type: {user_type_data['ut_name']}")
             return {'success': True, 'user_type': response.data[0]}
             
         else:
@@ -322,7 +322,7 @@ def get_resource_types():
         return []
 
 
-def add_resource_type(resource_type_data):
+def add_resource_type(user_email,resource_type_data):
     """
     Add a new resource type to the database.
     :param resource_type_data: Dictionary containing resource type details.
@@ -331,6 +331,7 @@ def add_resource_type(resource_type_data):
         response = supabase.from_("Resource_type").insert(resource_type_data).execute()
 
         if response.data:
+            add_log(user_email, f"added a resource type: {resource_type_data['rt_name']}")
             return {'success': True, 'resource_type': response.data[0]}
         else:
             return {'success': False, 'error': 'Failed to add resource type'}
@@ -494,7 +495,7 @@ def create_reservation(user_email, user_id, resource_id, transaction_type):
         
         if response.data:
             # Log reservation creation
-            add_log(user_email, f"Created a transaction of type: {transaction_type} for resource ID: {resource_id}")
+            add_log(user_email, f"created a transaction of type: {transaction_type} for resource ID: {resource_id}")
 
             # If the transaction type is "Borrow", increment the r_num_of_borrows in the Resource table
             if transaction_type == "Borrow":
@@ -577,7 +578,7 @@ def login(email, password):
 
             if check_password_hash(stored_hashed_password, password):
                 # Successful login, add a log using add_log
-                if add_log(staff['s_email'], f"{staff['s_email']} logged in successfully."):
+                if add_log(staff['s_email'], "logged in successfully."):
                     return {
                         'success': True,
                         'user': {
@@ -1042,7 +1043,7 @@ def add_staff_type(user_email, staff_type_data):
         if response.data:
             # Log the staff type creation
             type_name = staff_type_data.get('st_name', 'Unknown')
-            add_log(user_email, f"Added a new staff type: {type_name}")
+            add_log(user_email, f"added a new staff type: {type_name}")
 
             return {'success': True, 'staff_type': response.data[0]}
         else:
@@ -1138,7 +1139,7 @@ def add_staff_member(user_email, data):
 
         if response.data:
             # Log the staff creation
-            add_log(user_email, f"Added a new staff member with email: {email}")
+            add_log(user_email, f"added a new staff member with email: {email}")
             
             return {
                 'success': True,

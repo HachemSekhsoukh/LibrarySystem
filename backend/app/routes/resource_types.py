@@ -5,6 +5,7 @@ Routes related to resource types
 from flask import jsonify, request
 from app import app
 from app.database import get_resource_types, add_resource_type, delete_resource_type, update_resource_type
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/resource-types', methods=['GET'])
 def resource_types():
@@ -15,11 +16,13 @@ def resource_types():
     return jsonify(resource_type_list)
 
 @app.route('/api/resource-types', methods=['POST'])
+@jwt_required()
 def add_resource_type_endpoint():
     """
     API endpoint to add a new resource type
     """
     data = request.json
+    user_email = get_jwt_identity()
     
     if not data:
         return jsonify({'success': False, 'error': 'No data provided'}), 400
@@ -32,7 +35,7 @@ def add_resource_type_endpoint():
         return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
     
     # Add the resource type
-    result = add_resource_type(data)
+    result = add_resource_type(user_email,data)
     
     if result['success']:
         return jsonify(result), 201
