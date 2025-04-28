@@ -184,10 +184,6 @@ def add_reader(reader_data):
 
         # Add user with the reader type
         reader_data['u_type'] = reader_type_id  # Assign reader type ID
-        
-        # Remove any password field if it exists (should be handled by auth)
-        if 'u_password' in reader_data:
-            del reader_data['u_password']
             
         response = supabase.from_("User").insert(reader_data).execute()
 

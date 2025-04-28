@@ -129,7 +129,7 @@ def add_new_reader():
         return jsonify({'success': False, 'error': 'No data provided'}), 400
     
     # Check for required fields
-    required_fields = ['u_name', 'u_email', 'u_birthDate', 'u_phone']
+    required_fields = ['u_name', 'u_email', 'u_birthDate', 'u_phone', 'u_password']
     missing_fields = [field for field in required_fields if field not in data or not data[field]]
     
     if missing_fields:
