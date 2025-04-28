@@ -2,6 +2,7 @@ from flask import jsonify, request
 import supabase
 from app import app
 from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type, get_reader_history, get_resource_history
+from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/readers', methods=['GET'])
 def readers():
@@ -24,12 +25,14 @@ def user_types():
     return jsonify(get_user_types())
 
 @app.route('/api/add-user-types', methods=['POST'])
+@jwt_required()
 def add_new_user_type():
     """
     API endpoint to add a new user type.
     Expects JSON data with 'u_type' and 'u_description'.
     """
     data = request.get_json()
+    user_email = get_jwt_identity()
     
     # Check if data is provided
     if not data:
@@ -41,9 +44,8 @@ def add_new_user_type():
     
     if missing_fields:
         return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
-
     # Add the user type
-    result = add_user_type(data)
+    result = add_user_type(user_email,data)
     
     if result['success']:
         return jsonify(result), 200
