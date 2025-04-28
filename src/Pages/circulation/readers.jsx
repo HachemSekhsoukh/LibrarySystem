@@ -179,6 +179,7 @@ const Readers = () => {
         response = await fetch(`${API_BASE_URL}api/readers/${currentReaderId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
+          credentials: 'include',
           body: JSON.stringify(readerDataToSend),
         });
       } else {
@@ -186,6 +187,7 @@ const Readers = () => {
         console.log(readerDataToSend);
         response = await fetch(`${API_BASE_URL}api/add-readers`, {
           method: "POST",
+          credentials: 'include',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(readerDataToSend),
         });
@@ -205,7 +207,7 @@ const Readers = () => {
       resetForm();
       
       // Refresh the readers list
-      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`);
+      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
       const updatedData = await updatedResponse.json();
       const formattedData = updatedData.map(reader => ({
         id: reader.id,
@@ -261,6 +263,7 @@ const Readers = () => {
       for (const readerId of selectedReaders) {
         const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
           method: "PATCH",
+          credentials: 'include',
           headers: {
             "Content-Type": "application/json"
           },
@@ -287,7 +290,7 @@ const Readers = () => {
       });
 
       // Refresh the main readers list after verifying
-      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`);
+      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
       const updatedData = await updatedResponse.json();
       const formattedData = updatedData.map(reader => ({
         id: reader.id,
@@ -332,6 +335,7 @@ const Readers = () => {
           headers: {
             "Content-Type": "application/json"
           },
+          credentials: 'include',
           body: JSON.stringify({ status: 2 }),
         });
   
@@ -355,7 +359,7 @@ const Readers = () => {
       });
   
       // Refresh the readers list
-      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`);
+      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
       const updatedData = await updatedResponse.json();
       const formattedData = updatedData.map(reader => ({
         id: reader.id,
@@ -408,7 +412,8 @@ const Readers = () => {
   const confirmDelete = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}api/readers/${readerToDelete.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -426,7 +431,7 @@ const Readers = () => {
         });
         
         // Refresh the readers list
-        const updatedResponse = await fetch(`${API_BASE_URL}api/readers`);
+        const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
         const updatedData = await updatedResponse.json();
         const formattedData = updatedData.map(reader => ({
           id: reader.id,

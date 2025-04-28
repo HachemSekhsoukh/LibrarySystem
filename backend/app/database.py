@@ -339,7 +339,7 @@ def add_resource_type(user_email,resource_type_data):
         print(f"Error adding resource type: {e}")
         return {'success': False, 'error': str(e)}
 
-def delete_resource_type(resource_type_id):
+def delete_resource_type(user_email,resource_type_id):
     """
     Delete a resource type from the database by its ID.
     :param resource_type_id: The ID of the resource type to delete.
@@ -348,6 +348,7 @@ def delete_resource_type(resource_type_id):
         response = supabase.from_("Resource_type").delete().eq("rt_id", resource_type_id).execute()
 
         if response.data:
+            add_log(user_email, f"deleted a resource type with id: {resource_type_id}")
             return {'success': True, 'message': 'Resource type deleted successfully'}
         else:
             return {'success': False, 'error': 'Resource type not found or could not be deleted'}
@@ -355,7 +356,7 @@ def delete_resource_type(resource_type_id):
         print(f"Error deleting resource type: {e}")
         return {'success': False, 'error': str(e)}
 
-def update_resource_type(resource_type_id, resource_type_data):
+def update_resource_type(user_email,resource_type_id, resource_type_data):
     """
     Update a resource type in the database.
     :param resource_type_id: The ID of the resource type to update.
@@ -365,6 +366,7 @@ def update_resource_type(resource_type_id, resource_type_data):
         response = supabase.from_("Resource_type").update(resource_type_data).eq("rt_id", resource_type_id).execute()
 
         if response.data:
+            add_log(user_email, f"updated a resource type, id: {resource_type_id}, data: {resource_type_data['rt_name'], resource_type_data['rt_borrow']}")
             return {
                 'success': True,
                 'resource_type': response.data[0],
@@ -382,7 +384,7 @@ def update_resource_type(resource_type_id, resource_type_data):
             'error': str(e)
         }
 
-def add_resource(resource_data):
+def add_resource(user_email,resource_data):
     """
     Add a new resource (book) to the database.
     :param resource_data: Dictionary containing resource details.
@@ -391,6 +393,7 @@ def add_resource(resource_data):
         response = supabase.from_("Resource").insert(resource_data).execute()
 
         if response.data:
+            add_log(user_email, f"added a resource with: title: {resource_data['r_title']}, author: {resource_data['r_author']}")
             return {
                 'success': True,
                 'resource': response.data[0]
@@ -407,7 +410,7 @@ def add_resource(resource_data):
             'error': str(e)
         }
 
-def delete_resource(resource_id):
+def delete_resource(user_email,resource_id):
     """
     Delete a resource from the database by its ID.
     :param resource_id: The ID of the resource to delete.
@@ -416,6 +419,7 @@ def delete_resource(resource_id):
         response = supabase.from_("Resource").delete().eq("r_id", resource_id).execute()
 
         if response.data:
+            add_log(user_email, f"deleted a resource with id: {resource_id}")
             return {'success': True, 'message': 'Resource deleted successfully'}
         else:
             return {'success': False, 'error': 'Resource not found or could not be deleted'}
@@ -423,7 +427,7 @@ def delete_resource(resource_id):
         print(f"Error deleting resource: {e}")
         return {'success': False, 'error': str(e)}
 
-def update_resource(resource_id, resource_data):
+def update_resource(user_email,resource_id, resource_data):
     """
     Update a resource in the database.
     :param resource_id: The ID of the resource to update.
@@ -433,6 +437,7 @@ def update_resource(resource_id, resource_data):
         response = supabase.from_("Resource").update(resource_data).eq("r_id", resource_id).execute()
 
         if response.data:
+            add_log(user_email, f"updated a resource with id: {resource_id}, title: {resource_data['r_title']}, author: {resource_data['r_author']}, ISBN: {resource_data['r_ISBN']}")
             return {
                 'success': True,
                 'resource': response.data[0],

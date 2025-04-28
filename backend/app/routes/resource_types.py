@@ -8,6 +8,7 @@ from app.database import get_resource_types, add_resource_type, delete_resource_
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/resource-types', methods=['GET'])
+@jwt_required()
 def resource_types():
     """
     API endpoint to retrieve all resource types
@@ -43,19 +44,23 @@ def add_resource_type_endpoint():
         return jsonify(result), 400
 
 @app.route('/api/resource-types/<int:resource_type_id>', methods=['DELETE'])
+@jwt_required()
 def remove_resource_type(resource_type_id):
     """
     API endpoint to delete a resource type by ID
     """
-    result = delete_resource_type(resource_type_id)
+    user_email = get_jwt_identity()
+    result = delete_resource_type(user_email,resource_type_id)
     return jsonify(result), (200 if result['success'] else 400)
 
 @app.route('/api/resource-types/<int:resource_type_id>', methods=['PUT'])
+@jwt_required()
 def update_resource_type_endpoint(resource_type_id):
     """
     API endpoint to update a resource type by ID
     """
     data = request.json
+    user_email = get_jwt_identity()
     
     if not data:
         return jsonify({'success': False, 'error': 'No data provided'}), 400
@@ -68,12 +73,9 @@ def update_resource_type_endpoint(resource_type_id):
         return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
     
     # Update the resource type
-    result = update_resource_type(resource_type_id, data)
+    result = update_resource_type(user_email,resource_type_id, data)
     
     if result['success']:
         return jsonify(result), 200
     else:
         return jsonify(result), 400
-
-
-

@@ -5,6 +5,7 @@ from app.database import add_reader, delete_reader, get_readers_by_status, get_u
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/readers', methods=['GET'])
+@jwt_required()
 def readers():
     """
     API endpoint to retrieve all readers.
@@ -93,37 +94,10 @@ def delete_user_type_endpoint(user_type_id):
         return jsonify(result), 200
     else:
         return jsonify(result), 400
-
-
-@app.route('/api/add-readers', methods=['POST'])
-def add_new_reader():
-    """
-    API endpoint to add a new reader.
-    Expects JSON data with 'u_name', 'u_email', etc.
-    """
-    data = request.get_json()
-    
-    # Check if data is provided
-    if not data:
-        return jsonify({'success': False, 'error': 'No data provided'}), 400
-    
-    # Check for required fields
-    required_fields = ['u_name', 'u_email', 'u_birthDate', 'u_phone', 'u_password']
-    missing_fields = [field for field in required_fields if field not in data or not data[field]]
-    
-    if missing_fields:
-        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
-
-    # Add the reader
-    result = add_reader(data)
-    
-    if result['success']:
-        return jsonify(result), 200
-    else:
-        return jsonify(result), 400
     
 
 @app.route('/api/update-readers/<int:reader_id>/status', methods=['PATCH'])
+@jwt_required()
 def update_reader_status(reader_id):
     data = request.get_json()
     print("Received data:", data)  # Debug log
@@ -137,6 +111,7 @@ def update_reader_status(reader_id):
     return jsonify(result), (200 if result['success'] else 400)
 
 @app.route('/api/readers/<int:reader_id>', methods=['DELETE'])
+@jwt_required()
 def remove_reader(reader_id):
     """
     API endpoint to delete a reader by ID.
@@ -145,6 +120,7 @@ def remove_reader(reader_id):
     return jsonify(result), (200 if result['success'] else 400)
 
 @app.route('/api/readers/<int:reader_id>', methods=['PUT'])
+@jwt_required()
 def update_reader_endpoint(reader_id):
     """
     API endpoint to update a reader by ID

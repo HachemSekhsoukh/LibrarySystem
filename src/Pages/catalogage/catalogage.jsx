@@ -50,7 +50,7 @@ const Catalogage = () => {
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}api/resource-types`)
+    fetch(`${API_BASE_URL}api/resource-types`, {credentials: 'include'})
       .then(res => res.json())
       .then(data => {
         setResourceTypes(data);
@@ -64,7 +64,7 @@ const Catalogage = () => {
   
   const fetchResources = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}api/resources`);
+      const response = await fetch(`${API_BASE_URL}api/resources`, {credentials: 'include'});
       if (!response.ok) {
         throw new Error("Failed to fetch resources");
       }
