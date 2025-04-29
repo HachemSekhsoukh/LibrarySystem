@@ -26,6 +26,35 @@ def pending_readers():
 def user_types():
     return jsonify(get_user_types())
 
+@app.route('/api/add-readers', methods=['POST'])
+@jwt_required()
+def add_new_reader():
+    """
+    API endpoint to add a new reader.
+    Expects JSON data with 'u_name', 'u_email', etc.
+    """
+    data = request.get_json()
+    user_email = get_jwt_identity()
+    
+    # Check if data is provided
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    # Check for required fields
+    required_fields = ['u_name', 'u_email', 'u_birthDate', 'u_phone', 'u_password']
+    missing_fields = [field for field in required_fields if field not in data or not data[field]]
+    
+    if missing_fields:
+        return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+
+    # Add the reader
+    result = add_reader(user_email,data)
+    
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
+
 @app.route('/api/add-user-types', methods=['POST'])
 @jwt_required()
 def add_new_user_type():
@@ -116,7 +145,8 @@ def remove_reader(reader_id):
     """
     API endpoint to delete a reader by ID.
     """
-    result = delete_reader(reader_id)
+    user_email = get_jwt_identity()
+    result = delete_reader(user_email,reader_id)
     return jsonify(result), (200 if result['success'] else 400)
 
 @app.route('/api/readers/<int:reader_id>', methods=['PUT'])
@@ -126,6 +156,7 @@ def update_reader_endpoint(reader_id):
     API endpoint to update a reader by ID
     """
     data = request.json
+    user_email = get_jwt_identity()
     
     if not data:
         return jsonify({'success': False, 'error': 'No data provided'}), 400
@@ -138,7 +169,7 @@ def update_reader_endpoint(reader_id):
         return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
     
     # Update the reader
-    result = update_reader(reader_id, data)
+    result = update_reader(user_email,reader_id, data)
     
     if result['success']:
         return jsonify(result), 200

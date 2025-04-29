@@ -168,7 +168,7 @@ def update_user_type(user_type_id, user_type_data):
             'error': str(e)
         }
 
-def add_reader(reader_data):
+def add_reader(user_email,reader_data):
     """
     Add a new reader to the database.
     :param reader_data: Dictionary containing reader details.
@@ -190,6 +190,7 @@ def add_reader(reader_data):
         response = supabase.from_("User").insert(reader_data).execute()
 
         if response.data:
+            add_log(user_email, f"added a new reader with name: {reader_data['u_name']}")
             return {'success': True, 'reader': response.data[0]}
         else:
             return {'success': False, 'error': 'Failed to add reader'}
@@ -198,7 +199,7 @@ def add_reader(reader_data):
         return {'success': False, 'error': str(e)}
 
 
-def delete_reader(reader_id):
+def delete_reader(user_email,reader_id):
     """
     Delete a reader from the database by their user ID.
     :param reader_id: The ID of the reader to delete.
@@ -207,6 +208,7 @@ def delete_reader(reader_id):
         response = supabase.from_("User").delete().eq("u_id", reader_id).execute()
 
         if response.data:
+            add_log(user_email, f"deleted a reader with ID: {reader_id}")
             return {'success': True, 'message': 'Reader deleted successfully'}
         else:
             return {'success': False, 'error': 'Reader not found or could not be deleted'}
@@ -500,7 +502,7 @@ def create_reservation(user_email, user_id, resource_id, transaction_type):
         
         if response.data:
             # Log reservation creation
-            add_log(user_email, f"created a transaction of type: {transaction_type} for resource ID: {resource_id}")
+            add_log(user_email, f"created a transaction of type: {transaction_type} for resource ID: {resource_id} for user ID: {user_id}")
 
             # If the transaction type is "Borrow", increment the r_num_of_borrows in the Resource table
             if transaction_type == "Borrow":
@@ -1316,7 +1318,7 @@ def delete_reservation(reservation_id):
             'error': str(e)
         }
 
-def update_reader(reader_id, reader_data):
+def update_reader(user_email,reader_id, reader_data):
     """
     Update a reader's information in the database.
     :param reader_id: The ID of the reader to update.
@@ -1344,6 +1346,7 @@ def update_reader(reader_id, reader_data):
         response = supabase.from_("User").update(reader_data).eq("u_id", reader_id).execute()
         
         if response.data:
+            add_log(user_email, f"edited a reader with ID: {reader_id}")
             return {'success': True, 'reader': response.data[0]}
         else:
             return {'success': False, 'error': 'Reader not found or could not be updated'}
