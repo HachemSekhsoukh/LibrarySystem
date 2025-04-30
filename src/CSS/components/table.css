@@ -179,3 +179,13 @@
   padding: 8px 12px;
   vertical-align: middle;
 }
+
+.rdt_Pagination button svg {
+  fill: var(--text-color); /* or use a hardcoded color like #065AA3 */
+}
+
+/* Optional: Change on hover */
+.rdt_Pagination button:hover svg {
+  fill: var(--primary-color);
+  cursor: pointer;
+}

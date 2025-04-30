@@ -1,7 +1,7 @@
 from datetime import timedelta
 from flask import jsonify, request, make_response
 from app import app
-from app.database import sign_up, login, get_user_by_email, update_user_password, get_user_password, update_user_by_email
+from app.database import sign_up, login, get_user_by_email, update_user_password, get_user_password, update_user_by_email, add_log
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
@@ -35,10 +35,12 @@ def api_login():
         return jsonify({'success': False, 'error': result['error']}), 401
     
 @app.route('/api/logout', methods=['POST'])
+@jwt_required()
 def logout():
     resp = make_response(jsonify({"message": "Logged out successfully"}))
-    
-    # Make sure to match all cookie settings used during creation
+    current_user_email = get_jwt_identity()
+    add_log(current_user_email, f"logged out")
+    # Make sure to match all cookie settings used during     creation
     resp.set_cookie(
         'access_token_cookie',  # Match the cookie name
         '',  # Empty value to clear the cookie
@@ -134,7 +136,7 @@ def update_user_info():
         return jsonify({'error': f'Failed to update user: {str(e)}'}), 500
     
 @app.route('/api/user/update-password', methods=['PUT'])
-@jwt_required()  # Ensure the user is authenticated
+@jwt_required() 
 def update_password():
     # Get the current user's email from the JWT token
     current_user_email = get_jwt_identity()

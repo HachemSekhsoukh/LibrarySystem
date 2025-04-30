@@ -140,3 +140,25 @@
   .add-staff-form .save-button:hover {
     background-color: #052c45;
   }
+
+  .privilege-section {
+    margin-top: 1.5rem;
+
+  }
+
+  .privilege-section h4{
+    color: var(--title-color);
+    margin-right: 1rem;
+  }
+  
+  #priv-title{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+  }
+
+  .form-field .text-field{
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
