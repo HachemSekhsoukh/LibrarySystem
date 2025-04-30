@@ -14,6 +14,13 @@
     "contact_us": "Contact us",
     "address": "Address",
     "license": "License",
+
+    "view": "View",
+    "edit": "Edit",
+    "create": "Create",
+    "delete": "Delete",
+    "select_all": "Select All",
+    "staff": "Staff",
   
     "settings": "Settings",
     "edit_profile": "Edit Profile",

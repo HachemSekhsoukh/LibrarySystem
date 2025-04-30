@@ -1586,3 +1586,42 @@ def get_logs():
     except Exception as e:
         print(f"Error fetching logs: {e}")
         return []
+
+
+def assign_privileges_to_user_type(staff_type_id, privilege_labels):
+    try:
+        # Fetch privilege IDs matching the given labels
+        priv_query = supabase.table('privileges')\
+            .select('id, name')\
+            .in_('name', privilege_labels)\
+            .execute()
+
+        if not priv_query.data:
+            return {'success': False, 'error': "no priveleges sent to endpoint"}
+
+        privilege_id_map = {row['name']: row['id'] for row in priv_query.data}
+        missing = [label for label in privilege_labels if label not in privilege_id_map]
+
+        if missing:
+            return {'success': False, 'error': f"Unknown privileges: {', '.join(missing)}"}
+
+        privilege_ids = list(privilege_id_map.values())
+
+        # Delete old privileges
+        delete_result = supabase.table('staff_type_privileges')\
+            .delete().eq('staff_type_id', staff_type_id).execute()
+
+        # Insert new privileges
+        new_entries = [{'staff_type_id': staff_type_id, 'privilege_id': pid} for pid in privilege_ids]
+
+        insert_result = supabase.table('staff_type_privileges')\
+            .insert(new_entries).execute()
+
+        # Check if insert was successful
+        if not insert_result.data:
+            return {'success': False, 'error': ""}
+
+        return {'success': True, 'message': 'Privileges assigned successfully'}
+
+    except Exception as e:
+        return {'success': False, 'error': str(e)}

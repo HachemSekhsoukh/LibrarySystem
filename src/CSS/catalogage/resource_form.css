@@ -10,3 +10,7 @@
 .custom-textfield .MuiOutlinedInput-notchedOutline {
   border-color: var(--text-color);
 }
+
+.PrivateSwitchBase-input{
+  display: none;
+}

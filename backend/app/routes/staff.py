@@ -1,6 +1,6 @@
 from datetime import timedelta
 from flask import jsonify, request, make_response
-from app.database import get_all_staff_members, add_staff_member, get_staff_types, add_staff_type, delete_staff_type, update_staff_type
+from app.database import get_all_staff_members, add_staff_member, get_staff_types, add_staff_type, delete_staff_type, update_staff_type, assign_privileges_to_user_type
 from app import app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -52,6 +52,7 @@ def add_staff_type_endpoint():
     
     # Add the resource type
     result = add_staff_type(user_email,data)
+    print(result)
     
     if result['success']:
         return jsonify(result), 201
@@ -88,6 +89,30 @@ def update_staff_type_endpoint(staff_type_id):
     # Update the staff type
     result = update_staff_type(staff_type_id, data)
     
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
+    
+@app.route('/api/staff-types/<int:user_type_id>/privileges', methods=['POST'])
+@jwt_required()
+def assign_privileges(user_type_id):
+    """
+    API endpoint to assign privileges to a staff type
+    """
+    data = request.json
+
+    if not data or 'privileges' not in data:
+        return jsonify({'success': False, 'error': 'Missing privileges data'}), 400
+
+    privileges = data['privileges']  # Expected to be a list of privilege names or IDs
+
+    if not isinstance(privileges, list):
+        return jsonify({'success': False, 'error': 'Privileges should be a list'}), 400
+
+    print("calling assign...")
+    result = assign_privileges_to_user_type(user_type_id, privileges)
+
     if result['success']:
         return jsonify(result), 200
     else:

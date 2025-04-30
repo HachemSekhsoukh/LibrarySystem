@@ -250,7 +250,7 @@ export const logoutUser = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/logout`, {
       method: 'POST',
-      credentials: 'include',  // Important: Include credentials (cookies)
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -258,10 +258,8 @@ export const logoutUser = async () => {
     }
 
     const data = await response.json();
-    console.log('Logout successful:', data);
     return data;
   } catch (error) {
-    console.error('Logout error:', error);
     return null;
   }
 };
@@ -943,3 +941,22 @@ export const fetchLogs = async () => {
   }
 };
 
+export const assignPrivilegesToUserType = async (userTypeId, privileges) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/staff-types/${userTypeId}/privileges`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        privileges,
+      }),
+    });
+
+    return await res.json();
+  } catch (error) {
+    console.error("Error assigning privileges:", error);
+    return { success: false, error: error.message };
+  }
+};

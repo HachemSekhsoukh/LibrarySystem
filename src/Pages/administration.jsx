@@ -18,7 +18,8 @@ import {
   fetchAllStaff,
   addStaffMember,
   fetchStaffTypes,
-  addStaffType
+  addStaffType,
+  assignPrivilegesToUserType
 } from "../utils/api";
 
 // Importing the i18n hook
@@ -62,22 +63,39 @@ const Administration = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  const sections = [
+    "readers",
+    "books",
+    "staff",
+    "late",
+    "transactions",
+    "resource_types",
+    "reader_types",
+    "staff_types"
+  ];  
   
-  const checkboxOptions = [
-    "Can View",
-    "Can Edit",
-    "Can Delete",
-    "Can Create",
-    "Can Manage Users",
-    "Can Export Data",
-  ];
+  const permissionTypes = ["view", "edit", "delete", "create"];
+  
 
   const [checkboxValues, setCheckboxValues] = useState({});
 
-  const handleCheckboxChange = (event) => {
+  const handleCheckboxChange = (event, section, perm) => {
     const { name, checked } = event.target;
-    setCheckboxValues((prev) => ({ ...prev, [name]: checked }));
-  };
+  
+    if (name === `select_all_${section}`) {
+      // Handle select all logic for the section
+      const sectionPermissions = permissionTypes.reduce((acc, permission) => {
+        acc[`${permission.toLowerCase()}_${section.toLowerCase().replace(/ /g, "_")}`] = checked;
+        return acc;
+      }, {});
+      setCheckboxValues((prev) => ({ ...prev, ...sectionPermissions }));
+    } else {
+      // Handle individual checkbox change
+      setCheckboxValues((prev) => ({ ...prev, [name]: checked }));
+    }
+  };  
+  
 
   const staffTypesColumns = [
     { label: t("id"), key: "id" },
@@ -148,17 +166,37 @@ const Administration = () => {
 
   const handleAddStaffType = async () => {
     setLoading(true);
+  
     try {
       const response = await addStaffType(newStaffType);
+      console.log(response)
+  
       if (response?.success) {
+        const userTypeId = response.staff_type.st_id;
+        console.log(userTypeId)
+
+        console.log(checkboxValues)
+  
+        const selectedPrivileges = Object.entries(checkboxValues)
+        .filter(([_, checked]) => checked)
+        .map(([privilege]) => privilege.split("_").reverse().join("_"));      
+
+        console.log(selectedPrivileges)
+        const privResponse = await assignPrivilegesToUserType(userTypeId, selectedPrivileges);
+  
+        if (!privResponse.success) throw new Error(privResponse.error);
+  
         setSnackbar({
           open: true,
           message: t("staff_type_added_success"),
-          severity: "success"
+          severity: "success",
         });
+  
         setNewStaffType({ st_name: "" });
+        setCheckboxValues({});
         setOpenTypePopup(false);
         await fetchStaffTypesData();
+  
       } else {
         throw new Error(t("failed_add_staff_type"));
       }
@@ -166,7 +204,7 @@ const Administration = () => {
       setSnackbar({
         open: true,
         message: `Error: ${error.message}`,
-        severity: "error"
+        severity: "error",
       });
     } finally {
       setLoading(false);
@@ -320,7 +358,7 @@ const Administration = () => {
       >
         <div className="add-staff-type-form">
           <div className="form-field">
-            <label>{t("staff_type_name")}</label>
+            <label>{t("staff_type_name")}:</label>
             <TextField
               className="text-field"
               name="st_name"
@@ -333,24 +371,46 @@ const Administration = () => {
           </div>
 
           <div className="form-field">
-            <label>{t("privelages")}</label>
-            <Grid container spacing={1}>
-              {checkboxOptions.map((option, index) => (
-                <Grid item xs={6} key={index}>
+            <label >{t("privileges")}:</label>
+            {sections.map((section) => (
+              <div key={section} className="privilege-section">
+                <div id="priv-title">  
+                  <h4>{t(section)}:</h4>
                   <FormControlLabel
                     control={
                       <Checkbox
-                        name={option}
-                        checked={!!checkboxValues[option]}
-                        onChange={handleCheckboxChange}
+                        name={`select_all_${section}`}
+                        checked={permissionTypes.every(perm => checkboxValues[`${section.toLowerCase().replace(/ /g, "_")}_${perm}`])}
+                        onChange={(e) => handleCheckboxChange(e, section)}
                       />
                     }
-                    label={t(option)}
+                    label={t("select_all")}
                   />
+                </div>
+
+                <Grid container spacing={1}>
+                  {permissionTypes.map((perm) => {
+                    const key = `${section.toLowerCase().replace(/ /g, "_")}_${perm}`;
+                    return (
+                      <Grid item xs={4} key={t(key)}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              name={key}
+                              checked={!!checkboxValues[key]}
+                              onChange={(e) => handleCheckboxChange(e, section, perm)}
+                            />
+                          }
+                          label={t(perm)}
+                        />
+                      </Grid>
+                    );
+                  })}
                 </Grid>
-              ))}
-            </Grid>
+              </div>
+            ))}
           </div>
+
 
           <div className="dialog-button-container">
             <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>

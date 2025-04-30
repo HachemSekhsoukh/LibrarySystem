@@ -19,6 +19,13 @@
     "message": "Message",
     "date_and_time": "Date et temps",
     "logs": "Registre",
+
+    "view": "Voir",
+    "edit": "Modifier",
+    "create": "Creer",
+    "delete": "Supprimer",
+    "select_all": "Selectioner tous",
+    "staff": "Personnel",
   
     "settings": "Paramètres",
     "edit_profile": "Modifier le profil",
