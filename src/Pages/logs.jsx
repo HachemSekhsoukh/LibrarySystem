@@ -3,13 +3,10 @@ import Table from "../components/Table";
 import { useTranslation } from 'react-i18next';
 import { fetchLogs } from '../utils/api'; // you should have a function to fetch logs
 import React, { useEffect, useState } from 'react';
-import { useUser } from '../utils/userContext';
 import { format } from 'date-fns'; // Import date-fns format function
 
 const Logs = () => {
   const { t } = useTranslation();
-  const { user, setUser } = useUser();
-
   const [logs, setLogs] = useState([]);
   const [loadingLogs, setLoadingLogs] = useState(true);
 
@@ -27,7 +24,7 @@ const Logs = () => {
     };
     getLogs();
     console.log(logs)
-  }, [setUser]);
+  }, []);
 
   const columns = [
     // { label: t("Staff ID"), key: "s_id" },

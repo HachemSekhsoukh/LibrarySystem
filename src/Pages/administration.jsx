@@ -65,15 +65,19 @@ const Administration = () => {
   const [errors, setErrors] = useState({});
 
   const sections = [
-    "readers",
-    "books",
-    "staff",
-    "late",
-    "transactions",
-    "resource_types",
-    "reader_types",
-    "staff_types"
-  ];  
+
+    "dashboard",
+    "logs",
+    "administration_staff",
+    "administration_staff_types",
+    "circulation_readers",
+    "circulation_exemplaires",
+    "circulation_late",
+    "circulation_reader_types",
+    "catalogage_books",
+    "catalogage_resource_types",
+
+  ];
   
   const permissionTypes = ["view", "edit", "delete", "create"];
   
@@ -82,19 +86,25 @@ const Administration = () => {
 
   const handleCheckboxChange = (event, section, perm) => {
     const { name, checked } = event.target;
-  
+    
     if (name === `select_all_${section}`) {
       // Handle select all logic for the section
       const sectionPermissions = permissionTypes.reduce((acc, permission) => {
+        // Skip "create" and "delete" permissions for "late" section
+        if (section === "circulation_late" && (permission === "create" || permission === "delete") || (section === "logs" || section === "dashboard") && (permission === "create" || permission === "delete" || permission === "edit")) {
+          return acc;
+        }
+        
         acc[`${permission.toLowerCase()}_${section.toLowerCase().replace(/ /g, "_")}`] = checked;
         return acc;
       }, {});
+      
       setCheckboxValues((prev) => ({ ...prev, ...sectionPermissions }));
     } else {
       // Handle individual checkbox change
       setCheckboxValues((prev) => ({ ...prev, [name]: checked }));
     }
-  };  
+  };
   
 
   const staffTypesColumns = [
@@ -169,20 +179,41 @@ const Administration = () => {
   
     try {
       const response = await addStaffType(newStaffType);
-      console.log(response)
+      console.log(response);
   
       if (response?.success) {
         const userTypeId = response.staff_type.st_id;
-        console.log(userTypeId)
-
-        console.log(checkboxValues)
+        console.log(userTypeId);
   
-        const selectedPrivileges = Object.entries(checkboxValues)
-        .filter(([_, checked]) => checked)
-        .map(([privilege]) => privilege.split("_").reverse().join("_"));      
+        console.log(checkboxValues);
+  
+        let selectedPrivileges = Object.entries(checkboxValues)
+          .filter(([_, checked]) => checked)
+          .map(([privilege]) => privilege);
+  
+        // Auto-add "view_administration" if any "administration" privilege is selected
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_administration")) ) {
+          selectedPrivileges.push("view_administration");
+        }
 
-        console.log(selectedPrivileges)
-        const privResponse = await assignPrivilegesToUserType(userTypeId, selectedPrivileges);
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_circulation_reader_types")) ) {
+          selectedPrivileges.push("view_circulation_administration");
+        }
+
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_catalogage_resource_types")) ) {
+          selectedPrivileges.push("view_catalogage_administration");
+        }
+
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_catalogage_books")) ) {
+          selectedPrivileges.push("view_catalogage_catalogage");
+        }
+  
+        console.log(selectedPrivileges);
+  
+        const privResponse = await assignPrivilegesToUserType(
+          userTypeId,
+          selectedPrivileges
+        );
   
         if (!privResponse.success) throw new Error(privResponse.error);
   
@@ -196,7 +227,6 @@ const Administration = () => {
         setCheckboxValues({});
         setOpenTypePopup(false);
         await fetchStaffTypesData();
-  
       } else {
         throw new Error(t("failed_add_staff_type"));
       }
@@ -209,7 +239,7 @@ const Administration = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const handleChange = (e) => {
     setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
@@ -219,6 +249,7 @@ const Administration = () => {
     if (reason === 'clickaway') {
       return;
     }
+    setCheckboxValues({});
     setSnackbar({ ...snackbar, open: false });
   };
 
@@ -380,7 +411,7 @@ const Administration = () => {
                     control={
                       <Checkbox
                         name={`select_all_${section}`}
-                        checked={permissionTypes.every(perm => checkboxValues[`${section.toLowerCase().replace(/ /g, "_")}_${perm}`])}
+                        checked={permissionTypes.every(perm => checkboxValues[`${perm}_${section.toLowerCase().replace(/ /g, "_")}`])}
                         onChange={(e) => handleCheckboxChange(e, section)}
                       />
                     }
@@ -390,7 +421,10 @@ const Administration = () => {
 
                 <Grid container spacing={1}>
                   {permissionTypes.map((perm) => {
-                    const key = `${section.toLowerCase().replace(/ /g, "_")}_${perm}`;
+                    if((perm == "delete" || perm == "create") && section == "circulation_late" || (perm == "delete" || perm == "create" || perm == "edit") && (section === "logs" || section === "dashboard")){
+                      return;
+                    }
+                    const key = `${perm}_${section.toLowerCase().replace(/ /g, "_")}`;
                     return (
                       <Grid item xs={4} key={t(key)}>
                         <FormControlLabel

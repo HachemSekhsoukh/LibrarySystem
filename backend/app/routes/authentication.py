@@ -1,7 +1,7 @@
 from datetime import timedelta
 from flask import jsonify, request, make_response
 from app import app
-from app.database import sign_up, login, get_user_by_email, update_user_password, get_user_password, update_user_by_email, add_log
+from app.database import get_user_privileges, login, get_user_by_email, update_user_password, get_user_password, update_user_by_email, add_log
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
@@ -19,9 +19,20 @@ def api_login():
         # Generate access token
         access_token = create_access_token(identity=data['email'],  expires_delta=timedelta(hours=8))  # Token expires in 1 hour)
         
+        user = get_user_by_email(data['email'])
+        privileges = get_user_privileges(data['email'])
         # Create the response
-        response = make_response(jsonify({'success': True, 'message': 'Login successful'}))
-        
+        response = make_response(jsonify({
+            'success': True, 
+            'message': 'Login successful',
+            'user': {
+                'id': user['id'],
+                'name': user['name'],
+                'email': user['email'],
+                'staff_type': user.get('type'),
+            },
+            'privileges': privileges
+        }))
         # Set the token as an HTTP-only cookie (also add secure and samesite settings for security)
         response.set_cookie(
             'access_token_cookie', access_token, 

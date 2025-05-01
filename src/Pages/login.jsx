@@ -5,8 +5,10 @@ import "../../src/CSS/login.css";
 import logo from "/assets/images/logo2.png";
 import bgLogin from "../../public/assets/images/bg-login.png";
 import { loginUser } from "../utils/api";
+import { useAuth } from "../utils/privilegeContext";
 
 const Login = () => {
+  const {setPrivileges} = useAuth();
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,34 +29,40 @@ const Login = () => {
       }
     }, [isDarkMode]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    const newErrors = {};
-    if (!email.trim()) newErrors.email = t("email_required");
-    if (!password) newErrors.password = t("password_required");
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const data = await loginUser(email, password);
-      if (data && data.success) {
-        navigate("/dashboard");
-      } else {
-        setErrors({ password: data?.error || t("login_failed") });
+    const handleLogin = async (e) => {
+      e.preventDefault();
+    
+      const newErrors = {};
+      if (!email.trim()) newErrors.email = t("email_required");
+      if (!password) newErrors.password = t("password_required");
+    
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setErrors({ password: t("login_error") });
-    } finally {
-      setLoading(false);
-    }
-  };
+    
+      setLoading(true);
+    
+      try {
+        const data = await loginUser(email, password);
+    
+        if (data && data.success) {
+          if (Array.isArray(data.privileges)) {
+            localStorage.setItem("privileges", JSON.stringify(data.privileges));
+            setPrivileges(data.privileges);
+          }
+          navigate("/dashboard");
+        } else {
+          setErrors({ password: data?.error || t("login_failed") });
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        setErrors({ password: t("login_error") });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
 
   return (
     <>
