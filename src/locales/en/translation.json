@@ -21,6 +21,15 @@
     "delete": "Delete",
     "select_all": "Select All",
     "staff": "Staff",
+
+    "circulation_readers":"Readers",
+    "catalogage_books":"Books",
+    "administration_staff":"Staff",
+    "circulation_late":"Late Returners",
+    "circulation_exemplaires":"Transactions",
+    "catalogage_resource_types":"Resource Types",
+    "circulation_reader_types":"Reader Types",
+    "administration_staff_types":"Staff Types",
   
     "settings": "Settings",
     "edit_profile": "Edit Profile",

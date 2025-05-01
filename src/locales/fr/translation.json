@@ -26,6 +26,15 @@
     "delete": "Supprimer",
     "select_all": "Selectioner tous",
     "staff": "Personnel",
+
+    "circulation_readers": "Lecteurs",
+    "catalogage_books": "Livres",
+    "administration_staff": "Personnel",
+    "circulation_late": "Retards",
+    "circulation_exemplaires": "Transactions",
+    "catalogage_resource_types": "Types de ressources",
+    "circulation_reader_types": "Types de lecteurs",
+    "administration_staff_types": "Types de personnel",
   
     "settings": "Paramètres",
     "edit_profile": "Modifier le profil",

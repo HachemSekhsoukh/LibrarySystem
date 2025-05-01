@@ -3,7 +3,6 @@ import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import photoProfile from "../../public/assets/images/profile.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useUser } from '../utils/userContext';
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from 'react';
 import { getUserInfo, updateUserInfo, updateUserPassword } from  '../utils/api';
@@ -11,7 +10,6 @@ import { getUserInfo, updateUserInfo, updateUserPassword } from  '../utils/api';
 
 const Settings = () => {
   const { t, i18n } = useTranslation();
-  const { user, setUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -54,7 +52,6 @@ const Settings = () => {
       setIsLoading(true);
       const fetchedUser = await getUserInfo();
       if (fetchedUser) {
-        setUser(fetchedUser);
         setFormData({
           name: fetchedUser.name || "",
           email: fetchedUser.email || "",
@@ -71,7 +68,7 @@ const Settings = () => {
       setIsLoading(false);
     };
     fetchUser();
-  }, [setUser]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -137,7 +134,6 @@ const Settings = () => {
     setIsLoading(false);
   
     if (updatedUser) {
-      setUser(updatedUser);
       alert(t("success_profile_update"));
       setInitialFormData(trimmedData); // update reference for future changes
     } else {

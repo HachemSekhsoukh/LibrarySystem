@@ -730,7 +730,7 @@ def get_user_by_email(email):
     try:
         response = supabase \
             .from_("Staff") \
-            .select("s_id, s_name, s_email, s_phone, s_birthdate, s_address") \
+            .select("s_id, s_name, s_email, s_phone, s_birthdate, s_address, s_type") \
             .eq("s_email", email) \
             .limit(1) \
             .execute()
@@ -743,7 +743,8 @@ def get_user_by_email(email):
                 'email': user.get('s_email'),
                 'phone': user.get('s_phone'),
                 'birthdate': user.get('s_birthdate'),
-                'address': user.get('s_address')
+                'address': user.get('s_address'),
+                'type': user.get('s_type')
             }
         else:
             return None
@@ -1625,3 +1626,36 @@ def assign_privileges_to_user_type(staff_type_id, privilege_labels):
 
     except Exception as e:
         return {'success': False, 'error': str(e)}
+    
+def get_user_privileges(email):
+    """
+    Fetches user privileges based on their user type using Supabase.
+    Returns a list of privilege objects or an empty list if not found.
+    """
+    try:
+        # Get the user object
+        user = get_user_by_email(email)
+        if not user:
+            return []
+
+        user_type_id = user.get('type')
+        if not user_type_id:
+            return []
+
+        # Fetch privileges associated with the user_type_id
+        response = supabase \
+            .from_('staff_type_privileges') \
+            .select('privileges(id, name)') \
+            .eq('staff_type_id', user_type_id) \
+            .execute()
+
+        if not response.data:
+            return []
+
+        # Extract privilege objects
+        privileges = [entry['privileges']['name'] for entry in response.data if 'privileges' in entry]
+        return privileges
+
+    except Exception as e:
+        print(f"Error fetching user privileges: {str(e)}")
+        return []

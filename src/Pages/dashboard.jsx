@@ -12,11 +12,9 @@ import {
 } from '../utils/api';
 
 import React, { useEffect, useState } from 'react';
-import { useUser } from '../utils/userContext';
 
 const Dashboard = () => {
   const { t } = useTranslation();
-  const { user, setUser } = useUser();
 
   const [stats, setStats] = useState({
     readers: 0,
@@ -38,7 +36,6 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const fetchedUser = await getUserInfo();
-      if (fetchedUser) setUser(fetchedUser);
     };
 
     const getStats = async () => {
@@ -74,7 +71,7 @@ const Dashboard = () => {
     getRecentTransactions();
     getChartData();
     getMostBorrowed();
-  }, [setUser]);
+  }, []);
 
   const columns = [
     { label: t("id"), key: "id" },
