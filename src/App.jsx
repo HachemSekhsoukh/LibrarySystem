@@ -34,15 +34,7 @@ const router = createBrowserRouter(
       <Route element={<ProtectedRoute />}>
         <Route element={<PagesLayout />}>
           <Route path="/settings" element={<Settings />} />
-
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute requiredPrivileges={["view_dashboard"]} />
-            }
-          >
-            <Route index element={<Dashboard />} />
-          </Route>
+          <Route path="/dashboard" element={<Dashboard />} />
 
           <Route
             path="/logs"
