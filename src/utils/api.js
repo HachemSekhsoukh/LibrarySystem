@@ -650,7 +650,7 @@ export const fetchMostBorrowedBooks = async () => {
 // Reader-related API calls
 export const fetchReaderTransactions = async (readerId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}api/transactions?reader_id=${readerId}`);
+    const response = await fetch(`${API_BASE_URL}/transactions?reader_id=${readerId}`);
     if (!response.ok) {
       throw new Error('Failed to fetch reader transactions');
     }
@@ -663,7 +663,7 @@ export const fetchReaderTransactions = async (readerId) => {
 
 export const addReader = async (readerData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}api/add-readers`, {
+    const response = await fetch(`${API_BASE_URL}/add-readers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(readerData)
@@ -684,6 +684,7 @@ export const updateReader = async (readerId, readerData) => {
     const response = await fetch(`${API_BASE_URL}/readers/${readerId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(readerData)
     });
     if (!response.ok) {
@@ -699,7 +700,7 @@ export const updateReader = async (readerId, readerData) => {
 
 export const deleteReader = async (readerId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}api/readers/${readerId}`, {
+    const response = await fetch(`${API_BASE_URL}/readers/${readerId}`, {
       method: 'DELETE',
       credentials: 'include'
     });
@@ -716,9 +717,10 @@ export const deleteReader = async (readerId) => {
 
 export const updateReaderStatus = async (readerId, status) => {
   try {
-    const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
+    const response = await fetch(`${API_BASE_URL}/update-readers/${readerId}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ status })
     });
     if (!response.ok) {
@@ -835,7 +837,7 @@ const getStatus = (borrow, returnRecord, lateRecord) => {
 
 export const fetchResourceHistory = async (resourceId) => {
   try {
-    const url = `${API_BASE_URL}/api/resource-history?resource_id=${resourceId}`;
+    const url = `${API_BASE_URL}/resource-history?resource_id=${resourceId}`;
     const response = await fetch(url);
     
     if (!response.ok) {
