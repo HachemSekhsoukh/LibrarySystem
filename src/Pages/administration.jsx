@@ -65,8 +65,7 @@ const Administration = () => {
   const [errors, setErrors] = useState({});
 
   const sections = [
-
-    "dashboard",
+    // "dashboard",
     "logs",
     "administration_staff",
     "administration_staff_types",
@@ -183,9 +182,6 @@ const Administration = () => {
   
       if (response?.success) {
         const userTypeId = response.staff_type.st_id;
-        console.log(userTypeId);
-  
-        console.log(checkboxValues);
   
         let selectedPrivileges = Object.entries(checkboxValues)
           .filter(([_, checked]) => checked)
@@ -207,8 +203,7 @@ const Administration = () => {
         if (selectedPrivileges.some((priv) => priv.startsWith("view_catalogage_books")) ) {
           selectedPrivileges.push("view_catalogage_catalogage");
         }
-  
-        console.log(selectedPrivileges);
+        selectedPrivileges.push("view_dashboard");
   
         const privResponse = await assignPrivilegesToUserType(
           userTypeId,
