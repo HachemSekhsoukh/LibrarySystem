@@ -23,7 +23,6 @@ import {
 } from "../../utils/api";
 
 const Readers = () => {
-  const API_BASE_URL = "http://127.0.0.1:5000/";
   const [readers, setReaders] = useState([]);
   const { t } = useTranslation();
   const [userTypes, setUserTypes] = useState([]);
@@ -165,37 +164,17 @@ const Readers = () => {
     }
   
     try {
-      // Create a copy of the newReader object to avoid modifying the state directly
       const readerDataToSend = { ...newReader };
       
-      // If u_type is an object (from Autocomplete), extract just the ID
       if (typeof readerDataToSend.u_type === 'object' && readerDataToSend.u_type !== null) {
         readerDataToSend.u_type = readerDataToSend.u_type.id;
       }
       
       let response;
       if (isEditing) {
-        // Update existing reader
-        response = await fetch(`${API_BASE_URL}api/readers/${currentReaderId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: 'include',
-          body: JSON.stringify(readerDataToSend),
-        });
+        response = await updateReader(currentReaderId, readerDataToSend);
       } else {
-        // Add new reader
-        console.log(readerDataToSend);
-        response = await fetch(`${API_BASE_URL}api/add-readers`, {
-          method: "POST",
-          credentials: 'include',
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(readerDataToSend),
-        });
-      }
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save reader");
+        response = await addReader(readerDataToSend);
       }
   
       setSnackbar({ 
@@ -207,18 +186,8 @@ const Readers = () => {
       resetForm();
       
       // Refresh the readers list
-      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
-      const updatedData = await updatedResponse.json();
-      const formattedData = updatedData.map(reader => ({
-        id: reader.id,
-        name: reader.name,
-        dob: reader.birthDate,
-        email: reader.email,
-        phone: reader.phone,
-        status: "Active",
-        type: reader.type
-      }));
-      setReaders(formattedData);
+      const updatedData = await fetchReaders();
+      setReaders(updatedData);
     } catch (error) {
       console.error(isEditing ? "Error updating reader:" : "Error adding reader:", error);
       setSnackbar({ open: true, message: error.message || "Error saving reader", severity: "error" });
@@ -259,26 +228,10 @@ const Readers = () => {
     }
 
     try {
-      // Verify each reader individually using PATCH
       for (const readerId of selectedReaders) {
-        const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
-          method: "PATCH",
-          credentials: 'include',
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ status: 1 }),
-        });
-
-        const result = await response.json();
-        console.log(response);
-
-        if (!response.ok) {
-          throw new Error(result.error || `Failed to verify reader ${readerId}`);
-        }
+        await updateReaderStatus(readerId, 1);
       }
 
-      // Remove verified readers from pending list
       setPendingReaders(prevReaders => 
         prevReaders.filter(reader => !selectedReaders.includes(reader.id))
       );
@@ -289,19 +242,8 @@ const Readers = () => {
         severity: "success" 
       });
 
-      // Refresh the main readers list after verifying
-      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
-      const updatedData = await updatedResponse.json();
-      const formattedData = updatedData.map(reader => ({
-        id: reader.id,
-        name: reader.name,
-        dob: reader.birthDate,
-        email: reader.email,
-        phone: reader.phone,
-        status: reader.status,
-        type: reader.type
-      }));
-      setReaders(formattedData);
+      const updatedData = await fetchReaders();
+      setReaders(updatedData);
       setSelectedReaders([]);
 
       if (pendingReaders.length === selectedReaders.length) {
@@ -328,26 +270,10 @@ const Readers = () => {
     }
     
     try {
-      // Reject each reader individually using PATCH
       for (const readerId of selectedReaders) {
-        const response = await fetch(`${API_BASE_URL}api/update-readers/${readerId}/status`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          credentials: 'include',
-          body: JSON.stringify({ status: 2 }),
-        });
-  
-        const result = await response.json();
-        console.log(response);
-  
-        if (!response.ok) {
-          throw new Error(result.error || `Failed to reject reader ${readerId}`);
-        }
+        await updateReaderStatus(readerId, 2);
       }
   
-      // Remove rejected readers from pending list
       setPendingReaders(prevReaders => 
         prevReaders.filter(reader => !selectedReaders.includes(reader.id))
       );
@@ -358,19 +284,8 @@ const Readers = () => {
         severity: "success" 
       });
   
-      // Refresh the readers list
-      const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
-      const updatedData = await updatedResponse.json();
-      const formattedData = updatedData.map(reader => ({
-        id: reader.id,
-        name: reader.name,
-        dob: reader.birthDate,
-        email: reader.email,
-        phone: reader.phone,
-        status: reader.status,
-        type: reader.type
-      }));
-      setReaders(formattedData);
+      const updatedData = await fetchReaders();
+      setReaders(updatedData);
   
       if (pendingReaders.length === selectedReaders.length) {
         setVerifyReadersPopup(false);
@@ -411,41 +326,16 @@ const Readers = () => {
 
   const confirmDelete = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}api/readers/${readerToDelete.id}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      await deleteReader(readerToDelete.id);
+      
+      setSnackbar({
+        open: true,
+        message: "Reader deleted successfully!",
+        severity: "success"
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error ${response.status}`);
-      }
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        setSnackbar({
-          open: true,
-          message: "Reader deleted successfully!",
-          severity: "success"
-        });
-        
-        // Refresh the readers list
-        const updatedResponse = await fetch(`${API_BASE_URL}api/readers`, {credentials: 'include'});
-        const updatedData = await updatedResponse.json();
-        const formattedData = updatedData.map(reader => ({
-          id: reader.id,
-          name: reader.name,
-          dob: reader.birthDate,
-          email: reader.email,
-          phone: reader.phone,
-          status: "Active",
-          type: reader.type
-        }));
-        setReaders(formattedData);
-      } else {
-        throw new Error(result.error || "Failed to delete reader");
-      }
+      const updatedData = await fetchReaders();
+      setReaders(updatedData);
     } catch (error) {
       console.error("Error deleting reader:", error);
       setSnackbar({
