@@ -10,7 +10,7 @@ import {
   MenuItem,
   Select,
   InputLabel,
-  FormControl, Checkbox, FormControlLabel, Grid
+  FormControl, Checkbox, FormControlLabel, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Autocomplete
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../CSS/administration.css";
@@ -19,7 +19,11 @@ import {
   addStaffMember,
   fetchStaffTypes,
   addStaffType,
-  assignPrivilegesToUserType
+  assignPrivilegesToUserType,
+  updateStaffMember,
+  deleteStaffMember,
+  updateStaffType,
+  deleteStaffType
 } from "../utils/api";
 
 // Importing the i18n hook
@@ -42,19 +46,6 @@ const Administration = () => {
     birthdate: "",
     staff_type_id: ""
   });
-  const resetStaffForm = () => {
-    setNewStaff({
-      name: "",
-      email: "",
-      password: "",
-      phone: "",
-      address: "",
-      birthdate: "",
-      staff_type_id: ""
-    });
-    setErrors({});
-  };
-  
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -65,7 +56,6 @@ const Administration = () => {
   const [errors, setErrors] = useState({});
 
   const sections = [
-
     "dashboard",
     "logs",
     "administration_staff",
@@ -76,36 +66,19 @@ const Administration = () => {
     "circulation_reader_types",
     "catalogage_books",
     "catalogage_resource_types",
-
   ];
   
   const permissionTypes = ["view", "edit", "delete", "create"];
-  
-
   const [checkboxValues, setCheckboxValues] = useState({});
 
-  const handleCheckboxChange = (event, section, perm) => {
-    const { name, checked } = event.target;
-    
-    if (name === `select_all_${section}`) {
-      // Handle select all logic for the section
-      const sectionPermissions = permissionTypes.reduce((acc, permission) => {
-        // Skip "create" and "delete" permissions for "late" section
-        if (section === "circulation_late" && (permission === "create" || permission === "delete") || (section === "logs" || section === "dashboard") && (permission === "create" || permission === "delete" || permission === "edit")) {
-          return acc;
-        }
-        
-        acc[`${permission.toLowerCase()}_${section.toLowerCase().replace(/ /g, "_")}`] = checked;
-        return acc;
-      }, {});
-      
-      setCheckboxValues((prev) => ({ ...prev, ...sectionPermissions }));
-    } else {
-      // Handle individual checkbox change
-      setCheckboxValues((prev) => ({ ...prev, [name]: checked }));
-    }
-  };
-  
+  // Edit states
+  const [editStaffPopup, setEditStaffPopup] = useState(false);
+  const [editStaffTypePopup, setEditStaffTypePopup] = useState(false);
+  const [staffToEdit, setStaffToEdit] = useState(null);
+  const [staffTypeToEdit, setStaffTypeToEdit] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [isStaffType, setIsStaffType] = useState(false);
 
   const staffTypesColumns = [
     { label: t("id"), key: "id" },
@@ -132,6 +105,7 @@ const Administration = () => {
         phone: member.s_phone || "N/A",
         address: member.s_address,
         birthdate: member.s_birthdate,
+        staff_type_id: member.s_type
       }));
       setStaffData(formatted);
     }
@@ -176,53 +150,39 @@ const Administration = () => {
 
   const handleAddStaffType = async () => {
     setLoading(true);
-  
     try {
       const response = await addStaffType(newStaffType);
-      console.log(response);
-  
+
       if (response?.success) {
         const userTypeId = response.staff_type.st_id;
-        console.log(userTypeId);
-  
-        console.log(checkboxValues);
-  
+
         let selectedPrivileges = Object.entries(checkboxValues)
           .filter(([_, checked]) => checked)
           .map(([privilege]) => privilege);
-  
-        // Auto-add "view_administration" if any "administration" privilege is selected
-        if (selectedPrivileges.some((priv) => priv.startsWith("view_administration")) ) {
+
+        // Auto-add related privileges
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_administration"))) {
           selectedPrivileges.push("view_administration");
         }
-
-        if (selectedPrivileges.some((priv) => priv.startsWith("view_circulation_reader_types")) ) {
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_circulation_reader_types"))) {
           selectedPrivileges.push("view_circulation_administration");
         }
-
-        if (selectedPrivileges.some((priv) => priv.startsWith("view_catalogage_resource_types")) ) {
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_catalogage_resource_types"))) {
           selectedPrivileges.push("view_catalogage_administration");
         }
-
-        if (selectedPrivileges.some((priv) => priv.startsWith("view_catalogage_books")) ) {
+        if (selectedPrivileges.some((priv) => priv.startsWith("view_catalogage_books"))) {
           selectedPrivileges.push("view_catalogage_catalogage");
         }
-  
-        console.log(selectedPrivileges);
-  
-        const privResponse = await assignPrivilegesToUserType(
-          userTypeId,
-          selectedPrivileges
-        );
-  
+
+        const privResponse = await assignPrivilegesToUserType(userTypeId, selectedPrivileges);
         if (!privResponse.success) throw new Error(privResponse.error);
-  
+
         setSnackbar({
           open: true,
           message: t("staff_type_added_success"),
-          severity: "success",
+          severity: "success"
         });
-  
+
         setNewStaffType({ st_name: "" });
         setCheckboxValues({});
         setOpenTypePopup(false);
@@ -233,13 +193,13 @@ const Administration = () => {
     } catch (error) {
       setSnackbar({
         open: true,
-        message: `Error: ${error.message}`,
-        severity: "error",
+        message: error.message,
+        severity: "error"
       });
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   const handleChange = (e) => {
     setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
@@ -293,13 +253,13 @@ const Administration = () => {
     return Object.keys(validationErrors).length === 0;
   };
 
-
-  const handleSubmit = async () => {
+  const handleAddStaff = async () => {
     if (!validateInputs()) return;
 
     setLoading(true);
     try {
       const response = await addStaffMember(newStaff);
+
       if (response?.success) {
         setSnackbar({
           open: true,
@@ -323,11 +283,152 @@ const Administration = () => {
     } catch (error) {
       setSnackbar({
         open: true,
-        message: `Error: ${error.message}`,
+        message: error.message,
         severity: "error"
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Edit handlers
+  const handleEditStaff = (staff) => {
+    // Find the staff type object that matches the staff's type ID
+    const staffType = staffTypesData.find(type => type.id === staff.staff_type_id);
+    
+    setStaffToEdit({
+      id: staff.id,
+      name: staff.name,
+      email: staff.email,
+      phone: staff.phone,
+      address: staff.address,
+      birthdate: staff.birthdate,
+      staff_type_id: staffType ? staffType.id : "",
+      password: "" // Don't populate password for security reasons
+    });
+    setEditStaffPopup(true);
+  };
+
+  const handleEditStaffType = (staffType) => {
+    setStaffTypeToEdit({
+      id: staffType.id,
+      name: staffType.name
+    });
+    setEditStaffTypePopup(true);
+  };
+
+  const handleUpdateStaff = async () => {
+    setLoading(true);
+    try {
+      // Create a copy of the staff data to send
+      const staffDataToUpdate = { ...staffToEdit };
+      
+      // If password is empty, remove it from the data
+      if (!staffDataToUpdate.password) {
+        delete staffDataToUpdate.password;
+      }
+
+      const response = await updateStaffMember(staffToEdit.id, staffDataToUpdate);
+
+      if (response?.success) {
+        setSnackbar({
+          open: true,
+          message: t("staff_member_updated_success"),
+          severity: "success"
+        });
+        setEditStaffPopup(false);
+        setStaffToEdit(null);
+        await fetchStaffData();
+      } else {
+        throw new Error(response?.error || t("failed_update_staff_member"));
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      setSnackbar({
+        open: true,
+        message: error.message || t("failed_update_staff_member"),
+        severity: "error"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateStaffType = async () => {
+    setLoading(true);
+    try {
+      const response = await updateStaffType(staffTypeToEdit.id, staffTypeToEdit);
+
+      if (response?.success) {
+        setSnackbar({
+          open: true,
+          message: t("staff_type_updated_success"),
+          severity: "success"
+        });
+        setEditStaffTypePopup(false);
+        setStaffTypeToEdit(null);
+        await fetchStaffTypesData();
+      } else {
+        throw new Error(t("failed_update_staff_type"));
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.message,
+        severity: "error"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete handlers
+  const handleDeleteStaff = (staff) => {
+    setItemToDelete(staff);
+    setIsStaffType(false);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteStaffType = (staffType) => {
+    setItemToDelete(staffType);
+    setIsStaffType(true);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    setLoading(true);
+    try {
+      let response;
+      if (isStaffType) {
+        response = await deleteStaffType(itemToDelete.id);
+      } else {
+        response = await deleteStaffMember(itemToDelete.id);
+      }
+
+      if (response?.success) {
+        setSnackbar({
+          open: true,
+          message: isStaffType ? t("staff_type_deleted_success") : t("staff_member_deleted_success"),
+          severity: "success"
+        });
+        if (isStaffType) {
+          await fetchStaffTypesData();
+        } else {
+          await fetchStaffData();
+        }
+      } else {
+        throw new Error(response?.message || t("failed_to_delete"));
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.message,
+        severity: "error"
+      });
+    } finally {
+      setLoading(false);
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -343,6 +444,8 @@ const Administration = () => {
               data={staffData}
               showActions={true}
               title={t("staff_members")}
+              onEdit={handleEditStaff}
+              onDelete={handleDeleteStaff}
             />
             <div className="bottom-buttons">
               <Button
@@ -367,10 +470,16 @@ const Administration = () => {
               data={staffTypesData}
               showActions={true}
               title={t("staff_types")}
+              onEdit={handleEditStaffType}
+              onDelete={handleDeleteStaffType}
             />
             <div className="bottom-buttons">
               <Button
-                onClick={() => setOpenTypePopup(true)}
+                onClick={() => {
+                  setNewStaffType({ st_name: "" });
+                  setCheckboxValues({});
+                  setOpenTypePopup(true);
+                }}
                 label={t("add_staff_type")}
                 lightBackgrnd={false}
                 icon={<AddIcon />}
@@ -380,6 +489,23 @@ const Administration = () => {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>{t("confirm_delete")}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t("are_you_sure_delete")} {isStaffType ? t("staff_type") : t("staff_member")} "{itemToDelete?.name}"?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} label={t("cancel")} lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label={t("delete")} lightBackgrnd={false} />
+        </DialogActions>
+      </Dialog>
 
       {/* Add Staff Type Popup */}
       <Popup
@@ -444,7 +570,6 @@ const Administration = () => {
               </div>
             ))}
           </div>
-
 
           <div className="dialog-button-container">
             <button className="dialog-cancel-button" onClick={() => setOpenTypePopup(false)}>
@@ -585,11 +710,166 @@ const Administration = () => {
           </div>
 
           <div className="dialog-button-container">
-            <button className="dialog-cancel-button" onClick={() =>{ setOpenPopup(false); resetStaffForm();}}>
+            <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>
               {t("cancel")}
             </button>
-            <button className="dialog-save-button" onClick={handleSubmit} disabled={loading}>
+            <button className="dialog-save-button" onClick={handleAddStaff} disabled={loading}>
               {loading ? <CircularProgress size={24} /> : t("save")}
+            </button>
+          </div>
+        </div>
+      </Popup>
+
+      {/* Edit Staff Member Popup */}
+      <Popup
+        title={t("edit_staff_member")}
+        openPopup={editStaffPopup}
+        setOpenPopup={setEditStaffPopup}
+        className="staff-popup"
+      >
+        <div className="add-staff-form">
+          <div className="form-field-row">
+            <div className="form-field">
+              <label>{t("name")}</label>
+              <TextField
+                className="text-field"
+                name="name"
+                value={staffToEdit?.name || ""}
+                onChange={(e) => setStaffToEdit({...staffToEdit, name: e.target.value})}
+                variant="outlined"
+                fullWidth
+                placeholder={t("enter_name")}
+              />
+            </div>
+
+            <div className="form-field">
+              <label>{t("email")}</label>
+              <TextField
+                className="text-field"
+                name="email"
+                value={staffToEdit?.email || ""}
+                onChange={(e) => setStaffToEdit({...staffToEdit, email: e.target.value})}
+                variant="outlined"
+                fullWidth
+                placeholder={t("enter_email")}
+              />
+            </div>
+          </div>
+
+          <div className="form-field-row">
+            <div className="form-field">
+              <label>{t("password")} ({t("leave_blank_to_keep_current")})</label>
+              <TextField
+                className="text-field"
+                name="password"
+                value={staffToEdit?.password || ""}
+                onChange={(e) => setStaffToEdit({...staffToEdit, password: e.target.value})}
+                variant="outlined"
+                fullWidth
+                placeholder={t("password_placeholder")}
+              />
+            </div>
+
+            <div className="form-field">
+              <label>{t("phone_number")}</label>
+              <TextField
+                className="text-field"
+                name="phone"
+                value={staffToEdit?.phone || ""}
+                onChange={(e) => setStaffToEdit({...staffToEdit, phone: e.target.value})}
+                variant="outlined"
+                fullWidth
+                placeholder={t("enter_phone_number")}
+              />
+            </div>
+          </div>
+
+          <div className="form-field-row">
+            <div className="form-field">
+              <label>{t("address")}</label>
+              <TextField
+                className="text-field"
+                name="address"
+                value={staffToEdit?.address || ""}
+                onChange={(e) => setStaffToEdit({...staffToEdit, address: e.target.value})}
+                variant="outlined"
+                fullWidth
+                placeholder={t("enter_address")}
+              />
+            </div>
+
+            <div className="form-field">
+              <label>{t("birthdate")}</label>
+              <TextField
+                className="text-field"
+                name="birthdate"
+                value={staffToEdit?.birthdate || ""}
+                onChange={(e) => setStaffToEdit({...staffToEdit, birthdate: e.target.value})}
+                variant="outlined"
+                fullWidth
+                type="date"
+                InputLabelProps={{ shrink: true }}
+              />
+            </div>
+          </div>
+
+          <div className="form-field">
+            <label>{t("staff_type")}</label>
+            <TextField
+              select
+              className="text-field"
+              name="staff_type_id"
+              value={staffToEdit?.staff_type_id || ""}
+              onChange={(e) => setStaffToEdit({...staffToEdit, staff_type_id: e.target.value})}
+              variant="outlined"
+              fullWidth
+              placeholder={t("select_staff_type")}
+            >
+              {staffTypesData.map((type) => (
+                <MenuItem key={type.id} value={type.id}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </div>
+
+          <div className="dialog-button-container">
+            <button className="dialog-cancel-button" onClick={() => setEditStaffPopup(false)}>
+              {t("cancel")}
+            </button>
+            <button className="dialog-save-button" onClick={handleUpdateStaff} disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : t("save")}
+            </button>
+          </div>
+        </div>
+      </Popup>
+
+      {/* Edit Staff Type Popup */}
+      <Popup
+        title={t("edit_staff_type")}
+        openPopup={editStaffTypePopup}
+        setOpenPopup={setEditStaffTypePopup}
+      >
+        <div className="add-staff-type-form">
+          <div className="form-field">
+            <label>{t("staff_type_name")}:</label>
+            <TextField
+              className="text-field"
+              name="name"
+              value={staffTypeToEdit?.name || ""}
+              onChange={(e) => setStaffTypeToEdit({...staffTypeToEdit, name: e.target.value})}
+              variant="outlined"
+              fullWidth
+              placeholder={t("enter_staff_type_name")}
+            />
+          </div>
+
+          <div className="dialog-button-container">
+            <button className="dialog-cancel-button" onClick={() => setEditStaffTypePopup(false)}>
+              {t("cancel")}
+            </button>
+            <button className="dialog-save-button" onClick={handleUpdateStaffType} disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : t("Save")}
             </button>
           </div>
         </div>

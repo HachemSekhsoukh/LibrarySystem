@@ -597,21 +597,47 @@ export const fetchTransactions = async () => {
 };
 
 export const createTransaction = async (payload) => {
-  const response = await fetch(`${API_BASE_URL}/transactions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(payload),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/transactions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to create transaction');
+    if (!response.ok) {
+      throw new Error('Failed to create transaction');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating transaction:', error);
+    throw error;
   }
+};
 
-  return await response.json();
+export const updateTransaction = async (transactionId, payload) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/transactions/${transactionId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update transaction');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+    throw error;
+  }
 };
 
 export const fetchMonthlyBorrows = async () => {
@@ -959,6 +985,120 @@ export const assignPrivilegesToUserType = async (userTypeId, privileges) => {
     return await res.json();
   } catch (error) {
     console.error("Error assigning privileges:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const updateStaffMember = async (staffId, staffData) => {
+  try {
+    // If password is empty, remove it from the data to keep the current password
+    if (!staffData.password) {
+      delete staffData.password;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/staff/${staffId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(staffData)
+    });
+
+    // First check if the response is JSON
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Server returned non-JSON response');
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to update staff member');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error updating staff member:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const deleteStaffMember = async (staffId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/staff/${staffId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to delete staff member");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error deleting staff member:", error);
+    return { success: false, message: error.message };
+  }
+};
+
+export const updateStaffType = async (staffTypeId, staffTypeData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/staff-types/${staffTypeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(staffTypeData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update staff type');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating staff type:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const deleteStaffType = async (staffTypeId) => {
+  try {
+    console.log(`Attempting to delete staff type with ID: ${staffTypeId}`);
+    const response = await fetch(`${API_BASE_URL}/staff-types/${staffTypeId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include"
+    });
+
+    const result = await response.json();
+    console.log("Delete response:", result);
+    
+    if (!response.ok) {
+      console.error("Delete failed with status:", response.status);
+      throw new Error(result.error || "Failed to delete staff type");
+    }
+
+    if (!result.success) {
+      console.error("Delete failed with error:", result.error);
+      throw new Error(result.error || "Failed to delete staff type");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Error deleting staff type:", error);
     return { success: false, error: error.message };
   }
 };
