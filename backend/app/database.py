@@ -1765,3 +1765,44 @@ def update_staff_member(user_email, staff_id, staff_data):
     except Exception as e:
         print(f"Error updating staff member: {e}")
         return {'success': False, 'error': str(e)}
+    
+
+def add_comment(data):
+    try:
+        user = data.get('userId')
+        resource = data.get('resourceId')
+        comment = data.get('comment')
+        rating = data.get('rating')
+        date = data.get('date')
+        response = supabase \
+                    .from_("Rating") \
+                    .insert({
+                        'user_id': user,
+                        'res_id': resource,
+                        'comment':comment,
+                        'rating':rating,
+                        'rat_date':date
+                    }) \
+                    .execute()
+        if response.data:
+            return {'success': True}
+        else:
+            return {'success': False, 'error':'failed to add comment'}
+    except Exception as e :
+        print(f"Error adding comment: {e}")
+        return {'success': False, 'error': str(e)}
+    
+def get_comments(resource_id):
+    try:
+        response = supabase \
+            .from_('Rating') \
+            .select('comment','rating','rat_date') \
+            .eq('res_id', resource_id) \
+            .execute()
+        
+        if not response.data:
+            return []
+        return response
+    except Exception as e :
+        print(f"Error adding comment: {e}")
+        return {'success': False, 'error': str(e)}
