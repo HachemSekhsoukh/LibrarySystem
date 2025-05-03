@@ -81,10 +81,12 @@ const Readers = () => {
     const loadInitialData = async () => {
       setLoading(true);
       try {
+        console.log("Starting to load initial data...");
         const [readersData, userTypesData] = await Promise.all([
           fetchReaders(),
           fetchUserTypes()
         ]);
+        console.log("Successfully loaded data:", { readersData, userTypesData });
         setReaders(readersData);
         setUserTypes(userTypesData);
       } catch (error) {
@@ -108,7 +110,9 @@ const Readers = () => {
       const loadPendingReaders = async () => {
         setPendingReadersLoading(true);
         try {
+          console.log("Loading pending readers...");
           const data = await fetchPendingReaders();
+          console.log("Successfully loaded pending readers:", data);
           setPendingReaders(data);
         } catch (error) {
           console.error("Error loading pending readers:", error);
@@ -154,8 +158,10 @@ const Readers = () => {
   
 
   const handleAddReader = async () => {
+    console.log("Starting to add reader with data:", newReader);
     
     if (!validateForm()) {
+      console.log("Form validation failed with errors:", formErrors);
       setSnackbar({ open: true, message: "Please fix the form errors", severity: "error" });
       return;
     }
@@ -168,6 +174,7 @@ const Readers = () => {
         readerDataToSend.u_type = readerDataToSend.u_type.id;
       }
       
+      console.log("Sending reader data to server:", readerDataToSend);
       
       let response;
       if (isEditing) {
@@ -176,6 +183,7 @@ const Readers = () => {
         response = await addReader(readerDataToSend);
       }
       
+      console.log("Server response:", response);
 
       setSnackbar({ 
         open: true, 
@@ -517,6 +525,7 @@ const Readers = () => {
           options={userTypes}
           value={newReader.u_type}
           onChange={(event, newValue) => {
+            console.log("User type changed to:", newValue);
             handleAutocompleteChange("u_type", newValue);
           }}
           getOptionLabel={(option) => {

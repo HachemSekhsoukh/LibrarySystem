@@ -79,6 +79,7 @@ def update_reader_status_in_db(reader_id, new_status):
             .eq('u_id', reader_id)
             .execute()
         )
+        print("Supabase update response:", response)
 
         # Only return 400 if there's a real error message
         if hasattr(response, 'error') and response.error:
@@ -462,6 +463,11 @@ def create_reservation(user_email, user_id, resource_id, transaction_type):
     number of borrows for the resource in the Resource table.
     """
     try:
+        print("create_reservation")
+        print(user_id)
+        print(resource_id)
+        print(transaction_type)
+        print("--------------------------------")
         # First, get the latest res_id to increment it
         latest_res = supabase.from_("Reservation").select("res_id").order("res_id", desc=True).limit(1).execute()
         
@@ -948,6 +954,7 @@ def get_user_password(email):
 
         if response.data:
             # Return the password field (assuming it's under the alias "s_password")
+            print(response.data[0]["s_password"])
             return response.data[0]["s_password"]
         else:
             print(f"User not found for email {email} or query failed.")
@@ -970,6 +977,7 @@ def get_student_password(email):
             .execute()
 
         if response.data:
+            print(response.data[0]["u_password"])
             return response.data[0]["u_password"]
         else:
             print(f"Student not found for email {email} or query failed.")
@@ -989,6 +997,7 @@ def hash_all_passwords():
         hashed_password = generate_password_hash(plain_password)
         supabase.from_("Staff").update({"s_password": hashed_password}).eq("s_email", user["s_email"]).execute()
 
+    print("All passwords hashed.")
 
 def get_all_staff_members():
     try:
@@ -1051,6 +1060,7 @@ def delete_staff_type(user_email, staff_type_id):
     :param staff_type_id: The ID of the staff type to delete.
     """
     try:
+        print(f"Attempting to delete staff type {staff_type_id}")
         
         # First check if the staff type exists
         existing = supabase.from_("Staff_type").select("st_id, st_name").eq("st_id", staff_type_id).execute()
@@ -1063,10 +1073,12 @@ def delete_staff_type(user_email, staff_type_id):
             # Try both possible table names
             try:
                 delete_priv_response = supabase.from_("staff_type_privileges").delete().eq("staff_type_id", staff_type_id).execute()
+                print(f"Deleted associated privileges from staff_type_privileges: {delete_priv_response}")
             except Exception as e1:
                 print(f"First attempt failed: {str(e1)}")
                 try:
                     delete_priv_response = supabase.from_("Staff_type_privileges").delete().eq("staff_type_id", staff_type_id).execute()
+                    print(f"Deleted associated privileges from Staff_type_privileges: {delete_priv_response}")
                 except Exception as e2:
                     print(f"Second attempt failed: {str(e2)}")
                     raise Exception("Failed to delete privileges from both table names")
@@ -1389,6 +1401,7 @@ def get_most_borrowed_resources(limit=5):
             .order("r_num_of_borrows", desc=True) \
             .limit(limit) \
             .execute()
+        print(response)
 
         if response.data:
             return response.data
@@ -1404,7 +1417,8 @@ def get_reader_history(user_id):
     Also calculates due dates based on resource type borrow limits or user type limits.
     """
     try:
-
+        print(f"\nFetching history for user_id: {user_id}")
+        
         # First get the user's type to get the borrow limit
         user_response = supabase.from_("User") \
             .select("u_type, User_type(ut_borrow)") \
@@ -1412,7 +1426,9 @@ def get_reader_history(user_id):
             .single() \
             .execute()
 
+        print("User response:", user_response.data)
         user_type_borrow_limit = user_response.data.get('User_type', {}).get('ut_borrow') if user_response.data else None
+        print("User type borrow limit:", user_type_borrow_limit)
 
         # Get all history records for the user
         response = supabase.from_("History") \
@@ -1423,6 +1439,9 @@ def get_reader_history(user_id):
             .eq("h_user_id", user_id) \
             .order("h_date", desc=True) \
             .execute()
+
+        print("\nRaw history response:", response.data)
+        print(f"Number of history records: {len(response.data) if response.data else 0}")
 
         if not response.data:
             return []
@@ -1444,6 +1463,7 @@ def get_reader_history(user_id):
                         'return_date': None,
                         'status': 'Reserved'
                     }
+                    print(f"Created reservation {res_id}: {reservations[res_id]}")
 
         # Second pass: Update reservations with borrows and returns
         for record in response.data:
@@ -1457,23 +1477,24 @@ def get_reader_history(user_id):
                         due_date = datetime.fromisoformat(record['h_date']) + timedelta(days=borrow_limit)
                         reservations[res_id]['due_date'] = due_date.isoformat()
                     reservations[res_id]['status'] = 'Borrowed'
-
+                    print(f"Updated reservation {res_id} to borrowed: {reservations[res_id]}")
                 
                 elif record['h_status'] == 2:  # Return
                     reservations[res_id]['return_date'] = record['h_date']
                     reservations[res_id]['status'] = 'Returned'
                     if reservations[res_id]['due_date'] and record['h_date'] > reservations[res_id]['due_date']:
                         reservations[res_id]['status'] = 'Late'
-
+                    print(f"Updated reservation {res_id} to returned: {reservations[res_id]}")
                 
                 elif record['h_status'] == 4:  # Late
                     reservations[res_id]['status'] = 'Late'
-
+                    print(f"Updated reservation {res_id} to late: {reservations[res_id]}")
 
         # Convert dictionary to list and sort by reservation date
         processed_history = list(reservations.values())
         processed_history.sort(key=lambda x: x['reservation_date'], reverse=True)
 
+        print(f"\nFinal processed history: {processed_history}")
         return processed_history
 
     except Exception as e:

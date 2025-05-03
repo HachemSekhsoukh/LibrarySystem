@@ -80,11 +80,13 @@ const Late = () => {
   };
 
   const handleVerifySelected = () => {
+    console.log("Verifying selected transactions:", selectedTransactions);
     // Leave empty for now
   };
 
   const handleRejectSelected = () => {
-
+    console.log("Rejecting selected transactions:", selectedTransactions);
+    // Leave empty for now
   };
 
   return (

@@ -9,6 +9,7 @@ const API_BASE_URL = 'http://127.0.0.1:5000/api';
  */
 export const fetchAllResources = async () => {
   try {
+    console.log('Fetching all resources from API...');
     const response = await fetch(`${API_BASE_URL}/resources` , {credentials: 'include'});
     
     if (!response.ok) {
@@ -16,6 +17,7 @@ export const fetchAllResources = async () => {
     }
     
     const data = await response.json();
+    console.log(`Fetched ${data.length} resources`, data);
     return data;
   } catch (error) {
     console.error('Error fetching all resources:', error);
@@ -30,6 +32,7 @@ export const fetchUserTypes = async () => {
       throw new Error(`Failed to fetch user types: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
+    console.log("Fetched user types data:", data);
     return data;
   } catch (error) {
     console.error('Error fetching user types:', error);
@@ -59,6 +62,7 @@ export const fetchResources = async (limit = 20) => {
  */
 export const fetchResourceById = async (id) => {
   try {
+    console.log(`Fetching resource with ID: ${id}`);
     // First fetch all resources
     const resources = await fetchAllResources();
     
@@ -69,7 +73,8 @@ export const fetchResourceById = async (id) => {
       console.error(`Resource with ID ${id} not found`);
       return null;
     }
-
+    
+    console.log(`Resource found:`, resource);
     return resource;
   } catch (error) {
     console.error(`Error fetching resource with ID ${id}:`, error);
@@ -85,6 +90,7 @@ export const fetchResourceById = async (id) => {
 export const fetchLatestResources = async (limit = 5) => {
   try {
     const resources = await fetchAllResources();
+    console.log(`Fetched ${resources.length} resources for latest books`);
     
     if (!resources || resources.length === 0) {
       console.error('No resources found in the database for latest books');
@@ -99,7 +105,8 @@ export const fetchLatestResources = async (limit = 5) => {
         return dateB - dateA; // Descending order (newest first)
       })
       .slice(0, limit);
-
+    
+    console.log(`Returning ${sortedResources.length} latest books from database`);
     return sortedResources;
   } catch (error) {
     console.error('Error fetching latest resources:', error);
@@ -115,6 +122,7 @@ export const fetchLatestResources = async (limit = 5) => {
 export const fetchPopularResources = async (limit = 5) => {
   try {
     const resources = await fetchAllResources();
+    console.log(`Fetched ${resources.length} resources for popular books`);
     
     if (!resources || resources.length === 0) {
       console.error('No resources found in the database for popular books');
@@ -129,7 +137,8 @@ export const fetchPopularResources = async (limit = 5) => {
         return statusB - statusA; // Descending order
       })
       .slice(0, limit);
-
+    
+    console.log(`Returning ${sortedResources.length} popular books from database`);
     return sortedResources;
   } catch (error) {
     console.error('Error fetching popular resources:', error);
@@ -144,6 +153,7 @@ export const fetchPopularResources = async (limit = 5) => {
  */
 export const searchResources = async (query) => {
   try {
+    console.log('Searching resources for:', query);
     if (!query || query.trim() === '') {
       return [];
     }
@@ -196,6 +206,7 @@ export const loginUser = async (email, password) => {
     }
 
     const data = await response.json();
+    console.log('Login successful:', data);
     return data;
   } catch (error) {
     console.error('Login error:', error);
@@ -223,6 +234,7 @@ export const signupUser = async (userData) => {
     }
 
     const data = await response.json();
+    console.log('Signup successful:', data);
     return data;
   } catch (error) {
     console.error('Signup error:', error);
@@ -269,11 +281,14 @@ export const loginStudent = async (email, password) => {
       credentials: 'include',
     });
 
+    console.log(response)
+
     if (!response.ok) {
       throw new Error('Invalid email or password');
     }
 
     const data = await response.json();
+    console.log('Login successful:', data);
     return data;
   } catch (error) {
     console.error('Login error:', error);
@@ -301,6 +316,7 @@ export const signupStudent = async (studentData) => {
     }
 
     const data = await response.json();
+    console.log('Signup successful:', data);
     return data;
   } catch (error) {
     console.error('Signup error:', error);
@@ -324,6 +340,7 @@ export const logoutStudent = async () => {
     }
 
     const data = await response.json();
+    console.log('Logout successful:', data);
     return data;
   } catch (error) {
     console.error('Logout error:', error);
@@ -435,6 +452,7 @@ export const addStaffMember = async (staffData) => {
       credentials: "include",
       body: JSON.stringify(staffData),
     });
+    console.log(response);
     // Check if response is ok
     if (!response.ok) {
       const errorData = await response.json();
@@ -534,7 +552,7 @@ export const fetchStats = async () => {
       },
       credentials: "include",
     });
-    
+    console.log(res)
     if (!res.ok) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
@@ -553,6 +571,7 @@ export const fetchReaders = async () => {
       throw new Error(`Failed to fetch readers: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
+    console.log("Fetched readers data:", data);
     return data.map(reader => ({
       id: reader.id,
       name: reader.name,
@@ -749,6 +768,7 @@ export const fetchPendingReaders = async () => {
       throw new Error(`Failed to fetch pending readers: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
+    console.log("Fetched pending readers data:", data);
     return data.map(reader => ({
       id: reader.id,
       name: reader.name,
@@ -767,6 +787,7 @@ export const fetchPendingReaders = async () => {
 export const fetchReaderHistory = async (userId) => {
   try {
     const url = `${API_BASE_URL}/history?user_id=${userId}`;
+    console.log("Fetching reader history from:", url);
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -783,9 +804,11 @@ export const fetchReaderHistory = async (userId) => {
 
 // Helper function to process history data
 const processHistoryData = (historyData) => {
+    console.log("Processing history data:", historyData);
     
     // If the data is already in the correct format, return it directly
     if (Array.isArray(historyData) && historyData.length > 0 && historyData[0].reservation_id) {
+        console.log("Data already in correct format, returning as is");
         return historyData;
     }
 
@@ -797,6 +820,8 @@ const processHistoryData = (historyData) => {
         acc[record.h_res_id].push(record);
         return acc;
     }, {});
+
+    console.log("Grouped by reservation:", groupedByReservation);
 
     // Process each group
     const processed = Object.values(groupedByReservation).map(group => {
@@ -821,8 +846,11 @@ const processHistoryData = (historyData) => {
             is_late: lateRecord !== undefined
         };
 
+        console.log("Processed record:", processedRecord);
         return processedRecord;
     });
+
+    console.log("Final processed data:", processed);
     return processed;
 };
 
@@ -1047,6 +1075,7 @@ export const updateStaffType = async (staffTypeId, staffTypeData) => {
 
 export const deleteStaffType = async (staffTypeId) => {
   try {
+    console.log(`Attempting to delete staff type with ID: ${staffTypeId}`);
     const response = await fetch(`${API_BASE_URL}/staff-types/${staffTypeId}`, {
       method: "DELETE",
       headers: {
@@ -1056,6 +1085,7 @@ export const deleteStaffType = async (staffTypeId) => {
     });
 
     const result = await response.json();
+    console.log("Delete response:", result);
     
     if (!response.ok) {
       console.error("Delete failed with status:", response.status);
