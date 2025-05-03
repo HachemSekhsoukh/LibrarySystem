@@ -158,17 +158,23 @@ const Readers = () => {
   
 
   const handleAddReader = async () => {
+    console.log("Starting to add reader with data:", newReader);
+    
     if (!validateForm()) {
+      console.log("Form validation failed with errors:", formErrors);
       setSnackbar({ open: true, message: "Please fix the form errors", severity: "error" });
       return;
     }
-  
+
     try {
       const readerDataToSend = { ...newReader };
       
+      // Ensure user type is properly formatted
       if (typeof readerDataToSend.u_type === 'object' && readerDataToSend.u_type !== null) {
         readerDataToSend.u_type = readerDataToSend.u_type.id;
       }
+      
+      console.log("Sending reader data to server:", readerDataToSend);
       
       let response;
       if (isEditing) {
@@ -176,7 +182,9 @@ const Readers = () => {
       } else {
         response = await addReader(readerDataToSend);
       }
-  
+      
+      console.log("Server response:", response);
+
       setSnackbar({ 
         open: true, 
         message: isEditing ? "Reader updated successfully" : "Reader added successfully", 
@@ -517,11 +525,11 @@ const Readers = () => {
           options={userTypes}
           value={newReader.u_type}
           onChange={(event, newValue) => {
-            if (newValue) {
-              handleAutocompleteChange("u_type", newValue);
-            }
+            console.log("User type changed to:", newValue);
+            handleAutocompleteChange("u_type", newValue);
           }}
           getOptionLabel={(option) => {
+            if (!option) return '';
             if (typeof option === 'string') return option;
             return option.name || '';
           }}

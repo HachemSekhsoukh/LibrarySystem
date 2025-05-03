@@ -692,6 +692,7 @@ export const addReader = async (readerData) => {
     const response = await fetch(`${API_BASE_URL}/add-readers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(readerData)
     });
     if (!response.ok) {
