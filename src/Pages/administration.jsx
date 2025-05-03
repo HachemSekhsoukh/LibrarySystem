@@ -56,7 +56,7 @@ const Administration = () => {
   const [errors, setErrors] = useState({});
 
   const sections = [
-    "dashboard",
+    // "dashboard",
     "logs",
     "administration_staff",
     "administration_staff_types",
@@ -174,7 +174,13 @@ const Administration = () => {
           selectedPrivileges.push("view_catalogage_catalogage");
         }
 
-        const privResponse = await assignPrivilegesToUserType(userTypeId, selectedPrivileges);
+        selectedPrivileges.push("view_dashboard");
+  
+        const privResponse = await assignPrivilegesToUserType(
+          userTypeId,
+          selectedPrivileges
+        );
+
         if (!privResponse.success) throw new Error(privResponse.error);
 
         setSnackbar({
