@@ -23,7 +23,6 @@ const Logs = () => {
       setLoadingLogs(false);
     };
     getLogs();
-    console.log(logs)
   }, []);
 
   const columns = [

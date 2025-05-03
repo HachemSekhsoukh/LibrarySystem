@@ -44,7 +44,6 @@ const CatalogageAdministration = () => {
   const fetchResourceTypes = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}api/resource-types`, {credentials: 'include'});
-      console.log(response)
       if (!response.ok) {
         throw new Error("Failed to fetch resource types");
       }

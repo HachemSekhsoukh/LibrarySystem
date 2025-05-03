@@ -88,7 +88,6 @@ const CirculationAdministration = () => {
 
       let method = isEditing ? "PUT" : "POST";
 
-      console.log(endpoint, method)
       
       response = await fetch(endpoint, {
         method: method,
@@ -96,7 +95,6 @@ const CirculationAdministration = () => {
         credentials: "include",
         body: JSON.stringify(newReaderType),
       });
-      console.log(response)
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `Failed to ${isEditing ? 'update' : 'add'} reader type`);
