@@ -22,7 +22,6 @@ def pending_readers():
     return jsonify(pending_reader_list)
 
 @app.route("/api/user-types", methods=["GET"])
-@jwt_required()
 def user_types():
     return jsonify(get_user_types())
 
