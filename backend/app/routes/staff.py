@@ -1,6 +1,6 @@
 from datetime import timedelta
 from flask import jsonify, request, make_response
-from app.database import get_all_staff_members, add_staff_member, get_staff_types, add_staff_type, delete_staff_type, update_staff_type, assign_privileges_to_user_type
+from app.database import get_all_staff_members, add_staff_member, get_staff_types, add_staff_type, delete_staff_type, update_staff_type, assign_privileges_to_user_type, delete_staff_member, update_staff_member
 from app import app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -65,8 +65,19 @@ def remove_staff_type(staff_type_id):
     """
     API endpoint to delete a resource type by ID
     """
-    result = delete_staff_type(staff_type_id)
-    return jsonify(result), (200 if result['success'] else 400)
+    try:
+        user_email = get_jwt_identity()
+        result = delete_staff_type(user_email, staff_type_id)
+        
+        if not result['success']:
+            print(f"Failed to delete staff type {staff_type_id}: {result.get('error', 'Unknown error')}")
+            return jsonify(result), 400
+            
+        print(f"Successfully deleted staff type {staff_type_id}")
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error in remove_staff_type: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/staff-types/<int:staff_type_id>', methods=['PUT'])
 @jwt_required()
@@ -113,6 +124,36 @@ def assign_privileges(user_type_id):
     print("calling assign...")
     result = assign_privileges_to_user_type(user_type_id, privileges)
 
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 400
+
+@app.route('/api/staff/<int:staff_id>', methods=['DELETE'])
+@jwt_required()
+def remove_staff(staff_id):
+    """
+    API endpoint to delete a staff member by ID
+    """
+    user_email = get_jwt_identity()
+    result = delete_staff_member(user_email, staff_id)
+    return jsonify(result), (200 if result['success'] else 400)
+
+@app.route('/api/staff/<int:staff_id>', methods=['PUT'])
+@jwt_required()
+def update_staff(staff_id):
+    """
+    API endpoint to update a staff member by ID
+    """
+    user_email = get_jwt_identity()
+    data = request.json
+    
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    # Update the staff member
+    result = update_staff_member(user_email, staff_id, data)
+    
     if result['success']:
         return jsonify(result), 200
     else:

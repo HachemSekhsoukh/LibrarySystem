@@ -15,7 +15,8 @@ import {
   fetchReaders,
   fetchResources,
   fetchTransactions,
-  createTransaction
+  createTransaction,
+  updateTransaction
 } from "../../utils/api.js";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
@@ -23,6 +24,8 @@ import "../../CSS/circulation/transactions.css";
 const Exemplaires = () => {
   const { t } = useTranslation();
   const [openPopup, setOpenPopup] = useState(false);
+  const [editPopup, setEditPopup] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [transactionData, setTransactionData] = useState({
     borrowerName: "",
     transactionType: "Borrow",
@@ -192,6 +195,51 @@ const Exemplaires = () => {
     }
   };
 
+  const handleEdit = async (row) => {
+    setSelectedTransaction(row);
+    setTransactionData({
+      transactionType: row.type || "Borrow"
+    });
+    setEditPopup(true);
+  };
+
+  const handleUpdate = async () => {
+    if (!transactionData.transactionType) {
+      setErrors({
+        transactionType: 'Transaction type is required'
+      });
+      return;
+    }
+
+    try {
+      const payload = {
+        transactionType: transactionData.transactionType
+      };
+
+      await updateTransaction(selectedTransaction.id, payload);
+
+      setSnackbar({
+        open: true,
+        message: 'Transaction updated successfully!',
+        severity: 'success'
+      });
+
+      setTransactionData({
+        transactionType: "Borrow"
+      });
+      setEditPopup(false);
+      setSelectedTransaction(null);
+      loadTransactions();
+    } catch (err) {
+      console.error(err);
+      setSnackbar({
+        open: true,
+        message: `Failed to update transaction: ${err.message}`,
+        severity: 'error'
+      });
+    }
+  };
+
   const columns = [
     { label: "ID", key: "id" },
     { label: "Title", key: "title" },
@@ -207,7 +255,13 @@ const Exemplaires = () => {
         ) : (
           <>
             <div id='table'>
-              <Table columns={columns} data={transactions} showActions={true} title={t("transactions")}/>
+              <Table 
+                columns={columns} 
+                data={transactions} 
+                showActions={true} 
+                title={t("transactions")}
+                onEdit={handleEdit}
+              />
             </div>
             <div className="bottom-buttons">
               <Button 
@@ -244,7 +298,6 @@ const Exemplaires = () => {
               value={transactionData.borrowerName}
               onChange={(event, newValue) => handleAutocompleteChange("borrowerName", newValue)}
               getOptionLabel={(option) => {
-                // Handle both string values and option objects
                 if (typeof option === 'string') {
                   return option;
                 }
@@ -344,6 +397,45 @@ const Exemplaires = () => {
           </button>
           <button className="dialog-save-button" onClick={handleSubmit}>
             Save
+          </button>
+        </div>
+      </div>
+    </Popup>
+
+    <Popup 
+      title={t("edit_transaction")} 
+      openPopup={editPopup} 
+      setOpenPopup={setEditPopup}
+      className="transaction-dialog"
+    >
+      <div className="add-transaction-form">
+        <div className="form-field">
+          <label>{t("transaction_type")}</label>
+          <Autocomplete
+            fullWidth
+            options={transactionTypes}
+            value={transactionData.transactionType}
+            onChange={(event, newValue) => handleAutocompleteChange("transactionType", newValue)}
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                placeholder="Select transaction type"
+                variant="outlined"
+                className="custom-textfield"
+                error={!!errors.transactionType}
+                helperText={errors.transactionType}
+              />
+            )}
+            className="dropdown-field"
+          />
+        </div>
+
+        <div className="dialog-button-container">
+          <button className="dialog-cancel-button" onClick={() => setEditPopup(false)}>
+            Cancel
+          </button>
+          <button className="dialog-save-button" onClick={handleUpdate}>
+            Update
           </button>
         </div>
       </div>

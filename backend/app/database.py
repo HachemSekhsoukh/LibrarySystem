@@ -1053,20 +1053,54 @@ def add_staff_type(user_email, staff_type_data):
         return {'success': False, 'error': str(e)}
 
 
-def delete_staff_type(staff_type_id):
+def delete_staff_type(user_email, staff_type_id):
     """
     Delete a staff type from the database by its ID.
+    :param user_email: Email of the user performing the deletion
     :param staff_type_id: The ID of the staff type to delete.
     """
     try:
-        response = supabase.from_("Staff_type").delete().eq("st_id", staff_type_id).execute()
+        print(f"Attempting to delete staff type {staff_type_id}")
+        
+        # First check if the staff type exists
+        existing = supabase.from_("Staff_type").select("st_id, st_name").eq("st_id", staff_type_id).execute()
+        if not existing.data or len(existing.data) == 0:
+            print(f"Staff type {staff_type_id} not found")
+            return {'success': False, 'error': 'Staff type not found'}
 
-        if response.data:
+        # First delete all associated privileges
+        try:
+            # Try both possible table names
+            try:
+                delete_priv_response = supabase.from_("staff_type_privileges").delete().eq("staff_type_id", staff_type_id).execute()
+                print(f"Deleted associated privileges from staff_type_privileges: {delete_priv_response}")
+            except Exception as e1:
+                print(f"First attempt failed: {str(e1)}")
+                try:
+                    delete_priv_response = supabase.from_("Staff_type_privileges").delete().eq("staff_type_id", staff_type_id).execute()
+                    print(f"Deleted associated privileges from Staff_type_privileges: {delete_priv_response}")
+                except Exception as e2:
+                    print(f"Second attempt failed: {str(e2)}")
+                    raise Exception("Failed to delete privileges from both table names")
+
+        except Exception as priv_error:
+            print(f"Error deleting privileges: {str(priv_error)}")
+            return {'success': False, 'error': f'Failed to delete associated privileges: {str(priv_error)}'}
+
+        # Then delete the staff type
+        response = supabase.from_("Staff_type").delete().eq("st_id", staff_type_id).execute()
+        print(f"Delete response: {response}")
+
+        # In Supabase, a successful delete operation returns an empty array
+        if response.data is not None:
+            # Log the deletion
+            add_log(user_email, f"deleted staff type with ID: {staff_type_id}")
             return {'success': True, 'message': 'Staff type deleted successfully'}
         else:
-            return {'success': False, 'error': 'Staff type not found or could not be deleted'}
+            print(f"Failed to delete staff type {staff_type_id}: {response.error if hasattr(response, 'error') else 'Unknown error'}")
+            return {'success': False, 'error': 'Failed to delete staff type'}
     except Exception as e:
-        print(f"Error deleting staff type: {e}")
+        print(f"Error deleting staff type: {str(e)}")
         return {'success': False, 'error': str(e)}
 
 def update_staff_type(staff_type_id, staff_type_data):
@@ -1659,3 +1693,75 @@ def get_user_privileges(email):
     except Exception as e:
         print(f"Error fetching user privileges: {str(e)}")
         return []
+
+def delete_staff_member(user_email, staff_id):
+    """
+    Delete a staff member from the database by their ID.
+    :param user_email: Email of the user performing the deletion
+    :param staff_id: The ID of the staff member to delete
+    """
+    try:
+        # First check if the staff member exists
+        existing = supabase.from_("Staff").select("s_id, s_email").eq("s_id", staff_id).execute()
+        if not existing.data or len(existing.data) == 0:
+            return {'success': False, 'error': 'Staff member not found'}
+
+        # Delete the staff member
+        response = supabase.from_("Staff").delete().eq("s_id", staff_id).execute()
+
+        if response.data:
+            # Log the deletion
+            add_log(user_email, f"deleted staff member with ID: {staff_id}")
+            return {'success': True, 'message': 'Staff member deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Failed to delete staff member'}
+    except Exception as e:
+        print(f"Error deleting staff member: {e}")
+        return {'success': False, 'error': str(e)}
+
+def update_staff_member(user_email, staff_id, staff_data):
+    """
+    Update a staff member in the database.
+    :param user_email: Email of the user performing the update
+    :param staff_id: The ID of the staff member to update
+    :param staff_data: Dictionary containing updated staff details
+    """
+    try:
+        # First check if the staff member exists
+        existing = supabase.from_("Staff").select("s_id").eq("s_id", staff_id).execute()
+        if not existing.data or len(existing.data) == 0:
+            return {'success': False, 'error': 'Staff member not found'}
+
+        # If password is provided, hash it
+        if 'password' in staff_data and staff_data['password']:
+            staff_data['s_password'] = generate_password_hash(staff_data['password'])
+            del staff_data['password']
+
+        # Map the input fields to database fields
+        update_data = {
+            's_name': staff_data.get('name'),
+            's_email': staff_data.get('email'),
+            's_phone': staff_data.get('phone'),
+            's_address': staff_data.get('address'),
+            's_birthdate': staff_data.get('birthdate'),
+            's_type': staff_data.get('staff_type_id')
+        }
+
+        # Remove None values
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+
+        # Update the staff member
+        response = supabase.from_("Staff").update(update_data).eq("s_id", staff_id).execute()
+
+        if response.data:
+            # Log the update
+            add_log(user_email, f"updated staff member with ID: {staff_id}")
+            return {
+                'success': True,
+                'message': 'Staff member updated successfully'
+            }
+        else:
+            return {'success': False, 'error': 'Failed to update staff member'}
+    except Exception as e:
+        print(f"Error updating staff member: {e}")
+        return {'success': False, 'error': str(e)}
