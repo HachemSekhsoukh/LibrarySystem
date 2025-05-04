@@ -64,17 +64,20 @@ const Catalogage = () => {
   
   const fetchResources = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${API_BASE_URL}api/resources`, {credentials: 'include'});
       if (!response.ok) {
         throw new Error("Failed to fetch resources");
       }
       const data = await response.json();
-      setResources(data);
+      setResources(data || []);
     } catch (error) {
       console.error("API Error:", error);
       setSnackbar({ open: true, message: "Error fetching resources", severity: "error" });
+      setResources([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleChange = (e) => {
@@ -398,40 +401,123 @@ const Catalogage = () => {
           History for {selectedResource?.title}
         </DialogTitle>
         <DialogContent>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Document Title</TableCell>
-                <TableCell>Reservation Date</TableCell>
-                <TableCell>Borrow Date</TableCell>
-                <TableCell>Due Date</TableCell>
-                <TableCell>Return Date</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {history.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>{record.document_title}</TableCell>
-                  <TableCell>{record.reservation_date}</TableCell>
-                  <TableCell>{record.borrow_date}</TableCell>
-                  <TableCell>{record.due_date}</TableCell>
-                  <TableCell>{record.return_date}</TableCell>
-                  <TableCell>
+          {/* Book Information Section */}
+          <Grid container spacing={2} sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Book Details
+              </Typography>
+            </Grid>
+            
+            {/* Basic Information */}
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Inventory Number</Typography>
+              <Typography variant="body1">{selectedResource?.inventoryNum || 'N/A'}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Type</Typography>
+              <Typography variant="body1">{selectedResource?.type_name}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="textSecondary">Title</Typography>
+              <Typography variant="body1">{selectedResource?.title}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Author</Typography>
+              <Typography variant="body1">{selectedResource?.author}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Editor</Typography>
+              <Typography variant="body1">{selectedResource?.editor || 'N/A'}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Edition</Typography>
+              <Typography variant="body1">{selectedResource?.edition || 'N/A'}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">ISBN</Typography>
+              <Typography variant="body1">{selectedResource?.isbn || 'N/A'}</Typography>
+            </Grid>
+            
+            {/* Additional Details */}
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Price</Typography>
+              <Typography variant="body1">{selectedResource?.price ? `$${selectedResource.price}` : 'N/A'}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Cote</Typography>
+              <Typography variant="body1">{selectedResource?.cote || 'N/A'}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Receiving Date</Typography>
+              <Typography variant="body1">{selectedResource?.receivingDate || 'N/A'}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Number of Borrows</Typography>
+              <Typography variant="body1">{selectedResource?.numofborrows || 0}</Typography>
+            </Grid>
+            
+            {/* Status and Description */}
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Status</Typography>
+              <Chip
+                label={selectedResource?.status_name}
+                color={
+                  selectedResource?.status_name === 'Available' ? 'success' :
+                  selectedResource?.status_name === 'Borrowed' ? 'warning' :
+                  'error'
+                }
+                size="small"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Typography variant="subtitle2" color="textSecondary">Observation</Typography>
+              <Typography variant="body1">{selectedResource?.observation || 'N/A'}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="textSecondary">Description</Typography>
+              <Typography variant="body1">{selectedResource?.description || 'No description available'}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" color="textSecondary">Resume</Typography>
+              <Typography variant="body1">{selectedResource?.resume || 'No resume available'}</Typography>
+            </Grid>
+          </Grid>
+
+          {/* History Table Section */}
+          <Typography variant="h6" gutterBottom>
+            Borrowing History
+          </Typography>
+          {loading ? (
+            <div className="loader"></div>
+          ) : (
+            <Table
+              columns={[
+                { label: "Borrower", key: "borrower_name" },
+                { label: "Reservation Date", key: "reservation_date" },
+                { label: "Borrow Date", key: "borrow_date" },
+                { label: "Due Date", key: "due_date" },
+                { label: "Return Date", key: "return_date" },
+                { 
+                  label: "Status", 
+                  key: "status",
+                  render: (value) => (
                     <Chip
-                      label={record.status}
+                      label={value}
                       color={
-                        record.status === 'Late' ? 'error' :
-                        record.status === 'Borrowed' ? 'warning' :
-                        record.status === 'Returned' ? 'success' :
+                        value === 'Late' ? 'error' :
+                        value === 'Borrowed' ? 'warning' :
+                        value === 'Returned' ? 'success' :
                         'info'
                       }
                     />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  )
+                }
+              ]}
+              data={history || []}
+              title="Resource History"
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setHistoryDialogOpen(false)}>Close</Button>
