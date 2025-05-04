@@ -1130,3 +1130,27 @@ export const sendLateNotices = async (transactionIds) => {
     throw error;
   }
 };
+
+export const fetchResourceComments = async (resourceId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/comments`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch resource comments');
+    }
+    
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to fetch resource comments');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching resource comments:', error);
+    throw error;
+  }
+};
