@@ -865,13 +865,16 @@ const getStatus = (borrow, returnRecord, lateRecord) => {
 export const fetchResourceHistory = async (resourceId) => {
   try {
     const url = `${API_BASE_URL}/resource-history?resource_id=${resourceId}`;
-    const response = await fetch(url);
+    const response = await fetch(url, { credentials: 'include' });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch resource history: ${response.status} ${response.statusText}`);
     }
     
     const historyData = await response.json();
+    if (historyData.error) {
+      throw new Error(historyData.error);
+    }
     return processHistoryData(historyData);
   } catch (error) {
     console.error('Error fetching resource history:', error);

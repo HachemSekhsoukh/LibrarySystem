@@ -212,6 +212,12 @@ def get_resource_history_route():
             print("Error: No resource_id provided")
             return jsonify({'error': 'Resource ID is required'}), 400
 
+        try:
+            resource_id = int(resource_id)
+        except ValueError:
+            print("Error: Invalid resource_id format")
+            return jsonify({'error': 'Resource ID must be a number'}), 400
+
         print(f"Fetching history for resource {resource_id}")
         history = get_resource_history(resource_id)
         print(f"Retrieved history data: {history}")
