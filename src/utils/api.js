@@ -1106,3 +1106,27 @@ export const deleteStaffType = async (staffTypeId) => {
     return { success: false, error: error.message };
   }
 };
+
+// Send email notifications to late returners
+export const sendLateNotices = async (transactionIds) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/send-late-notices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ transaction_ids: transactionIds }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send notifications');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error sending notifications:', error);
+    throw error;
+  }
+};
