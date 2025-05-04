@@ -4,7 +4,7 @@ import Button from '../../components/Button';
 import Popup from "../../components/Popup";
 import "../../CSS/form.css";
 import "./resource_form";
-import { TextField, MenuItem, Grid, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Typography, TableHead, TableBody, TableRow, TableCell, Chip } from "@mui/material";
+import { TextField, MenuItem, Grid, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Typography, TableHead, TableBody, TableRow, TableCell, Chip, Tabs, Tab, Box } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -12,7 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddResourceForm from "./resource_form";
 import { useTranslation } from 'react-i18next';
-import { fetchResources, fetchResourceTypes, addResourceType, updateResourceType, deleteResourceType, fetchResourceHistory } from '../../utils/api';
+import { fetchResources, fetchResourceTypes, addResourceType, updateResourceType, deleteResourceType, fetchResourceHistory, fetchResourceComments } from '../../utils/api';
 
 const Catalogage = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
@@ -48,6 +48,10 @@ const Catalogage = () => {
   const [history, setHistory] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}api/resource-types`, {credentials: 'include'})
@@ -293,16 +297,28 @@ const Catalogage = () => {
   const handleViewHistory = async (resource) => {
     try {
       setSelectedResource(resource);
-      const historyData = await fetchResourceHistory(resource.id);
+      setLoadingTransactions(true);
+      setLoadingComments(true);
+      
+      // Fetch both history and comments in parallel
+      const [historyData, commentsData] = await Promise.all([
+        fetchResourceHistory(resource.id),
+        fetchResourceComments(resource.id)
+      ]);
+      
       setHistory(historyData);
-      setHistoryDialogOpen(true);
+      setComments(commentsData.comments || []);
     } catch (error) {
-      console.error('Error fetching resource history:', error);
+      console.error('Error fetching resource details:', error);
       setSnackbar({ 
         open: true, 
-        message: 'Failed to fetch resource history', 
+        message: 'Failed to fetch resource details', 
         severity: 'error' 
       });
+    } finally {
+      setLoadingTransactions(false);
+      setLoadingComments(false);
+      setHistoryDialogOpen(true);
     }
   };
 
@@ -394,14 +410,20 @@ const Catalogage = () => {
       <Dialog
         open={historyDialogOpen}
         onClose={() => setHistoryDialogOpen(false)}
-        maxWidth="md"
+        maxWidth="xl"
         fullWidth
       >
         <DialogTitle>
-          History for {selectedResource?.title}
+          {selectedResource?.title}
+          <button 
+            className="close-button"
+            onClick={() => setHistoryDialogOpen(false)}
+          >
+            &times;
+          </button>
         </DialogTitle>
         <DialogContent>
-          {/* Book Information Section */}
+          {/* Book Details Section - Always visible */}
           <Grid container spacing={2} sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom>
@@ -484,44 +506,99 @@ const Catalogage = () => {
             </Grid>
           </Grid>
 
-          {/* History Table Section */}
-          <Typography variant="h6" gutterBottom>
-            Borrowing History
-          </Typography>
-          {loading ? (
-            <div className="loader"></div>
+          {/* Tabs Section */}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+              <Tab label="History" />
+              <Tab label="Ratings" />
+            </Tabs>
+          </Box>
+
+          {activeTab === 0 ? (
+            // History Tab
+            <>
+              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                Borrowing History
+              </Typography>
+              {loadingTransactions ? (
+                <div className="loader"></div>
+              ) : (
+                <Table
+                  columns={[
+                    { label: "Borrower", key: "borrower_name" },
+                    { label: "Reservation Date", key: "reservation_date" },
+                    { label: "Borrow Date", key: "borrow_date" },
+                    { label: "Due Date", key: "due_date" },
+                    { label: "Return Date", key: "return_date" },
+                    { 
+                      label: "Status", 
+                      key: "status",
+                      render: (value) => (
+                        <Chip
+                          label={value}
+                          color={
+                            value === 'Late' ? 'error' :
+                            value === 'Borrowed' ? 'warning' :
+                            value === 'Returned' ? 'success' :
+                            'info'
+                          }
+                        />
+                      )
+                    }
+                  ]}
+                  data={history || []}
+                  title="Resource History"
+                />
+              )}
+            </>
           ) : (
-            <Table
-              columns={[
-                { label: "Borrower", key: "borrower_name" },
-                { label: "Reservation Date", key: "reservation_date" },
-                { label: "Borrow Date", key: "borrow_date" },
-                { label: "Due Date", key: "due_date" },
-                { label: "Return Date", key: "return_date" },
-                { 
-                  label: "Status", 
-                  key: "status",
-                  render: (value) => (
-                    <Chip
-                      label={value}
-                      color={
-                        value === 'Late' ? 'error' :
-                        value === 'Borrowed' ? 'warning' :
-                        value === 'Returned' ? 'success' :
-                        'info'
-                      }
-                    />
-                  )
-                }
-              ]}
-              data={history || []}
-              title="Resource History"
-            />
+            // Ratings Tab
+            <>
+              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
+                Ratings and Comments
+              </Typography>
+              {loadingComments ? (
+                <div className="loader"></div>
+              ) : comments.length === 0 ? (
+                <Typography variant="body1" sx={{ p: 2, textAlign: 'center' }}>
+                  No ratings or comments yet.
+                </Typography>
+              ) : (
+                <Box sx={{ mt: 2 }}>
+                  {comments.map((comment, index) => (
+                    <Box key={index} sx={{ 
+                      p: 2, 
+                      mb: 2, 
+                      border: '1px solid #e0e0e0', 
+                      borderRadius: 1,
+                      backgroundColor: '#f9f9f9'
+                    }}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        {comment.user_name || 'Anonymous User'}
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} style={{ 
+                            color: i < comment.rating ? '#ffd700' : '#e0e0e0',
+                            fontSize: '1.2rem'
+                          }}>
+                            ★
+                          </span>
+                        ))}
+                      </Box>
+                      <Typography variant="body1">
+                        {comment.comment}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(comment.created_at).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setHistoryDialogOpen(false)}>Close</Button>
-        </DialogActions>
       </Dialog>
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>

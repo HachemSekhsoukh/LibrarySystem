@@ -14,7 +14,7 @@ CORS(app,
      origins=["http://localhost:5173", "http://127.0.0.1:5173"], 
      supports_credentials=True, 
      allow_headers=["Content-Type", "Authorization", "Access-Control-Allow-Credentials"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"])
 
 # Set the JWT secret key from the environment variable
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')

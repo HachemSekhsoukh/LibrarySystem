@@ -262,3 +262,25 @@ def get_comment(resource_id):
     except Exception as e:
         print('Error in get comment route:', e)
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/resources/<int:resource_id>/comments', methods=['GET'])
+@jwt_required()
+def get_resource_comments(resource_id):
+    """
+    API endpoint to get comments and ratings for a specific resource
+    """
+    try:
+        comments = get_comments(resource_id)
+        # Ensure comments is a list of dictionaries
+        if not isinstance(comments, list):
+            comments = []
+        return jsonify({
+            'success': True,
+            'comments': comments
+        }), 200
+    except Exception as e:
+        print(f"Error in get_resource_comments: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
