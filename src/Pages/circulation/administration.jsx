@@ -19,10 +19,12 @@ import {
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
+import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
 
 
 const CirculationAdministration = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const { t } = useTranslation();
   const [readerTypes, setReaderTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +38,10 @@ const CirculationAdministration = () => {
   const [currentReaderTypeId, setCurrentReaderTypeId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [readerTypeToDelete, setReaderTypeToDelete] = useState(null);
+
+  const canEdit = hasPrivilege("edit_circulation_reader_types");
+  const canDelete = hasPrivilege("delete_circulation_reader_types");
+  const canCreate = hasPrivilege("create_circulation_readers_types");
 
   useEffect(() => {
     fetchReaderTypes();
@@ -188,7 +194,9 @@ const CirculationAdministration = () => {
               <Table 
                 columns={columns} 
                 data={readerTypes} 
-                showActions={true} 
+                showActions= {canEdit || canDelete} 
+                showEdit={canEdit} // Pass privilege-based control for edit
+                showDelete={canDelete} // Pass privilege-based control for delete
                 title={t("reader_types")} 
                 loading={loading}
                 onEdit={handleEdit}
@@ -200,7 +208,8 @@ const CirculationAdministration = () => {
                 onClick={() => {
                   resetForm();
                   setOpenPopup(true);
-                }} 
+                }}
+                disabled={!canCreate}
                 label= {t("add_new_reader_type")} 
                 lightBackgrnd={false} 
                 icon={<AddIcon />} 

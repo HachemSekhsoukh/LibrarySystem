@@ -5,27 +5,36 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useTranslation } from 'react-i18next';
-import { BorderBottom } from "@mui/icons-material";
 
-const Table = ({ columns, data, showActions = false, title, onRowSelect, selectedRows = [],handleViewDetails ,onEdit, onDelete }) => {
+const Table = ({ 
+  columns, 
+  data, 
+  showActions = false, 
+  title, 
+  onRowSelect, 
+  selectedRows = [], 
+  handleViewDetails, 
+  onEdit, 
+  onDelete, 
+  showEdit = true, 
+  showDelete = true 
+}) => {
   const [searchText, setSearchText] = useState("");
   const { t } = useTranslation();
+
   // Convert columns to DataTable format while preserving custom renderers
   const formattedColumns = columns.map((col) => {
-    // Base column definition
     const formattedCol = {
       name: col.label,
       sortable: true,
     };
-    
-    // If the column has a custom render function, use it
+
     if (col.render) {
       formattedCol.cell = (row) => col.render(row[col.key], row);
     } else {
-      // Otherwise use standard selector
       formattedCol.selector = (row) => row[col.key];
     }
-    
+
     return formattedCol;
   });
 
@@ -35,24 +44,30 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
       name: "Action",
       cell: (row) => (
         <div className="edit-delete">
-          {handleViewDetails ? (
-              <>
-                <button 
-                  className="view-details-button" 
-                  onClick={() => handleViewDetails(row)}
-                >
-                  <VisibilityIcon style={{ fontSize: "20px", color: "#065AA3" }} />
-                </button>
-                <div className="splitter"></div>
-              </>
-            ) : null}
-          <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
-            <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
-          </button>
-          <div className="splitter"></div>
-          <button className="delete-btn" onClick={() => onDelete && onDelete(row)}>
-            <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
-          </button>
+          {handleViewDetails && (
+            <>
+              <button 
+                className="view-details-button" 
+                onClick={() => handleViewDetails(row)}
+              >
+                <VisibilityIcon style={{ fontSize: "20px", color: "#065AA3" }} />
+              </button>
+              <div className="splitter"></div>
+            </>
+          )}
+          {showEdit && (
+            <>
+              <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
+                <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
+              </button>
+              <div className="splitter"></div>
+            </>
+          )}
+          {showDelete && (
+            <button className="delete-btn" onClick={() => onDelete && onDelete(row)}>
+              <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
+            </button>
+          )}
         </div>
       ),
       ignoreRowClick: true,
@@ -86,14 +101,13 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
         backgroundColor: "var(--table-background-color)",
         color: "var(--text-color)",
       },
-    },    
+    },
     cells: {
       style: {
         padding: "10px",
         borderBottom: "1px solid var(--table-row-line)", 
       },
     },
-    
     pagination: {
       style: {
         display: "flex",
@@ -104,7 +118,6 @@ const Table = ({ columns, data, showActions = false, title, onRowSelect, selecte
         marginTop: "20px",
       },
     },
-    // Make sure checkboxes are visible
     checkbox: {
       style: {
         color: "var(--text-color)",

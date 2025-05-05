@@ -111,7 +111,7 @@ const Dashboard = () => {
 
       {/* Recent Transactions Table */}
       <div className="recent-transactions-container">
-      {loadingTransactions ? <div className="loader" /> :<Table columns={columns} data={transactions} showActions={true} title={t("recent_transactions")} loading={loadingTransactions} />}
+      {loadingTransactions ? <div className="loader" /> :<Table columns={columns} data={transactions} showActions={false} title={t("recent_transactions")} loading={loadingTransactions} />}
       </div>
 
       {/* Most Borrowed Books Table */}
