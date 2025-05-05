@@ -5,7 +5,6 @@ import Popup from "../../components/Popup";
 import { useTranslation } from 'react-i18next';
 import { 
   TextField, 
-  MenuItem, 
   Autocomplete, 
   CircularProgress,
   Snackbar,
@@ -20,10 +19,12 @@ import {
 } from "../../utils/api.js";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
+import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
 
 const Exemplaires = () => {
   const { t } = useTranslation();
   const [openPopup, setOpenPopup] = useState(false);
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const [editPopup, setEditPopup] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [transactionData, setTransactionData] = useState({
@@ -51,6 +52,11 @@ const Exemplaires = () => {
     transactionType: '',
     documentTitle: ''
   });
+
+    // Determine if the user has privileges
+  const canEdit = hasPrivilege("edit_circulation_exemplaires");
+  const canDelete = hasPrivilege("delete_circulation_exemplaires");
+  const canCreate = hasPrivilege("create_circulation_exemplaires");
   
   const validateForm = () => {
     let tempErrors = {
@@ -258,7 +264,9 @@ const Exemplaires = () => {
               <Table 
                 columns={columns} 
                 data={transactions} 
-                showActions={true} 
+                showActions={canEdit || canDelete} 
+                showEdit={canEdit} // Pass privilege-based control for edit
+                showDelete={canDelete} // Pass privilege-based control for delete
                 title={t("transactions")}
                 onEdit={handleEdit}
               />
@@ -266,6 +274,7 @@ const Exemplaires = () => {
             <div className="bottom-buttons">
               <Button 
                 onClick={() => setOpenPopup(true)} 
+                disabled={!canCreate}
                 label={t("add_transaction")} 
                 lightBackgrnd={false}
                 icon={<AddIcon />}
