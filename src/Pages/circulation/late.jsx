@@ -6,7 +6,8 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import Popup from "../../components/Popup"; // make sure you have this Popup component
 import Button from "../../components/Button";
 import { useTranslation } from 'react-i18next';
-import { fetchTransactions } from "../../utils/api.js";
+import { fetchTransactions, sendLateNotices } from "../../utils/api.js";
+import { Snackbar, Alert } from "@mui/material";
 
 const Late = () => {
   const { t } = useTranslation();
@@ -16,6 +17,12 @@ const Late = () => {
 
   const [verifyPopupOpen, setVerifyPopupOpen] = useState(false);
   const [selectedTransactions, setSelectedTransactions] = useState([]);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success"
+  });
+  const [sending, setSending] = useState(false);
 
   const loadTransactions = async () => {
     setLoadingTransactions(true);
@@ -79,14 +86,40 @@ const Late = () => {
     }
   };
 
-  const handleVerifySelected = () => {
-    console.log("Verifying selected transactions:", selectedTransactions);
-    // Leave empty for now
+  const handleVerifySelected = async () => {
+    if (selectedTransactions.length === 0) return;
+    
+    setSending(true);
+    try {
+      const result = await sendLateNotices(selectedTransactions);
+      
+      setSnackbar({
+        open: true,
+        message: `Successfully sent ${result.sent} email notifications to late returners`,
+        severity: "success"
+      });
+      
+      // Close popup and clear selection after successful send
+      setVerifyPopupOpen(false);
+      setSelectedTransactions([]);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.message || "Failed to send email notifications",
+        severity: "error"
+      });
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleRejectSelected = () => {
     console.log("Rejecting selected transactions:", selectedTransactions);
     // Leave empty for now
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -157,15 +190,31 @@ const Late = () => {
                 <button
                   className="verify-button"
                   onClick={handleVerifySelected}
-                  disabled={selectedTransactions.length === 0}
+                  disabled={selectedTransactions.length === 0 || sending}
                 >
-                  Send a mail notice
+                  {sending ? "Sending..." : "Send a mail notice"}
                 </button>
               </div>
             </div>
           </div>
         </Popup>
       </div>
+
+      {/* Add Snackbar for notifications */}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

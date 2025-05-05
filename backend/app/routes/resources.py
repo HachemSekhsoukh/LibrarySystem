@@ -4,7 +4,7 @@ Routes related to resources (books and other library items)
 
 from flask import jsonify, request
 from app import app
-from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history
+from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history,add_comment,get_comments
 import pandas as pd
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 import io
@@ -212,6 +212,12 @@ def get_resource_history_route():
             print("Error: No resource_id provided")
             return jsonify({'error': 'Resource ID is required'}), 400
 
+        try:
+            resource_id = int(resource_id)
+        except ValueError:
+            print("Error: Invalid resource_id format")
+            return jsonify({'error': 'Resource ID must be a number'}), 400
+
         print(f"Fetching history for resource {resource_id}")
         history = get_resource_history(resource_id)
         print(f"Retrieved history data: {history}")
@@ -221,3 +227,60 @@ def get_resource_history_route():
     except Exception as e:
         print(f"Error in get_resource_history route: {str(e)}")
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/comments', methods=['POST'])
+def create_comment():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success':False, 'error':'No data'}),400
+        required_fields = ['userId','resourceId','comment','rating','date']
+        missing_fields = [field for field in required_fields if field not in data or not data[field]]
+    
+        if missing_fields:
+            return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+        result = add_comment(data)
+        if result['success']:
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        print(' error in add comment route')
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/comments/<int:resource_id>', methods=['GET'])
+def get_comment(resource_id):
+    try:
+        print(resource_id)
+        result = get_comments(resource_id)
+        print(result)
+        
+        if hasattr(result, 'data') and result.data:
+            return jsonify(result.data), 200
+        else:
+            return jsonify({'message': 'No comments found'}), 404
+    except Exception as e:
+        print('Error in get comment route:', e)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/resources/<int:resource_id>/comments', methods=['GET'])
+@jwt_required()
+def get_resource_comments(resource_id):
+    """
+    API endpoint to get comments and ratings for a specific resource
+    """
+    try:
+        comments = get_comments(resource_id)
+        # Ensure comments is a list of dictionaries
+        if not isinstance(comments, list):
+            comments = []
+        return jsonify({
+            'success': True,
+            'comments': comments
+        }), 200
+    except Exception as e:
+        print(f"Error in get_resource_comments: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
