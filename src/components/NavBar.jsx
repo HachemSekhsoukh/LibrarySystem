@@ -89,9 +89,8 @@ function NavBar() {
             );
           } else {
             const privKey = `view_${item.label.toLowerCase()}`;
-            console.log(privKey, hasPrivilege(privKey))
             if (!hasPrivilege(privKey)) return null;
-          
+            
             return (
               <NavLink
                 key={index}
