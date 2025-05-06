@@ -45,28 +45,32 @@ const Table = ({
       cell: (row) => (
         <div className="edit-delete">
           {handleViewDetails && (
-            <>
-              <button 
-                className="view-details-button" 
-                onClick={() => handleViewDetails(row)}
-              >
-                <VisibilityIcon style={{ fontSize: "20px", color: "#065AA3" }} />
-              </button>
-              <div className="splitter"></div>
-            </>
-          )}
-          {showEdit && (
-            <>
-              <button className="edit-btn" onClick={() => onEdit && onEdit(row)}>
-                <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
-              </button>
-              <div className="splitter"></div>
-            </>
-          )}
-          {showDelete && (
-            <button className="delete-btn" onClick={() => onDelete && onDelete(row)}>
-              <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
+            <button
+              className={`view-details-button ${!showEdit && !showDelete ? "full-width" : ""}`}
+              onClick={() => handleViewDetails(row)}
+            >
+              <VisibilityIcon style={{ fontSize: "20px", color: "#065AA3" }} />
             </button>
+          )}
+          {(showEdit || showDelete) && (
+            <>
+              {showEdit && (
+                <button
+                  className={`edit-btn ${!showDelete && !handleViewDetails ? "full-width" : ""}`}
+                  onClick={() => onEdit && onEdit(row)}
+                >
+                  <EditIcon style={{ fontSize: "20px", color: "#065AA3" }} />
+                </button>
+              )}
+              {showDelete && (
+                <button
+                  className={`delete-btn ${!showEdit && !handleViewDetails ? "full-width" : ""}`}
+                  onClick={() => onDelete && onDelete(row)}
+                >
+                  <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
+                </button>
+              )}
+            </>
           )}
         </div>
       ),
@@ -75,7 +79,6 @@ const Table = ({
       button: true,
     });
   }
-
   // Filter data based on search text
   const filteredData = data.filter((row) =>
     Object.values(row).some((value) =>
