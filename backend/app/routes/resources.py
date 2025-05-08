@@ -251,9 +251,7 @@ def create_comment():
 @app.route('/api/comments/<int:resource_id>', methods=['GET'])
 def get_comment(resource_id):
     try:
-        print(resource_id)
         result = get_comments(resource_id)
-        print(result)
         
         if hasattr(result, 'data') and result.data:
             return jsonify(result.data), 200
