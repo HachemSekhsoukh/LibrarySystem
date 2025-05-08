@@ -123,14 +123,16 @@
     background-color: rgb(6, 90, 163);
   }
 
-  .edit-delete{
+  .edit-delete {
     display: flex;
-    flex-direction: row;
+    flex-direction: row; 
+    align-items: center; 
+    justify-content: center; 
     border: 1px solid rgb(6, 90, 163);
+    overflow: hidden;
     border-radius: 7px;
-    overflow: hidden; /* Ensures corners are rounded */
-    height: 55%;
-    width: 100%;
+    min-width: 100%; 
+    height: auto; 
   }
   
   /* Action Buttons */
@@ -145,6 +147,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .edit-btn.full-width,
+  .delete-btn.full-width,
+  .view-details-button.full-width {
+    min-width: 100%; /* Apply full width when no other buttons are present */
   }
   
   .edit-btn {

@@ -692,6 +692,7 @@ export const addReader = async (readerData) => {
     const response = await fetch(`${API_BASE_URL}/add-readers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(readerData)
     });
     if (!response.ok) {
@@ -864,13 +865,16 @@ const getStatus = (borrow, returnRecord, lateRecord) => {
 export const fetchResourceHistory = async (resourceId) => {
   try {
     const url = `${API_BASE_URL}/resource-history?resource_id=${resourceId}`;
-    const response = await fetch(url);
+    const response = await fetch(url, { credentials: 'include' });
     
     if (!response.ok) {
       throw new Error(`Failed to fetch resource history: ${response.status} ${response.statusText}`);
     }
     
     const historyData = await response.json();
+    if (historyData.error) {
+      throw new Error(historyData.error);
+    }
     return processHistoryData(historyData);
   } catch (error) {
     console.error('Error fetching resource history:', error);
@@ -1100,5 +1104,53 @@ export const deleteStaffType = async (staffTypeId) => {
   } catch (error) {
     console.error("Error deleting staff type:", error);
     return { success: false, error: error.message };
+  }
+};
+
+// Send email notifications to late returners
+export const sendLateNotices = async (transactionIds) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/send-late-notices`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ transaction_ids: transactionIds }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send notifications');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error sending notifications:', error);
+    throw error;
+  }
+};
+
+export const fetchResourceComments = async (resourceId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/comments`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch resource comments');
+    }
+    
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || 'Failed to fetch resource comments');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching resource comments:', error);
+    throw error;
   }
 };

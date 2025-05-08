@@ -7,6 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import "../../CSS/circulation/readers.css";
 import { useTranslation } from 'react-i18next';
+import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -24,6 +25,7 @@ import {
 
 const Readers = () => {
   const [readers, setReaders] = useState([]);
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const { t } = useTranslation();
   const [userTypes, setUserTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +38,11 @@ const Readers = () => {
   const [selectedReader, setSelectedReader] = useState(null);
   const [readerTransactions, setReaderTransactions] = useState([]);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
+
+    // Determine if the user has privileges
+  const canEdit = hasPrivilege("edit_circulation_readers");
+  const canDelete = hasPrivilege("delete_circulation_readers");
+  const canCreate = hasPrivilege("create_circulation_readers");
   
   const [newReader, setNewReader] = useState({ 
     u_name: "", 
@@ -158,17 +165,23 @@ const Readers = () => {
   
 
   const handleAddReader = async () => {
+    console.log("Starting to add reader with data:", newReader);
+    
     if (!validateForm()) {
+      console.log("Form validation failed with errors:", formErrors);
       setSnackbar({ open: true, message: "Please fix the form errors", severity: "error" });
       return;
     }
-  
+
     try {
       const readerDataToSend = { ...newReader };
       
+      // Ensure user type is properly formatted
       if (typeof readerDataToSend.u_type === 'object' && readerDataToSend.u_type !== null) {
         readerDataToSend.u_type = readerDataToSend.u_type.id;
       }
+      
+      console.log("Sending reader data to server:", readerDataToSend);
       
       let response;
       if (isEditing) {
@@ -176,7 +189,9 @@ const Readers = () => {
       } else {
         response = await addReader(readerDataToSend);
       }
-  
+      
+      console.log("Server response:", response);
+
       setSnackbar({ 
         open: true, 
         message: isEditing ? "Reader updated successfully" : "Reader added successfully", 
@@ -425,6 +440,8 @@ const Readers = () => {
             columns={columns} 
             data={readers} 
             showActions={true} 
+            showEdit={canEdit} // Pass privilege-based control for edit
+            showDelete={canDelete} // Pass privilege-based control for delete
             title={t("readers")} 
             loading={loading} 
             onEdit={handleEdit}
@@ -434,7 +451,7 @@ const Readers = () => {
         </div>
         <div className="bottom-buttons">
           <Button onClick={() => setVerifyReadersPopup(true)} label={t("verify_new_readers")} lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
-          <Button onClick={() => setOpenPopup(true)} label={t("add_new_reader")} lightBackgrnd={false} icon={<AddIcon />} size="large" />
+          <Button disabled={!canCreate} onClick={() => setOpenPopup(true)} label={t("add_new_reader")} lightBackgrnd={false} icon={<AddIcon />} size="large" />
         </div>
       </>)}
        
@@ -517,11 +534,11 @@ const Readers = () => {
           options={userTypes}
           value={newReader.u_type}
           onChange={(event, newValue) => {
-            if (newValue) {
-              handleAutocompleteChange("u_type", newValue);
-            }
+            console.log("User type changed to:", newValue);
+            handleAutocompleteChange("u_type", newValue);
           }}
           getOptionLabel={(option) => {
+            if (!option) return '';
             if (typeof option === 'string') return option;
             return option.name || '';
           }}
