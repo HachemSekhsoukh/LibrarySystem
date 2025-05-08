@@ -914,7 +914,7 @@ def update_user_password(user_email, new_password):
         print(f"Error updating password for user {user_email}: {e}")
         return False
 
-def update_student_password(user_email, new_password):
+def update_student_password_db(user_email, new_password):
     """
     Update the student's password in the Supabase database.
     """
