@@ -1796,7 +1796,7 @@ def get_comments(resource_id):
     try:
         response = supabase \
             .from_('Rating') \
-            .select('comment','rating','rat_date') \
+            .select('comment','rating','rat_date','user_id', 'User(u_name)') \
             .eq('res_id', resource_id) \
             .execute()
         
