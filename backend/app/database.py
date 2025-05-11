@@ -1654,6 +1654,7 @@ def get_logs():
             .from_("Logs") \
             .select("id, message, created_at, s_id") \
             .order("created_at", desc=True) \
+            .limit(15) \
             .execute()
 
         logs = []
