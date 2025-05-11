@@ -33,6 +33,7 @@
   overflow: auto;
   width: 80%;
   margin-left: 17.5%;
+  margin-top: 2%;
   scrollbar-width: none;
   /* overflow-y: auto; */
 }
