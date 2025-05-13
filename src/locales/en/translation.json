@@ -119,6 +119,7 @@
     "borrows": "Borrows",
     "number_of_borrows": "Number of Borrows",
     "search": "Search",
+    "select_borrower_name": "Select borrower name",
 
     "manage_your_preferences": "Manage your preferences",
     "add_new_reader": "Add new reader",
@@ -166,5 +167,19 @@
     "staff_type_required": "Staff type is required.",
     "password_mismatch": "Passwords do not match.",
     "form_incomplete": "Please fill out all fields correctly.",
-    "password_strength": "Password must contain at least 8 characters, including uppercase, lowercase, numbers, and special characters."
+    "password_strength": "Password must contain at least 8 characters, including uppercase, lowercase, numbers, and special characters.",
+    "borrower_name_required": "Borrower name is required",
+    "transaction_type_required": "Transaction type is required",
+    "document_title_required": "Document title is required",
+    "failed_to_load_readers": "Failed to load readers. Please try again later.",
+    "failed_to_load_resources": "Failed to load resources. Please try again later.",
+    "failed_to_load_transactions": "Failed to load transactions. Please try again.",
+    "transaction_saved_successfully": "Transaction saved successfully!",
+    "failed_to_create_transaction": "Failed to create transaction",
+    "transaction_updated_successfully": "Transaction updated successfully!",
+    "failed_to_update_transaction": "Failed to update transaction",
+    "by": "by",
+    "unknown_author": "Unknown author",
+    "isbn": "ISBN",
+    "search_by_title_or_author": "Search by title or author"
 }

@@ -119,6 +119,7 @@
     "search": "Recherche",
     "transactions": "Transactions",
     "add_transaction": "Ajouter une transaction",
+    "select_borrower_name": "Sélectionnez le nom de l'emprunteur",
 
     "manage_your_preferences": "Gérer vos préférences",
     "add_new_reader": "Ajouter un nouveau lecteur",
@@ -166,5 +167,19 @@
     "resume": "Résumé",
     "confirm_delete": "Confirmer la suppression",
     "sure_to_delete": "Êtes-vous sûr de vouloir supprimer",
-    "sure_to_delete_reader_type": "Êtes-vous sûr de vouloir supprimer le type de lecteur"
+    "sure_to_delete_reader_type": "Êtes-vous sûr de vouloir supprimer le type de lecteur",
+    "borrower_name_required": "Le nom de l'emprunteur est requis",
+    "transaction_type_required": "Le type de transaction est requis",
+    "document_title_required": "Le titre du document est requis",
+    "failed_to_load_readers": "Échec du chargement des lecteurs. Veuillez réessayer plus tard.",
+    "failed_to_load_resources": "Échec du chargement des ressources. Veuillez réessayer plus tard.",
+    "failed_to_load_transactions": "Échec du chargement des transactions. Veuillez réessayer.",
+    "transaction_saved_successfully": "Transaction enregistrée avec succès !",
+    "failed_to_create_transaction": "Échec de la création de la transaction",
+    "transaction_updated_successfully": "Transaction mise à jour avec succès !",
+    "failed_to_update_transaction": "Échec de la mise à jour de la transaction",
+    "by": "par",
+    "unknown_author": "Auteur inconnu",
+    "isbn": "ISBN",
+    "search_by_title_or_author": "Rechercher par titre ou auteur"
 }
