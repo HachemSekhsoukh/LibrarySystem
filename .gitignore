@@ -27,3 +27,4 @@ dist-ssr
 /backend/app/__pycache__
 /backend/app/__pycache__
 *.pyc
+*.pyc

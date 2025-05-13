@@ -124,7 +124,7 @@
     "add_new_reader": "Ajouter un nouveau lecteur",
     "add_new_reader_type": "Ajouter un nouveau type de lecteur",
     "verify_new_readers": "Vérifier les nouveaux lecteurs",
-    "reader_types": "Type de lecteurs",
+    "reader_types": "Types de lecteurs",
     "category": "Categorie",
     "transaction_type": "Type de la transaction",
     "document_title": "Titre du document",
@@ -155,6 +155,16 @@
     "staff_type_required": "Le type de personnel est requis.",
     "password_mismatch": "Les mots de passe ne correspondent pas.",
     "form_incomplete": "Veuillez remplir tous les champs correctement.",
-    "password_strength": "Le mot de passe doit contenir au moins 8 caractères, incluant des majuscules, des minuscules, des chiffres et des caractères spéciaux."
-  }
-  
+    "password_strength": "Le mot de passe doit contenir au moins 8 caractères, incluant des majuscules, des minuscules, des chiffres et des caractères spéciaux.",
+    
+    "inventory_number": "Numéro d'inventaire",
+    "document_type": "Type de document",
+    "edition_year": "Édition (Année)",
+    "receiving_date": "Date de réception",
+    "available": "Disponible",
+    "unavailable": "Indisponible",
+    "resume": "Résumé",
+    "confirm_delete": "Confirmer la suppression",
+    "sure_to_delete": "Êtes-vous sûr de vouloir supprimer",
+    "sure_to_delete_reader_type": "Êtes-vous sûr de vouloir supprimer le type de lecteur"
+}
