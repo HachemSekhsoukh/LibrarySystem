@@ -210,7 +210,7 @@ const CirculationAdministration = () => {
                   setOpenPopup(true);
                 }}
                 disabled={!canCreate}
-                label= {t("add_new_reader_type")} 
+                label={t("add_new_reader_type")} 
                 lightBackgrnd={false} 
                 icon={<AddIcon />} 
                 size="large" 
@@ -221,7 +221,7 @@ const CirculationAdministration = () => {
       </div>
       
       {/* Add/Edit Reader Type Popup */}
-      <Popup title={isEditing ? t("edit_reader_type") : t("add_new_reader_type") } openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <Popup title={isEditing ? t("edit_reader_type") : t("add_new_reader_type")} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <div className="add-reader-type-form">
           <div className="form-row">
             <div className="form-group">
@@ -252,9 +252,9 @@ const CirculationAdministration = () => {
             <button className="dialog-cancel-button" onClick={() => {
               resetForm();
               setOpenPopup(false);
-            }}>Cancel</button>
+            }}>{t("cancel")}</button>
             <button className="dialog-save-button" onClick={handleAddReaderType}>
-              {isEditing ? 'Update' : 'Save'}
+              {isEditing ? t("update") : t("save")}
             </button>
           </div>
         </div>
@@ -265,15 +265,15 @@ const CirculationAdministration = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the reader type "{readerTypeToDelete?.name}"?
+            {t("sure_to_delete_reader_type")} "{readerTypeToDelete?.name}"?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
-          <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+          <Button onClick={() => setDeleteDialogOpen(false)} label={t("cancel")} lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label={t("delete")} lightBackgrnd={false} />
         </DialogActions>
       </Dialog>
 

@@ -1,14 +1,17 @@
 import { Grid, TextField, MenuItem } from "@mui/material";
 import "../../CSS/catalogage/resource_form.css";
+import { useTranslation } from "react-i18next";
 
 const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
+    const { t } = useTranslation();
+
     return (
         <Grid container spacing={2}>
             {/* Inventory Number */}
             <Grid item xs={6}>
                 <TextField
                     className="custom-textfield"
-                    label="Inventory Number"
+                    label={t("inventory_number")}
                     name="inventoryNum"
                     value={bookData.inventoryNum}
                     onChange={handleChange}
@@ -23,7 +26,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                 <TextField
                     className="custom-textfield"
                     select
-                    label="Document Type"
+                    label={t("document_type")}
                     name="type"
                     value={bookData.type}
                     onChange={handleChange}
@@ -43,7 +46,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={12}>
                 <TextField
                     className="custom-textfield"
-                    label="Title"
+                    label={t("title")}
                     name="title"
                     value={bookData.title}
                     onChange={handleChange}
@@ -57,7 +60,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={6}>
                 <TextField
                     className="custom-textfield"
-                    label="Author"
+                    label={t("author")}
                     name="author"
                     value={bookData.author}
                     onChange={handleChange}
@@ -71,7 +74,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={6}>
                 <TextField
                     className="custom-textfield"
-                    label="Editor"
+                    label={t("editor")}
                     name="editor"
                     value={bookData.editor}
                     onChange={handleChange}
@@ -82,24 +85,24 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             </Grid>
             
             <Grid item xs={12} sm={6}>
-            <TextField
-                label="Edition (Year)"
-                name="edition"
-                type="number"
-                inputProps={{ min: 1000, max: 9999 }}
-                value={bookData.edition}
-                onChange={handleChange}
-                variant="outlined"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-            />
+                <TextField
+                    label={t("edition_year")}
+                    name="edition"
+                    type="number"
+                    inputProps={{ min: 1000, max: 9999 }}
+                    value={bookData.edition}
+                    onChange={handleChange}
+                    variant="outlined"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                />
             </Grid>
 
             {/* ISBN */}
             <Grid item xs={6}>
                 <TextField
                     className="custom-textfield"
-                    label="ISBN"
+                    label={t("isbn")}
                     name="isbn"
                     value={bookData.isbn}
                     onChange={handleChange}
@@ -113,7 +116,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={6}>
                 <TextField
                     className="custom-textfield"
-                    label="Price"
+                    label={t("price")}
                     name="price"
                     type="number"
                     value={bookData.price}
@@ -128,7 +131,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={6}>
                 <TextField
                     className="custom-textfield"
-                    label="Cote"
+                    label={t("cote")}
                     name="cote"
                     value={bookData.cote}
                     onChange={handleChange}
@@ -142,7 +145,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={6}>
                 <TextField
                     className="custom-textfield"
-                    label="Receiving Date"
+                    label={t("receiving_date")}
                     name="receivingDate"
                     type="date"
                     value={bookData.receivingDate}
@@ -158,7 +161,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                 <TextField
                     className="custom-textfield"
                     select
-                    label="Status"
+                    label={t("status")}
                     name="status"
                     value={bookData.status}
                     onChange={handleChange}
@@ -166,8 +169,8 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                     fullWidth
                     InputLabelProps={{ shrink: true }}
                 >
-                    <MenuItem value={1}>Available</MenuItem>
-                    <MenuItem value={0}>Unavailable</MenuItem>
+                    <MenuItem value={1}>{t("available")}</MenuItem>
+                    <MenuItem value={0}>{t("unavailable")}</MenuItem>
                 </TextField>
             </Grid>
 
@@ -175,7 +178,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={12}>
                 <TextField
                     className="custom-textfield"
-                    label="Description"
+                    label={t("description")}
                     name="description"
                     value={bookData.description}
                     onChange={handleChange}
@@ -191,7 +194,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             <Grid item xs={12}>
                 <TextField
                     className="custom-textfield"
-                    label="Observation"
+                    label={t("observation")}
                     name="observation"
                     value={bookData.observation}
                     onChange={handleChange}
@@ -204,7 +207,7 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
             </Grid>
             <Grid item xs={12}>
                 <TextField
-                    label="Résumé"
+                    label={t("resume")}
                     name="resume"
                     value={bookData.resume}
                     onChange={handleChange}

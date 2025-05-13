@@ -209,7 +209,7 @@ const CatalogageAdministration = () => {
                 setOpenPopup(true);
               }} 
               disabled={!canCreate}
-              label= {t("add_new_resource_type")} 
+              label={t("add_new_resource_type")} 
               lightBackgrnd={false} 
               icon={<AddIcon />} 
               size="large" 
@@ -252,7 +252,7 @@ const CatalogageAdministration = () => {
               setOpenPopup(false);
             }}>{t("cancel")}</button>
             <button className="dialog-save-button" onClick={handleAddResourceType}>
-              {isEditing ? t('update') : t('save')}
+              {isEditing ? t("update") : t("save")}
             </button>
           </div>
         </div>
@@ -263,15 +263,15 @@ const CatalogageAdministration = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the resource type "{resourceTypeToDelete?.name}"?
+            {t("sure_to_delete")} "{resourceTypeToDelete?.name}"?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
-          <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+          <Button onClick={() => setDeleteDialogOpen(false)} label={t("cancel")} lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label={t("delete")} lightBackgrnd={false} />
         </DialogActions>
       </Dialog>
 
