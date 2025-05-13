@@ -156,7 +156,7 @@
     "edit_book": "Modifier le livre",
     "import_books": "Importer des livres",
     "importing...": "Importation en cours...",
-    
+
     "resource_types": "Types de ressources",
     "add_new_resource": "Ajouter une nouvelle ressource",
     "add_new_resource_type": "Ajouter un nouveau type de ressource",
@@ -189,6 +189,14 @@
     "failed_to_load_readers": "Échec du chargement des lecteurs. Veuillez réessayer plus tard.",
     "failed_to_load_resources": "Échec du chargement des ressources. Veuillez réessayer plus tard.",
     "failed_to_load_transactions": "Échec du chargement des transactions. Veuillez réessayer.",
+    "successfully_sent_email_notifications": "{{count}} notifications par e-mail envoyées avec succès aux retardataires",
+    "failed_to_send_email_notifications": "Échec de l'envoi des notifications par e-mail",
+    "rejecting_selected_transactions": "Rejet des transactions sélectionnées",
+    "late_returns": "Retours en retard",
+    "item_selected": "{{count}} élément sélectionné",
+    "block_user": "Bloquer l'utilisateur",
+    "send_mail_notice": "Envoyer un avis par e-mail",
+    "sending": "Envoi...",
     "transaction_saved_successfully": "Transaction enregistrée avec succès !",
     "failed_to_create_transaction": "Échec de la création de la transaction",
     "transaction_updated_successfully": "Transaction mise à jour avec succès !",
@@ -234,5 +242,12 @@
     "ratings_and_comments": "Évaluations et commentaires",
     "resource_history": "Historique des ressources",
     "no_description_available": "Aucune description disponible",
-    "no_resume_available": "Aucun résumé disponible"
+    "no_resume_available": "Aucun résumé disponible",
+    "price": "Prix",
+    "editor": "Éditeur",
+    "description": "Description",
+    "observation": "Observation",
+    "edit_staff_member": "Modifier le membre du staff",
+    "staff_member": "membre du staff",
+    "edit_staff_type": "Modifier le type de staff"
 }
