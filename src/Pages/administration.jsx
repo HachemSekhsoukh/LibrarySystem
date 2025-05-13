@@ -519,7 +519,7 @@ const Administration = () => {
         <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            {t("are_you_sure_delete")} {isStaffType ? t("staff_type") : t("staff_member")} "{itemToDelete?.name}"?
+            {t("sure_to_delete")} {isStaffType ? t("staff_type") : t("staff_member")} "{itemToDelete?.name}"?
           </Typography>
         </DialogContent>
         <DialogActions>

@@ -153,7 +153,7 @@
     "status": "Status",
     "books": "Books",
     "add_new_book": "Add New Book",
-    "edit_book": "Edit book",
+    "edit_book": "Edit Book",
     "import_books": "Import Books",
     "importing...": "Importing...",
 
@@ -189,6 +189,14 @@
     "failed_to_load_readers": "Failed to load readers. Please try again later.",
     "failed_to_load_resources": "Failed to load resources. Please try again later.",
     "failed_to_load_transactions": "Failed to load transactions. Please try again.",
+    "successfully_sent_email_notifications": "Successfully sent {{count}} email notifications to late returners",
+    "failed_to_send_email_notifications": "Failed to send email notifications",
+    "rejecting_selected_transactions": "Rejecting selected transactions",
+    "late_returns": "Late Returns",
+    "item_selected": "{{count}} item selected",
+    "block_user": "Block user",
+    "send_mail_notice": "Send a mail notice",
+    "sending": "Sending...",
     "transaction_saved_successfully": "Transaction saved successfully!",
     "failed_to_create_transaction": "Failed to create transaction",
     "transaction_updated_successfully": "Transaction updated successfully!",
@@ -235,5 +243,12 @@
     "ratings_and_comments": "Ratings and Comments",
     "resource_history": "Resource History",
     "no_description_available": "No description available",
-    "no_resume_available": "No resume available"
+    "no_resume_available": "No resume available",
+    "price": "Price",
+    "editor": "Editor",
+    "description": "Description",
+    "observation": "Observation",
+    "edit_staff_member": "Edit staff member",
+    "staff_member": "staff member",
+    "edit_staff_type": "Modify staff member"
 }

@@ -33,7 +33,7 @@ const Late = () => {
       setTransactionError(null);
     } catch (err) {
       console.error(err);
-      setTransactionError("Failed to load transactions. Please try again.");
+      setTransactionError(t("failed_to_load_transactions"));
     } finally {
       setLoadingTransactions(false);
     }
@@ -44,14 +44,14 @@ const Late = () => {
   }, []);
 
   const columns = [
-    { label: "ID", key: "id" },
-    { label: "Title", key: "title" },
-    { label: "Borrower Name", key: "borrower_name" },
-    { label: "Date", key: "date" },
+    { label: t("id"), key: "id" },
+    { label: t("title"), key: "title" },
+    { label: t("borrower_name"), key: "borrower_name" },
+    { label: t("date"), key: "date" },
   ];
   const pendingColumns = [
     { 
-      label: "Select", 
+      label: t("select"), 
       key: "select",
       render: (value, row) => (
         <input
@@ -61,10 +61,10 @@ const Late = () => {
         />
       )
     },
-    { label: "ID", key: "id" },
-    { label: "Title", key: "title" },
-    { label: "Borrower Name", key: "borrower_name" },
-    { label: "Date", key: "date" },
+    { label: t("id"), key: "id" },
+    { label: t("title"), key: "title" },
+    { label: t("borrower_name"), key: "borrower_name" },
+    { label: t("date"), key: "date" },
   ];
 
   const handleCheckboxChange = (transactionId) => {
@@ -95,7 +95,7 @@ const Late = () => {
       
       setSnackbar({
         open: true,
-        message: `Successfully sent ${result.sent} email notifications to late returners`,
+        message: t("successfully_sent_email_notifications", { count: result.sent }),
         severity: "success"
       });
       
@@ -105,7 +105,7 @@ const Late = () => {
     } catch (error) {
       setSnackbar({
         open: true,
-        message: error.message || "Failed to send email notifications",
+        message: error.message || t("failed_to_send_email_notifications"),
         severity: "error"
       });
     } finally {
@@ -114,7 +114,7 @@ const Late = () => {
   };
 
   const handleRejectSelected = () => {
-    console.log("Rejecting selected transactions:", selectedTransactions);
+    console.log(t("rejecting_selected_transactions"), selectedTransactions);
     // Leave empty for now
   };
 
@@ -140,7 +140,7 @@ const Late = () => {
 
         {/* Button to open popup */}
         <div className="bottom-buttons">
-                  <Button onClick={() => setVerifyPopupOpen(true)} label={t("verify_late_returns")} lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
+          <Button onClick={() => setVerifyPopupOpen(true)} label={t("verify_late_returns")} lightBackgrnd={true} icon={<FileUploadIcon />} size="large" />
         </div>
 
         {/* Popup */}
@@ -167,7 +167,7 @@ const Late = () => {
                 columns={pendingColumns}
                 data={transactions}
                 showActions={false}
-                title={"Late Returns"}
+                title={t("late_returns")}
                 onRowSelect={handleCheckboxChange}
                 selectedRows={selectedTransactions}
                 onSelectAll={handleSelectAll}
@@ -177,7 +177,7 @@ const Late = () => {
             {/* Action buttons */}
             <div className="verify-actions">
               <div className="selected-count">
-                {selectedTransactions.length} item{selectedTransactions.length !== 1 ? 's' : ''} selected
+                {selectedTransactions.length} {t("item_selected", { count: selectedTransactions.length })}
               </div>
               <div className="verify-buttons">
                 <button
@@ -185,14 +185,14 @@ const Late = () => {
                   onClick={handleRejectSelected}
                   disabled={selectedTransactions.length === 0}
                 >
-                  Block user
+                  {t("block_user")}
                 </button>
                 <button
                   className="verify-button"
                   onClick={handleVerifySelected}
                   disabled={selectedTransactions.length === 0 || sending}
                 >
-                  {sending ? "Sending..." : "Send a mail notice"}
+                  {sending ? t("sending") : t("send_mail_notice")}
                 </button>
               </div>
             </div>
