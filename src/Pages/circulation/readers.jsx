@@ -64,20 +64,20 @@ const Readers = () => {
   const validateForm = () => {
     const errors = {};
   
-    if (!newReader.u_name.trim()) errors.u_name = "Name is required";
-    if (!newReader.u_birthDate) errors.u_birthDate = "Date of birth is required";
+    if (!newReader.u_name.trim()) errors.u_name = t("name_required");
+    if (!newReader.u_birthDate) errors.u_birthDate = t("birthdate_required");
     if (!newReader.u_email) {
-      errors.u_email = "Email is required";
+      errors.u_email = t("email_required");
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(newReader.u_email)) {
-      errors.u_email = "Invalid email format";
+      errors.u_email = t("email_invalid");
     }
     if (!newReader.u_phone) {
-      errors.u_phone = "Phone number is required";
+      errors.u_phone = t("phone_required");
     } else if (!/^\+?\d{7,15}$/.test(newReader.u_phone)) {
-      errors.u_phone = "Invalid phone number";
+      errors.u_phone = t("phone_invalid");
     }
-    if (!isEditing && !newReader.u_password) errors.u_password = "Password is required";
-    if (!newReader.u_type) errors.u_type = "User type is required";
+    if (!isEditing && !newReader.u_password) errors.u_password = t("password_required");
+    if (!newReader.u_type) errors.u_type = t("user_type_required");
   
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -88,19 +88,19 @@ const Readers = () => {
     const loadInitialData = async () => {
       setLoading(true);
       try {
-        console.log("Starting to load initial data...");
+        console.log(t("starting_to_load_initial_data"));
         const [readersData, userTypesData] = await Promise.all([
           fetchReaders(),
           fetchUserTypes()
         ]);
-        console.log("Successfully loaded data:", { readersData, userTypesData });
+        console.log(t("successfully_loaded_data"), { readersData, userTypesData });
         setReaders(readersData);
         setUserTypes(userTypesData);
       } catch (error) {
-        console.error("Error loading initial data:", error);
+        console.error(t("error_loading_initial_data"), error);
         setSnackbar({ 
           open: true, 
-          message: `Failed to load data: ${error.message}`, 
+          message: `${t("failed_to_load_data")}: ${error.message}`, 
           severity: "error" 
         });
       } finally {
@@ -117,15 +117,13 @@ const Readers = () => {
       const loadPendingReaders = async () => {
         setPendingReadersLoading(true);
         try {
-          console.log("Loading pending readers...");
           const data = await fetchPendingReaders();
-          console.log("Successfully loaded pending readers:", data);
           setPendingReaders(data);
         } catch (error) {
-          console.error("Error loading pending readers:", error);
+          console.error(t("error_loading_pending_readers"), error);
           setSnackbar({ 
             open: true, 
-            message: `Failed to load pending readers: ${error.message}`, 
+            message: `${t("failed_to_load_pending_readers")}: ${error.message}`, 
             severity: "error" 
           });
         } finally {
@@ -165,11 +163,11 @@ const Readers = () => {
   
 
   const handleAddReader = async () => {
-    console.log("Starting to add reader with data:", newReader);
+    console.log(t("starting_to_add_reader_with_data"), newReader);
     
     if (!validateForm()) {
-      console.log("Form validation failed with errors:", formErrors);
-      setSnackbar({ open: true, message: "Please fix the form errors", severity: "error" });
+      console.log(t("form_validation_failed_with_errors"), formErrors);
+      setSnackbar({ open: true, message: t("please_fix_form_errors"), severity: "error" });
       return;
     }
 
@@ -181,7 +179,7 @@ const Readers = () => {
         readerDataToSend.u_type = readerDataToSend.u_type.id;
       }
       
-      console.log("Sending reader data to server:", readerDataToSend);
+      console.log(t("sending_reader_data_to_server"), readerDataToSend);
       
       let response;
       if (isEditing) {
@@ -190,11 +188,11 @@ const Readers = () => {
         response = await addReader(readerDataToSend);
       }
       
-      console.log("Server response:", response);
+      console.log(t("server_response"), response);
 
       setSnackbar({ 
         open: true, 
-        message: isEditing ? "Reader updated successfully" : "Reader added successfully", 
+        message: isEditing ? t("reader_updated_successfully") : t("reader_added_successfully"), 
         severity: "success" 
       });
       setOpenPopup(false);
@@ -204,8 +202,8 @@ const Readers = () => {
       const updatedData = await fetchReaders();
       setReaders(updatedData);
     } catch (error) {
-      console.error(isEditing ? "Error updating reader:" : "Error adding reader:", error);
-      setSnackbar({ open: true, message: error.message || "Error saving reader", severity: "error" });
+      console.error(isEditing ? t("error_updating_reader") : t("error_adding_reader"), error);
+      setSnackbar({ open: true, message: error.message || t("error_saving_reader"), severity: "error" });
     }
   };
 
@@ -236,7 +234,7 @@ const Readers = () => {
     if (selectedReaders.length === 0) {
       setSnackbar({ 
         open: true, 
-        message: "Please select at least one reader to verify", 
+        message: t("select_at_least_one_reader_to_verify"), 
         severity: "warning" 
       });
       return;
@@ -253,7 +251,7 @@ const Readers = () => {
 
       setSnackbar({ 
         open: true, 
-        message: `Successfully verified ${selectedReaders.length} reader(s)`, 
+        message: t("successfully_verified_readers", { count: selectedReaders.length }), 
         severity: "success" 
       });
 
@@ -265,10 +263,10 @@ const Readers = () => {
         setVerifyReadersPopup(false);
       }
     } catch (error) {
-      console.error("Error verifying readers:", error);
+      console.error(t("error_verifying_readers"), error);
       setSnackbar({ 
         open: true, 
-        message: "Failed to verify selected readers", 
+        message: t("failed_to_verify_selected_readers"), 
         severity: "error" 
       });
     }
@@ -278,7 +276,7 @@ const Readers = () => {
     if (selectedReaders.length === 0) {
       setSnackbar({ 
         open: true, 
-        message: "Please select at least one reader to reject", 
+        message: t("select_at_least_one_reader_to_reject"), 
         severity: "warning" 
       });
       return;
@@ -295,7 +293,7 @@ const Readers = () => {
   
       setSnackbar({ 
         open: true, 
-        message: `Successfully rejected ${selectedReaders.length} reader(s)`, 
+        message: t("successfully_rejected_readers", { count: selectedReaders.length }), 
         severity: "success" 
       });
   
@@ -306,10 +304,10 @@ const Readers = () => {
         setVerifyReadersPopup(false);
       }
     } catch (error) {
-      console.error("Error rejecting readers:", error);
+      console.error(t("error_rejecting_readers"), error);
       setSnackbar({ 
         open: true, 
-        message: "Failed to reject selected readers", 
+        message: t("failed_to_reject_selected_readers"), 
         severity: "error" 
       });
     }
@@ -345,17 +343,17 @@ const Readers = () => {
       
       setSnackbar({
         open: true,
-        message: "Reader deleted successfully!",
+        message: t("reader_deleted_successfully"),
         severity: "success"
       });
       
       const updatedData = await fetchReaders();
       setReaders(updatedData);
     } catch (error) {
-      console.error("Error deleting reader:", error);
+      console.error(t("error_deleting_reader"), error);
       setSnackbar({
         open: true,
-        message: `Failed to delete reader: ${error.message}`,
+        message: `${t("failed_to_delete_reader")}: ${error.message}`,
         severity: "error"
       });
     } finally {
@@ -371,10 +369,10 @@ const Readers = () => {
       const history = await fetchReaderHistory(reader.id);
       setReaderTransactions(history);
     } catch (error) {
-      console.error("Error fetching reader history:", error);
+      console.error(t("error_fetching_reader_history"), error);
       setSnackbar({
         open: true,
-        message: "Failed to fetch reader's history",
+        message: t("failed_to_fetch_reader_history"),
         severity: "error"
       });
     } finally {
@@ -411,7 +409,7 @@ const Readers = () => {
 
   const pendingColumns = [
     { 
-      label: "Select", 
+      label: t("select"), 
       key: "select",
       render: (value, row) => (
         <input
@@ -424,8 +422,8 @@ const Readers = () => {
     { label: t("id"), key: "id" },
     { label: t("name"), key: "name" },
     { label: t("email"), key: "email" },
-    { label: t("phone"), key: "phone" },
-    { label: t("type"), key: "type" }
+    { label: t("phone_number"), key: "phone" },
+    { label: t("category"), key: "type" }
   ];
 
   return (
@@ -458,7 +456,7 @@ const Readers = () => {
       </div>
       
       {/* Add/Edit Reader Popup */}
-      <Popup title={isEditing ? "Edit Reader" : "Add New Reader"} openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <Popup title={isEditing ? t("edit_reader") : t("add_new_reader")} openPopup={openPopup} setOpenPopup={setOpenPopup}>
   <div className="add-reader-form">
     <div className="form-row">
       <div className="form-group">
@@ -516,7 +514,7 @@ const Readers = () => {
 
     <div className="form-row">
       <div className="form-group">
-        <label>{t("password")} {isEditing && "(leave blank to keep current password)"}</label>
+        <label>{t("password")} {isEditing && t("leave_blank_to_keep_password")}</label>
         <TextField
           fullWidth
           type="password"
@@ -534,7 +532,7 @@ const Readers = () => {
           options={userTypes}
           value={newReader.u_type}
           onChange={(event, newValue) => {
-            console.log("User type changed to:", newValue);
+            console.log(t("user_type_changed_to"), newValue);
             handleAutocompleteChange("u_type", newValue);
           }}
           getOptionLabel={(option) => {
@@ -552,7 +550,7 @@ const Readers = () => {
           renderInput={(params) => (
             <TextField
               {...params}
-              placeholder="Select user type"
+              placeholder={t("select_user_type")}
               variant="outlined"
               className="text-field"
               error={!!formErrors.u_type}
@@ -569,7 +567,7 @@ const Readers = () => {
         setOpenPopup(false);
         resetForm();
       }}>{t("cancel")}</button>
-      <button className="dialog-save-button" onClick={handleAddReader}>Save</button>
+      <button className="dialog-save-button" onClick={handleAddReader}>{t("save")}</button>
     </div>
   </div>
 </Popup>
@@ -592,9 +590,9 @@ const Readers = () => {
           </div>
           
           {pendingReadersLoading ? (
-            <div className="loading-message">Loading pending readers...</div>
+            <div className="loading-message">{t("loading_pending_readers")}</div>
           ) : pendingReaders.length === 0 ? (
-            <div className="no-readers-message">No pending readers to verify</div>
+            <div className="no-readers-message">{t("no_pending_readers")}</div>
           ) : (
             <>
               <div className="verify-readers-table">
@@ -602,7 +600,7 @@ const Readers = () => {
                   columns={pendingColumns}
                   data={pendingReaders}
                   showActions={false}
-                  title={"Pending Readers"}
+                  title={t("pending_readers")}
                   loading={pendingReadersLoading}
                   onRowSelect={setSelectedReaders}
                   selectedRows={selectedReaders}
@@ -610,7 +608,7 @@ const Readers = () => {
               </div>
               <div className="verify-actions">
                 <div className="selected-count">
-                  {selectedReaders.length} reader{selectedReaders.length !== 1 ? 's' : ''} selected
+                  {selectedReaders.length} {t("reader_selected", { count: selectedReaders.length })}
                 </div>
                 <div className="verify-buttons">
                   <button
@@ -618,14 +616,14 @@ const Readers = () => {
                     onClick={handleRejectSelected}
                     disabled={selectedReaders.length === 0}
                   >
-                    Reject Selected
+                    {t("reject_selected")}
                   </button>
                   <button
                     className="verify-button"
                     onClick={handleVerifySelected}
                     disabled={selectedReaders.length === 0}
                   >
-                    Verify Selected
+                    {t("verify_selected")}
                   </button>
                 </div>
               </div>
@@ -639,15 +637,15 @@ const Readers = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete reader "{readerToDelete?.name}"?
+            {t("confirm_delete_reader", { name: readerToDelete?.name })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
-          <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+          <Button onClick={() => setDeleteDialogOpen(false)} label={t("cancel")} lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label={t("delete")} lightBackgrnd={false} />
         </DialogActions>
       </Dialog>
 
@@ -703,7 +701,7 @@ const Readers = () => {
             <div className="transaction-history">
               <h3>{t("transaction_history")}</h3>
               {loadingTransactions ? (
-                <div className="loading-message">Loading transactions...</div>
+                <div className="loading-message">{t("loading_transactions")}</div>
               ) : readerTransactions.length === 0 ? (
                 <div className="no-transactions-message">{t("no_transactions")}</div>
               ) : (
