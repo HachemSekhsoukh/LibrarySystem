@@ -28,3 +28,4 @@ dist-ssr
 /backend/app/__pycache__
 *.pyc
 *.pyc
+backend/app/routes/__pycache__/resource_types.cpython-312.pyc

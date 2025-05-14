@@ -115,7 +115,7 @@ const Dashboard = () => {
       </div>
 
       {/* Most Borrowed Books Table */}
-      <div className="recent-transactions-container">
+      <div id="most-borrowed-section" className="recent-transactions-container">
       {loadingMostBorrowed ? <div className="loader" /> : <Table columns={columns2} data={mostBorrowed} showActions={false} title={t("most_borrowed_books")} loading={loadingMostBorrowed} />}
       </div>
     </div>
