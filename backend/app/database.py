@@ -464,11 +464,6 @@ def create_reservation(user_email, user_id, resource_id, transaction_type):
     number of borrows for the resource in the Resource table.
     """
     try:
-        print("create_reservation")
-        print(user_id)
-        print(resource_id)
-        print(transaction_type)
-        print("--------------------------------")
         # First, get the latest res_id to increment it
         latest_res = supabase.from_("Reservation").select("res_id").order("res_id", desc=True).limit(1).execute()
         
@@ -491,7 +486,8 @@ def create_reservation(user_email, user_id, resource_id, transaction_type):
             'res_user_id': user_id,
             'res_resource_id': resource_id,
             'res_staff_id': None,
-            'res_type': type_map.get(transaction_type, 1)
+            'res_type': type_map.get(transaction_type, 1),
+            'res_date': datetime.now().strftime('%Y-%m-%d') 
         }
         
         # Insert into the Reservation table

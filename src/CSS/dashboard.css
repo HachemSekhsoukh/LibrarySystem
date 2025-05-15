@@ -20,6 +20,10 @@
     height: 250px;
 }
 
+#most-borrowed-section{
+    margin-top: 1rem;
+}
+
 .recent-transactions-container{
     display: flex;
     flex-direction: column;
@@ -30,6 +34,7 @@
     font-family: "Inter";
     background-color: var(--secondary-background-color);
     width: 100%;
+    padding: 0.5rem;
     max-height: 30%;
     border-radius: 15px;
 }
