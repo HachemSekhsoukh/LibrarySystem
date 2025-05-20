@@ -273,7 +273,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote,r_edition, r_resume, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type, "
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote,r_edition, r_resume, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type,cover_url, "
             "Resource_type(rt_name)"
         ).execute()
         status_map = {
@@ -298,7 +298,8 @@ def get_resources():
             'type': resource['r_type'],
             'description': resource['r_description'],
             'type_name': resource['Resource_type']['rt_name'] if resource.get('Resource_type') else None,
-            'status_name': status_map.get(resource['r_status'], "Unknown")  # Map status to name
+            'status_name': status_map.get(resource['r_status'], "Unknown"),
+            'image_url' :  resource['cover_url'],
         } for resource in response.data]
 
         return resources
@@ -1930,11 +1931,33 @@ def add_comment(data):
         print(f"Error adding comment: {e}")
         return {'success': False, 'error': str(e)}
     
+def add_report(data):
+    try:
+        reporter = data.get('reporter_id')
+        comment = data.get('comment_id')
+        reason = data.get('reason')
+
+        response = supabase \
+                    .from_("comment_report") \
+                    .insert({
+                        'reporter_id': reporter,
+                        'comment_id': comment,
+                        'reason':reason,
+                    }) \
+                    .execute()
+        if response.data:
+            return {'success': True}
+        else:
+            return {'success': False, 'error':'failed to report comment'}
+    except Exception as e :
+        print(f"Error reporting comment: {e}")
+        return {'success': False, 'error': str(e)}
+    
 def get_comments(resource_id):
     try:
         response = supabase \
             .from_('Rating') \
-            .select('comment','rating','rat_date','user_id', 'User(u_name)') \
+            .select('rat_id','comment','rating','rat_date','user_id', 'User(u_name)') \
             .eq('res_id', resource_id) \
             .execute()
         

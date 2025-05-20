@@ -4,7 +4,7 @@ Routes related to resources (books and other library items)
 
 from flask import jsonify, request
 from app import app
-from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history,add_comment,get_comments
+from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history,add_comment,get_comments,add_report
 import pandas as pd
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 import io
@@ -282,3 +282,24 @@ def get_resource_comments(resource_id):
             'success': False,
             'error': str(e)
         }), 500
+
+
+@app.route('/api/report', methods=['POST'])
+def create_report():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success':False, 'error':'No data'}),400
+        required_fields = ['reporter_id','comment_id','reason']
+        missing_fields = [field for field in required_fields if field not in data or not data[field]]
+    
+        if missing_fields:
+            return jsonify({'success': False, 'error': f'Missing required fields: {", ".join(missing_fields)}'}), 400
+        result = add_report(data)
+        if result['success']:
+            return jsonify(result), 200
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        print(' error in report comment route')
+        return jsonify({'error': str(e)}), 500
