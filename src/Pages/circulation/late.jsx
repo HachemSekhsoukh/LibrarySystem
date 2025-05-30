@@ -44,7 +44,6 @@ const Late = () => {
   }, []);
 
   const columns = [
-    { label: t("id"), key: "id" },
     { label: t("title"), key: "title" },
     { label: t("borrower_name"), key: "borrower_name" },
     { label: t("date"), key: "date" },
@@ -61,7 +60,6 @@ const Late = () => {
         />
       )
     },
-    { label: t("id"), key: "id" },
     { label: t("title"), key: "title" },
     { label: t("borrower_name"), key: "borrower_name" },
     { label: t("date"), key: "date" },

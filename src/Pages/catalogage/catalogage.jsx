@@ -329,7 +329,6 @@ const Catalogage = () => {
   };
 
   const columns = [
-    { label: t("id"), key: "id" },
     { label: t("title"), key: "title" },
     { label: t("author"), key: "author" },
     { label: t("type"), key: "type_name" },
@@ -432,103 +431,102 @@ const Catalogage = () => {
           </button>
         </DialogTitle>
         <DialogContent>
-          {/* Book Details Section - Always visible */}
-          <Grid container spacing={2} sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Book Details
-              </Typography>
-            </Grid>
-            
-            {/* Basic Information */}
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Inventory Number</Typography>
-              <Typography variant="body1">{selectedResource?.inventoryNum || 'N/A'}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Type</Typography>
-              <Typography variant="body1">{selectedResource?.type_name}</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" color="textSecondary">Title</Typography>
-              <Typography variant="body1">{selectedResource?.title}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Author</Typography>
-              <Typography variant="body1">{selectedResource?.author}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Editor</Typography>
-              <Typography variant="body1">{selectedResource?.editor || 'N/A'}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Edition</Typography>
-              <Typography variant="body1">{selectedResource?.edition || 'N/A'}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">ISBN</Typography>
-              <Typography variant="body1">{selectedResource?.isbn || 'N/A'}</Typography>
-            </Grid>
-            
-            {/* Additional Details */}
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Price</Typography>
-              <Typography variant="body1">{selectedResource?.price ? `$${selectedResource.price}` : 'N/A'}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Cote</Typography>
-              <Typography variant="body1">{selectedResource?.cote || 'N/A'}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Receiving Date</Typography>
-              <Typography variant="body1">{selectedResource?.receivingDate || 'N/A'}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Number of Borrows</Typography>
-              <Typography variant="body1">{selectedResource?.numofborrows || 0}</Typography>
-            </Grid>
-            
-            {/* Status and Description */}
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Status</Typography>
-              <Chip
-                label={selectedResource?.status_name}
-                color={
-                  selectedResource?.status_name === 'Available' ? 'success' :
-                  selectedResource?.status_name === 'Borrowed' ? 'warning' :
-                  'error'
-                }
-                size="small"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle2" color="textSecondary">Observation</Typography>
-              <Typography variant="body1">{selectedResource?.observation || 'N/A'}</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" color="textSecondary">Description</Typography>
-              <Typography variant="body1">{selectedResource?.description || 'No description available'}</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" color="textSecondary">Resume</Typography>
-              <Typography variant="body1">{selectedResource?.resume || 'No resume available'}</Typography>
-            </Grid>
-          </Grid>
-
           {/* Tabs Section */}
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+              <Tab label="Details" />
               <Tab label="History" />
               <Tab label="Ratings" />
             </Tabs>
           </Box>
 
-          {activeTab === 0 ? (
+          {activeTab === 0 && selectedResource ? (
+            /* Book Details Section - Moved into a tab */
+            <Grid container spacing={2} sx={{ mb: 3, p: 2, borderRadius: 1 }}>
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Book Details
+                </Typography>
+              </Grid>
+              
+              {/* Basic Information */}
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Inventory Number</Typography>
+                <Typography variant="body1">{selectedResource?.inventoryNum || 'N/A'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Type</Typography>
+                <Typography variant="body1">{selectedResource?.type_name}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" color="textSecondary">Title</Typography>
+                <Typography variant="body1">{selectedResource?.title}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Author</Typography>
+                <Typography variant="body1">{selectedResource?.author}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Editor</Typography>
+                <Typography variant="body1">{selectedResource?.editor || 'N/A'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Edition</Typography>
+                <Typography variant="body1">{selectedResource?.edition || 'N/A'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">ISBN</Typography>
+                <Typography variant="body1">{selectedResource?.isbn || 'N/A'}</Typography>
+              </Grid>
+              
+              {/* Additional Details */}
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Price</Typography>
+                <Typography variant="body1">{selectedResource?.price ? `$${selectedResource.price}` : 'N/A'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Cote</Typography>
+                <Typography variant="body1">{selectedResource?.cote || 'N/A'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Receiving Date</Typography>
+                <Typography variant="body1">{selectedResource?.receivingDate || 'N/A'}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Number of Borrows</Typography>
+                <Typography variant="body1">{selectedResource?.numofborrows || 0}</Typography>
+              </Grid>
+              
+              {/* Status and Description */}
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Status</Typography>
+                <Chip
+                  label={selectedResource?.status_name}
+                  color={
+                    selectedResource?.status_name === 'Available' ? 'success' :
+                    selectedResource?.status_name === 'Borrowed' ? 'warning' :
+                    'error'
+                  }
+                  size="small"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2" color="textSecondary">Observation</Typography>
+                <Typography variant="body1">{selectedResource?.observation || 'N/A'}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" color="textSecondary">Description</Typography>
+                <Typography variant="body1">{selectedResource?.description || 'No description available'}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" color="textSecondary">Resume</Typography>
+                <Typography variant="body1">{selectedResource?.resume || 'No resume available'}</Typography>
+              </Grid>
+            </Grid>
+          ) : activeTab === 1 ? (
             // History Tab
             <>
-              <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-                Borrowing History
-              </Typography>
+              
               {loadingTransactions ? (
                 <div className="loader"></div>
               ) : (

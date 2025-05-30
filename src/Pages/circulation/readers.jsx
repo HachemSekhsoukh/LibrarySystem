@@ -399,7 +399,6 @@ const Readers = () => {
   ];
 
   const columns = [
-    { label: t("id"), key: "id" },
     { label: t("name"), key: "name" },
     { label: t("date_of_birth"), key: "dob" },
     { label: t("email"), key: "email" },
@@ -419,7 +418,6 @@ const Readers = () => {
         />
       )
     },
-    { label: t("id"), key: "id" },
     { label: t("name"), key: "name" },
     { label: t("email"), key: "email" },
     { label: t("phone_number"), key: "phone" },

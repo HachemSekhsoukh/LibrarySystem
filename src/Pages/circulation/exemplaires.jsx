@@ -247,7 +247,6 @@ const Exemplaires = () => {
   };
 
   const columns = [
-    { label: t("id"), key: "id" },
     { label: t("title"), key: "title" },
     { label: t("borrower_name"), key: "borrower_name" },
     { label: t("type"), key: "type" },

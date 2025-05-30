@@ -184,7 +184,6 @@ const CirculationAdministration = () => {
   };
 
   const columns = [
-    { label: t("id"), key: "id" },
     { label: t("name"), key: "name" },
     { label: t("borrow_limit"), key: "borrow" },
     { label: t("books_limit"), key: "ut_books" },
