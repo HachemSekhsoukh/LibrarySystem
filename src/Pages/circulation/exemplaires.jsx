@@ -153,7 +153,7 @@ const Exemplaires = () => {
     loadTransactions();
   }, []);
 
-  const transactionTypes = ["Borrow", "Return", "Renew","Late"];
+  const transactionTypes = ["Borrow", "Return", "Renew_1", "Late", "Renew_2"];
 
   const handleAutocompleteChange = (name, value) => {
     setTransactionData({ ...transactionData, [name]: value || "" });
@@ -253,6 +253,33 @@ const Exemplaires = () => {
     { label: t("type"), key: "type" },
     { label: t("date"), key: "date" },
   ];
+
+  // Helper to get allowed transitions for edit
+  const getAllowedTransitions = (currentType) => {
+    switch (currentType) {
+      case "Reservation":
+      case 0:
+        return ["Borrow"];
+      case "Borrow":
+      case 1:
+        return ["Renew_1", "Return", "Late"];
+      case "Renew_1":
+      case 3:
+        return ["Renew_2", "Return", "Late"];
+      case "Renew_2":
+      case 5:
+        return ["Return", "Late"];
+      case "Late":
+      case 4:
+        return ["Return"];
+      default:
+        return ["Borrow"];
+    }
+  };
+
+  // Only allow 'Borrow' for add transaction
+  const addTransactionTypes = ["Borrow"];
+
   return (
     <>
     <div className="container">
@@ -331,7 +358,7 @@ const Exemplaires = () => {
           <label>{t("transaction_type")}</label>
           <Autocomplete
             fullWidth
-            options={transactionTypes}
+            options={addTransactionTypes}
             value={transactionData.transactionType}
             onChange={(event, newValue) => handleAutocompleteChange("transactionType", newValue)}
             renderInput={(params) => (
@@ -422,7 +449,7 @@ const Exemplaires = () => {
           <label>{t("transaction_type")}</label>
           <Autocomplete
             fullWidth
-            options={transactionTypes}
+            options={getAllowedTransitions(selectedTransaction?.type)}
             value={transactionData.transactionType}
             onChange={(event, newValue) => handleAutocompleteChange("transactionType", newValue)}
             renderInput={(params) => (

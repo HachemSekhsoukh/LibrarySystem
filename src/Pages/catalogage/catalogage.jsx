@@ -407,7 +407,7 @@ const Catalogage = () => {
         <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            {t("sure_to_delete")} "{resourceToDelete?.title}"?
+            {t("sure_to_delete") + " \"" + (resourceToDelete?.title || "") + "\"?"}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -532,32 +532,48 @@ const Catalogage = () => {
               {loadingTransactions ? (
                 <div className="loader"></div>
               ) : (
-                <Table
-                  columns={[
-                    { label: "Borrower", key: "borrower_name" },
-                    { label: "Reservation Date", key: "reservation_date" },
-                    { label: "Borrow Date", key: "borrow_date" },
-                    { label: "Due Date", key: "due_date" },
-                    { label: "Return Date", key: "return_date" },
-                    { 
-                      label: "Status", 
-                      key: "status",
-                      render: (value) => (
-                        <Chip
-                          label={value}
-                          color={
-                            value === 'Late' ? 'error' :
-                            value === 'Borrowed' ? 'warning' :
-                            value === 'Returned' ? 'success' :
-                            'info'
-                          }
-                        />
-                      )
-                    }
-                  ]}
-                  data={history || []}
-                  title="Resource History"
-                />
+                history && history.length > 0 ? (
+                  <Table
+                    columns={[
+                      { label: "Borrower", key: "borrower_name" },
+                      { label: "Reservation Date", key: "reservation_date" },
+                      { label: "Borrow Date", key: "borrow_date" },
+                      { label: "Due Date", key: "due_date" },
+                      { label: "Return Date", key: "return_date" },
+                      {
+                        label: "Status",
+                        key: "status",
+                        render: (value) => (
+                          <Chip
+                            label={
+                              value === 'Borrow' ? 'Borrowed' :
+                              value === 'Renew_1' ? 'Renew 1' :
+                              value === 'Renew_2' ? 'Renew 2' :
+                              value === 'Late' ? 'Late' :
+                              value === 'Return' ? 'Returned' :
+                              value
+                            }
+                            color={
+                              value === 'Late' ? 'error' :
+                              value === 'Borrow' ? 'warning' :
+                              value === 'Renew_1' ? 'info' :
+                              value === 'Renew_2' ? 'info' :
+                              value === 'Return' ? 'success' :
+                              'default'
+                            }
+                            size="small"
+                          />
+                        )
+                      }
+                    ]}
+                    data={history}
+                    title="Resource History"
+                  />
+                ) : (
+                  <Typography variant="body1" sx={{ p: 2, textAlign: 'center' }}>
+                    No history records found for this resource.
+                  </Typography>
+                )
               )}
             </>
           ) : (

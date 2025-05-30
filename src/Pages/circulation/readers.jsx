@@ -391,7 +391,7 @@ const Readers = () => {
       label: t("status"), 
       key: "status",
       render: (value, row) => (
-        <span className={row.is_late ? "status-late" : "status-normal"}>
+        <span className={row.status === 'Late' ? "status-late" : "status-normal"}>
           {value}
         </span>
       )

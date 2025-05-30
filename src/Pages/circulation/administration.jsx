@@ -31,7 +31,9 @@ const CirculationAdministration = () => {
   const [openPopup, setOpenPopup] = useState(false);
   const [newReaderType, setNewReaderType] = useState({ 
     ut_name: "", 
-    ut_borrow: 0
+    ut_borrow: 0,
+    ut_books: 0,
+    ut_renew: 0
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [isEditing, setIsEditing] = useState(false);
@@ -74,7 +76,9 @@ const CirculationAdministration = () => {
   const resetForm = () => {
     setNewReaderType({ 
       ut_name: "", 
-      ut_borrow: 0
+      ut_borrow: 0,
+      ut_books: 0,
+      ut_renew: 0
     });
     setIsEditing(false);
     setCurrentReaderTypeId(null);
@@ -129,7 +133,9 @@ const CirculationAdministration = () => {
     setCurrentReaderTypeId(readerType.id);
     setNewReaderType({
       ut_name: readerType.name,
-      ut_borrow: readerType.borrow
+      ut_borrow: readerType.borrow,
+      ut_books: readerType.ut_books || 0,
+      ut_renew: readerType.ut_renew || 0
     });
     setIsEditing(true);
     setOpenPopup(true);
@@ -180,7 +186,9 @@ const CirculationAdministration = () => {
   const columns = [
     { label: t("id"), key: "id" },
     { label: t("name"), key: "name" },
-    { label: t("borrow_limit"), key: "borrow" }
+    { label: t("borrow_limit"), key: "borrow" },
+    { label: t("books_limit"), key: "ut_books" },
+    { label: t("renewal_days"), key: "ut_renew" }
   ];
 
   return (
@@ -242,6 +250,30 @@ const CirculationAdministration = () => {
                 type="number"
                 name="ut_borrow"
                 value={newReaderType.ut_borrow} 
+                onChange={handleInputChange}
+                InputProps={{ inputProps: { min: 0 } }}
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>{t("books_limit")}</label>
+              <TextField 
+                fullWidth 
+                type="number"
+                name="ut_books"
+                value={newReaderType.ut_books} 
+                onChange={handleInputChange}
+                InputProps={{ inputProps: { min: 0 } }}
+              />
+            </div>
+            <div className="form-group">
+              <label>{t("renewal_days")}</label>
+              <TextField 
+                fullWidth 
+                type="number"
+                name="ut_renew"
+                value={newReaderType.ut_renew} 
                 onChange={handleInputChange}
                 InputProps={{ inputProps: { min: 0 } }}
               />

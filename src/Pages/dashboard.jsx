@@ -27,6 +27,7 @@ const Dashboard = () => {
   const [transactions, setTransactions] = useState([]);
   const [borrowsChartData, setBorrowsChartData] = useState([]);
   const [mostBorrowed, setMostBorrowed] = useState([]);
+  const [lateReturners, setLateReturners] = useState(0);
     // Loading state variables
   const [loadingStats, setLoadingStats] = useState(true);
   const [loadingTransactions, setLoadingTransactions] = useState(true);
@@ -66,11 +67,23 @@ const Dashboard = () => {
       setLoadingMostBorrowed(false);
     };
 
+    const getLateReturners = async () => {
+      try {
+        const transactions = await fetchTransactions();
+        // Get unique user IDs with at least one 'Late' transaction
+        const lateUserIds = new Set(transactions.filter(tx => tx.type === 'Late').map(tx => tx.borrower_name));
+        setLateReturners(lateUserIds.size);
+      } catch (err) {
+        setLateReturners(0);
+      }
+    };
+
     fetchUser();
     getStats();
     getRecentTransactions();
     getChartData();
     getMostBorrowed();
+    getLateReturners();
   }, []);
 
   const columns = [
@@ -99,7 +112,7 @@ const Dashboard = () => {
             <StatCard title={t("books_available")} number={stats.total_resources} subtitle={t("total_number_of_books_available")} image="../../public/assets/images/Group.png" />
             <StatCard title={t("books_borrowed")} number={stats.total_reservations} subtitle={t("number_of_books_currently_borrowed")} image="../../public/assets/images/Group.png" />
             <StatCard title={t("monthly_borrows")} number={stats.monthly_borrows} subtitle={t("total_number_of_borrows_this_month")} image="../../public/assets/images/Group.png" />
-            <StatCard title={t("overdue_books")} number={stats.overdueBooks} subtitle={t("total_number_of_overdue_books")} image="../../public/assets/images/Group.png" />
+            <StatCard title={t("overdue_books")} number={lateReturners} subtitle={t("total_number_of_overdue_books")} image="../../public/assets/images/Group.png" />
           </>
         )}
       </div>
