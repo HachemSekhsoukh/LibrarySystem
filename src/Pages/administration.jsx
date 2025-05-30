@@ -90,12 +90,10 @@ const Administration = () => {
   const [isStaffType, setIsStaffType] = useState(false);
 
   const staffTypesColumns = [
-    { label: t("id"), key: "id" },
     { label: t("type"), key: "name" },
   ];
 
   const columns = [
-    { label: t("id"), key: "id" },
     { label: t("name"), key: "name" },
     { label: t("email"), key: "email" },
     { label: t("phone_number"), key: "phone" },

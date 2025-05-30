@@ -183,7 +183,7 @@ cursor: not-allowed;
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
 }
 
@@ -191,6 +191,7 @@ cursor: not-allowed;
   display: flex;
   flex-direction: column;
   gap: 5px;
+  width: 100%;
 }
 
 .info-item label {
@@ -199,7 +200,11 @@ cursor: not-allowed;
 }
 
 .info-item span {
-  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
 }
 
 .transaction-history {

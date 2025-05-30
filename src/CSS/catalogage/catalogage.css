@@ -1,0 +1,10 @@
+.container {
+  width: 100%;
+  padding: 0.5rem; /* Add some padding similar to dashboard */
+  overflow-x: hidden; /* Hide horizontal overflow */
+  /* You might need to adjust height or other properties as needed */
+}
+
+#table {
+  width: 100%; /* Ensure table container takes full width of its parent */
+}

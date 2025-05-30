@@ -87,7 +87,6 @@ const Dashboard = () => {
   }, []);
 
   const columns = [
-    { label: t("id"), key: "id" },
     { label: t("title"), key: "title" },
     { label: t("borrower_name"), key: "borrower_name" },
     { label: t("type"), key: "type" },
@@ -95,7 +94,6 @@ const Dashboard = () => {
   ];
 
   const columns2 = [
-    { label: t("id"), key: "r_id" },
     { label: t("title"), key: "r_title" },
     { label: t("author"), key: "r_author" },
     { label: t("cote"), key: "r_cote" },
