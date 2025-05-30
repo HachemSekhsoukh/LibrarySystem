@@ -25,13 +25,14 @@ import {
   updateStaffType,
   deleteStaffType
 } from "../utils/api";
-
+import { useAuth } from "../utils/privilegeContext"; // Import the AuthProvider
 // Importing the i18n hook
 import { useTranslation } from "react-i18next";
 
+
 const Administration = () => {
   const { t } = useTranslation(); // Get translation function
-  
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const [staffTypesData, setStaffTypesData] = useState([]);
   const [openTypePopup, setOpenTypePopup] = useState(false);
   const [newStaffType, setNewStaffType] = useState({ st_name: "" });
@@ -52,6 +53,14 @@ const Administration = () => {
     message: "",
     severity: "success"
   });
+
+  const canEditStaff = hasPrivilege("edit_administration_staff");
+  const canDeleteStaff = hasPrivilege("delete_administration_staff");
+  const canCreateStaff = hasPrivilege("create_administration_staff");
+
+  const canEditStaffType = hasPrivilege("edit_administration_staff_types");
+  const canDeleteStaffType = hasPrivilege("delete_administration_staff_types");
+  const canCreateStaffType = hasPrivilege("create_administration_staff_types");
 
   const [errors, setErrors] = useState({});
 
@@ -448,7 +457,9 @@ const Administration = () => {
             <Table
               columns={columns}
               data={staffData}
-              showActions={true}
+              showActions={canEditStaff ||canDeleteStaff}
+              showEdit={canEditStaff} // Control edit button visibility
+              showDelete={canDeleteStaff} // Control delete button visibility
               title={t("staff_members")}
               onEdit={handleEditStaff}
               onDelete={handleDeleteStaff}
@@ -456,6 +467,7 @@ const Administration = () => {
             <div className="bottom-buttons">
               <Button
                 onClick={() => setOpenPopup(true)}
+                disabled={!canCreateStaff}
                 label={t("add_staff_member")}
                 lightBackgrnd={false}
                 icon={<AddIcon />}
@@ -474,7 +486,9 @@ const Administration = () => {
             <Table
               columns={staffTypesColumns}
               data={staffTypesData}
-              showActions={true}
+              showActions={canEditStaffType ||canDeleteStaffType}
+              showEdit={canEditStaffType} // Control edit button visibility for staff types
+              showDelete={canDeleteStaffType} // Control delete button visibility for staff types
               title={t("staff_types")}
               onEdit={handleEditStaffType}
               onDelete={handleDeleteStaffType}
@@ -486,6 +500,7 @@ const Administration = () => {
                   setCheckboxValues({});
                   setOpenTypePopup(true);
                 }}
+                disabled={!canCreateStaffType}
                 label={t("add_staff_type")}
                 lightBackgrnd={false}
                 icon={<AddIcon />}
@@ -504,7 +519,7 @@ const Administration = () => {
         <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            {t("are_you_sure_delete")} {isStaffType ? t("staff_type") : t("staff_member")} "{itemToDelete?.name}"?
+            {t("sure_to_delete")} {isStaffType ? t("staff_type") : t("staff_member")} "{itemToDelete?.name}"?
           </Typography>
         </DialogContent>
         <DialogActions>

@@ -19,10 +19,12 @@ import {
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
+import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
 
 
 const CirculationAdministration = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const { t } = useTranslation();
   const [readerTypes, setReaderTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +40,10 @@ const CirculationAdministration = () => {
   const [currentReaderTypeId, setCurrentReaderTypeId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [readerTypeToDelete, setReaderTypeToDelete] = useState(null);
+
+  const canEdit = hasPrivilege("edit_circulation_reader_types");
+  const canDelete = hasPrivilege("delete_circulation_reader_types");
+  const canCreate = hasPrivilege("create_circulation_readers_types");
 
   useEffect(() => {
     fetchReaderTypes();
@@ -196,7 +202,9 @@ const CirculationAdministration = () => {
               <Table 
                 columns={columns} 
                 data={readerTypes} 
-                showActions={true} 
+                showActions= {canEdit || canDelete} 
+                showEdit={canEdit} // Pass privilege-based control for edit
+                showDelete={canDelete} // Pass privilege-based control for delete
                 title={t("reader_types")} 
                 loading={loading}
                 onEdit={handleEdit}
@@ -208,8 +216,9 @@ const CirculationAdministration = () => {
                 onClick={() => {
                   resetForm();
                   setOpenPopup(true);
-                }} 
-                label= {t("add_new_reader_type")} 
+                }}
+                disabled={!canCreate}
+                label={t("add_new_reader_type")} 
                 lightBackgrnd={false} 
                 icon={<AddIcon />} 
                 size="large" 
@@ -220,7 +229,7 @@ const CirculationAdministration = () => {
       </div>
       
       {/* Add/Edit Reader Type Popup */}
-      <Popup title={isEditing ? t("edit_reader_type") : t("add_new_reader_type") } openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <Popup title={isEditing ? t("edit_reader_type") : t("add_new_reader_type")} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <div className="add-reader-type-form">
           <div className="form-row">
             <div className="form-group">
@@ -275,9 +284,9 @@ const CirculationAdministration = () => {
             <button className="dialog-cancel-button" onClick={() => {
               resetForm();
               setOpenPopup(false);
-            }}>Cancel</button>
+            }}>{t("cancel")}</button>
             <button className="dialog-save-button" onClick={handleAddReaderType}>
-              {isEditing ? 'Update' : 'Save'}
+              {isEditing ? t("update") : t("save")}
             </button>
           </div>
         </div>
@@ -288,15 +297,15 @@ const CirculationAdministration = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the reader type "{readerTypeToDelete?.name}"?
+            {t("sure_to_delete_reader_type")} "{readerTypeToDelete?.name}"?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
-          <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+          <Button onClick={() => setDeleteDialogOpen(false)} label={t("cancel")} lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label={t("delete")} lightBackgrnd={false} />
         </DialogActions>
       </Dialog>
 

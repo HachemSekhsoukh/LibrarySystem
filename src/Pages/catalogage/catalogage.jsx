@@ -12,10 +12,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddResourceForm from "./resource_form";
 import { useTranslation } from 'react-i18next';
+import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
 import { fetchResources, fetchResourceTypes, addResourceType, updateResourceType, deleteResourceType, fetchResourceHistory, fetchResourceComments } from '../../utils/api';
 
 const Catalogage = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const { t } = useTranslation();
   const [openPopup, setOpenPopup] = useState(false);
   const [resources, setResources] = useState([]);
@@ -52,6 +54,10 @@ const Catalogage = () => {
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
+
+  const canEdit = hasPrivilege("edit_catalogage_books");
+  const canDelete = hasPrivilege("delete_catalogage_books");
+  const canCreate = hasPrivilege("create_catalogage_books");
 
   useEffect(() => {
     fetch(`${API_BASE_URL}api/resource-types`, {credentials: 'include'})
@@ -343,6 +349,8 @@ const Catalogage = () => {
                 columns={columns} 
                 data={resources} 
                 showActions={true} 
+                showEdit={canEdit} // Pass privilege-based control for edit
+                showDelete={canDelete} // Pass privilege-based control for delete
                 title={t("books")} 
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -370,6 +378,7 @@ const Catalogage = () => {
                   resetForm();
                   setOpenPopup(true);
                 }}
+                disabled={!canCreate}
                 label={t("add_new_book")}
                 lightBackgrnd={false}
                 icon={<AddIcon />}

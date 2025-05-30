@@ -5,7 +5,6 @@ import Popup from "../../components/Popup";
 import { useTranslation } from 'react-i18next';
 import { 
   TextField, 
-  MenuItem, 
   Autocomplete, 
   CircularProgress,
   Snackbar,
@@ -20,10 +19,12 @@ import {
 } from "../../utils/api.js";
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/circulation/transactions.css";
+import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
 
 const Exemplaires = () => {
   const { t } = useTranslation();
   const [openPopup, setOpenPopup] = useState(false);
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const [editPopup, setEditPopup] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [transactionData, setTransactionData] = useState({
@@ -51,6 +52,11 @@ const Exemplaires = () => {
     transactionType: '',
     documentTitle: ''
   });
+
+    // Determine if the user has privileges
+  const canEdit = hasPrivilege("edit_circulation_exemplaires");
+  const canDelete = hasPrivilege("delete_circulation_exemplaires");
+  const canCreate = hasPrivilege("create_circulation_exemplaires");
   
   const validateForm = () => {
     let tempErrors = {
@@ -61,17 +67,17 @@ const Exemplaires = () => {
     let isValid = true;
   
     if (!transactionData.borrowerName || transactionData.borrowerName === '') {
-      tempErrors.borrowerName = 'Borrower name is required';
+      tempErrors.borrowerName = t("borrower_name_required");
       isValid = false;
     }
   
     if (!transactionData.transactionType || transactionData.transactionType === '') {
-      tempErrors.transactionType = 'Transaction type is required';
+      tempErrors.transactionType = t("transaction_type_required");
       isValid = false;
     }
   
     if (!transactionData.documentTitle || transactionData.documentTitle === '') {
-      tempErrors.documentTitle = 'Document title is required';
+      tempErrors.documentTitle = t("document_title_required");
       isValid = false;
     }
   
@@ -93,7 +99,7 @@ const Exemplaires = () => {
         setReaderError(null);
       } catch (err) {
         console.error(err);
-        setReaderError('Failed to load readers. Please try again later.');
+        setReaderError(t("failed_to_load_readers"));
       } finally {
         setLoadingReaders(false);
       }
@@ -112,14 +118,14 @@ const Exemplaires = () => {
           title: resource.title,
           author: resource.author,
           isbn: resource.isbn,
-          label: resource.title + (resource.author ? ` by ${resource.author}` : ''),
-          displayLabel: `${resource.title}${resource.author ? ` by ${resource.author}` : ''}`
+          label: resource.title + (resource.author ? ` ${t("by")} ${resource.author}` : ''),
+          displayLabel: `${resource.title}${resource.author ? ` ${t("by")} ${resource.author}` : ''}`
         }));
         setResources(resourceOptions);
         setResourceError(null);
       } catch (err) {
         console.error(err);
-        setResourceError('Failed to load resources. Please try again later.');
+        setResourceError(t("failed_to_load_resources"));
       } finally {
         setLoadingResources(false);
       }
@@ -136,7 +142,7 @@ const Exemplaires = () => {
       setTransactionError(null);
     } catch (err) {
       console.error(err);
-      setTransactionError("Failed to load transactions. Please try again.");
+      setTransactionError(t("failed_to_load_transactions"));
     } finally {
       setLoadingTransactions(false);
       setLoading(false);
@@ -174,7 +180,7 @@ const Exemplaires = () => {
 
       setSnackbar({
         open: true,
-        message: 'Transaction saved successfully!',
+        message: t("transaction_saved_successfully"),
         severity: 'success'
       });
 
@@ -189,7 +195,7 @@ const Exemplaires = () => {
       console.error(err);
       setSnackbar({
         open: true,
-        message: `Failed to create transaction: ${err.message}`,
+        message: `${t("failed_to_create_transaction")}: ${err.message}`,
         severity: 'error'
       });
     }
@@ -206,7 +212,7 @@ const Exemplaires = () => {
   const handleUpdate = async () => {
     if (!transactionData.transactionType) {
       setErrors({
-        transactionType: 'Transaction type is required'
+        transactionType: t("transaction_type_required")
       });
       return;
     }
@@ -220,7 +226,7 @@ const Exemplaires = () => {
 
       setSnackbar({
         open: true,
-        message: 'Transaction updated successfully!',
+        message: t("transaction_updated_successfully"),
         severity: 'success'
       });
 
@@ -234,18 +240,18 @@ const Exemplaires = () => {
       console.error(err);
       setSnackbar({
         open: true,
-        message: `Failed to update transaction: ${err.message}`,
+        message: `${t("failed_to_update_transaction")}: ${err.message}`,
         severity: 'error'
       });
     }
   };
 
   const columns = [
-    { label: "ID", key: "id" },
-    { label: "Title", key: "title" },
-    { label: "Borrower Name", key: "borrower_name" },
-    { label: "Type", key: "type" },
-    { label: "Date", key: "date" },
+    { label: t("id"), key: "id" },
+    { label: t("title"), key: "title" },
+    { label: t("borrower_name"), key: "borrower_name" },
+    { label: t("type"), key: "type" },
+    { label: t("date"), key: "date" },
   ];
 
   // Helper to get allowed transitions for edit
@@ -285,14 +291,17 @@ const Exemplaires = () => {
               <Table 
                 columns={columns} 
                 data={transactions} 
-                showActions={true} 
+                showActions={canEdit || canDelete} 
+                showEdit={canEdit} // Pass privilege-based control for edit
+                showDelete={canDelete} // Pass privilege-based control for delete
                 title={t("transactions")}
                 onEdit={handleEdit}
               />
             </div>
             <div className="bottom-buttons">
               <Button 
-                onClick={() => setOpenPopup(true)} 
+                onClick={() => setOpenPopup(true)}
+                disabled={!canCreate}
                 label={t("add_transaction")} 
                 lightBackgrnd={false}
                 icon={<AddIcon />}
@@ -333,7 +342,7 @@ const Exemplaires = () => {
               renderInput={(params) => (
                 <TextField 
                   {...params} 
-                  placeholder="Select borrower name"
+                  placeholder={t("select_borrower_name")}
                   variant="outlined"
                   className="custom-textfield"
                   error={!!errors.borrowerName}
@@ -355,7 +364,7 @@ const Exemplaires = () => {
             renderInput={(params) => (
               <TextField 
                 {...params} 
-                placeholder="Select transaction type"
+                placeholder={t("select_transaction_type")}
                 variant="outlined"
                 className="custom-textfield"
                 error={!!errors.transactionType}
@@ -397,8 +406,8 @@ const Exemplaires = () => {
                   <div>
                     <div style={{ fontWeight: 500 }}>{option.title}</div>
                     <div style={{ fontSize: '0.875rem', color: 'rgba(0, 0, 0, 0.6)' }}>
-                      {option.author ? `by ${option.author}` : 'Unknown author'} 
-                      {option.isbn ? ` • ISBN: ${option.isbn}` : ''}
+                      {option.author ? `${t("by")} ${option.author}` : t("unknown_author")} 
+                      {option.isbn ? ` • ${t("isbn")}: ${option.isbn}` : ''}
                     </div>
                   </div>
                 </li>
@@ -406,7 +415,7 @@ const Exemplaires = () => {
               renderInput={(params) => (
                 <TextField 
                   {...params} 
-                  placeholder="Search by title or author"
+                  placeholder={t("search_by_title_or_author")}
                   variant="outlined"
                   className="custom-textfield"
                   error={!!errors.documentTitle}
@@ -420,10 +429,10 @@ const Exemplaires = () => {
 
         <div className="dialog-button-container">
           <button className="dialog-cancel-button" onClick={() => setOpenPopup(false)}>
-            Cancel
+            {t("cancel")}
           </button>
           <button className="dialog-save-button" onClick={handleSubmit}>
-            Save
+            {t("save")}
           </button>
         </div>
       </div>
@@ -446,7 +455,7 @@ const Exemplaires = () => {
             renderInput={(params) => (
               <TextField 
                 {...params} 
-                placeholder="Select transaction type"
+                placeholder={t("select_transaction_type")}
                 variant="outlined"
                 className="custom-textfield"
                 error={!!errors.transactionType}
@@ -459,10 +468,10 @@ const Exemplaires = () => {
 
         <div className="dialog-button-container">
           <button className="dialog-cancel-button" onClick={() => setEditPopup(false)}>
-            Cancel
+            {t("cancel")}
           </button>
           <button className="dialog-save-button" onClick={handleUpdate}>
-            Update
+            {t("update")}
           </button>
         </div>
       </div>

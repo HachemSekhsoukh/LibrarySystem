@@ -275,7 +275,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote,r_edition, r_resume, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type, "
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote,r_edition, r_resume, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type,cover_url, "
             "Resource_type(rt_name)"
         ).execute()
         status_map = {
@@ -300,7 +300,8 @@ def get_resources():
             'type': resource['r_type'],
             'description': resource['r_description'],
             'type_name': resource['Resource_type']['rt_name'] if resource.get('Resource_type') else None,
-            'status_name': status_map.get(resource['r_status'], "Unknown")  # Map status to name
+            'status_name': status_map.get(resource['r_status'], "Unknown"),
+            'image_url' :  resource['cover_url'],
         } for resource in response.data]
 
         return resources
@@ -474,11 +475,6 @@ def create_reservation(user_email, user_id, resource_id, transaction_type):
         if ut_books and active_count.data and len(active_count.data) >= ut_books:
             return {'success': False, 'error': f'User has reached the maximum allowed active reservations/borrows ({ut_books})'}
 
-        print("create_reservation")
-        print(user_id)
-        print(resource_id)
-        print(transaction_type)
-        print("--------------------------------")
         # First, get the latest res_id to increment it
         latest_res = supabase.from_("Reservation").select("res_id").order("res_id", desc=True).limit(1).execute()
         
@@ -504,7 +500,7 @@ def create_reservation(user_email, user_id, resource_id, transaction_type):
             'res_resource_id': resource_id,
             'res_staff_id': None,
             'res_type': type_map.get(transaction_type, 1),
-            'res_date': datetime.now().isoformat()  # Add current timestamp
+            'res_date': datetime.now().strftime('%Y-%m-%d') 
         }
         
         # Print the reservation data before insert
@@ -930,7 +926,7 @@ def update_user_password(user_email, new_password):
         print(f"Error updating password for user {user_email}: {e}")
         return False
 
-def update_student_password(user_email, new_password):
+def update_student_password_db(user_email, new_password):
     """
     Update the student's password in the Supabase database.
     """
@@ -1666,6 +1662,7 @@ def get_logs():
             .from_("Logs") \
             .select("id, message, created_at, s_id") \
             .order("created_at", desc=True) \
+            .limit(15) \
             .execute()
 
         logs = []
@@ -1945,11 +1942,33 @@ def add_comment(data):
         print(f"Error adding comment: {e}")
         return {'success': False, 'error': str(e)}
     
+def add_report(data):
+    try:
+        reporter = data.get('reporter_id')
+        comment = data.get('comment_id')
+        reason = data.get('reason')
+
+        response = supabase \
+                    .from_("comment_report") \
+                    .insert({
+                        'reporter_id': reporter,
+                        'comment_id': comment,
+                        'reason':reason,
+                    }) \
+                    .execute()
+        if response.data:
+            return {'success': True}
+        else:
+            return {'success': False, 'error':'failed to report comment'}
+    except Exception as e :
+        print(f"Error reporting comment: {e}")
+        return {'success': False, 'error': str(e)}
+    
 def get_comments(resource_id):
     try:
         response = supabase \
             .from_('Rating') \
-            .select('comment','rating','rat_date') \
+            .select('rat_id','comment','rating','rat_date','user_id', 'User(u_name)') \
             .eq('res_id', resource_id) \
             .execute()
         
@@ -1992,8 +2011,4 @@ def mark_late_reservations():
                 supabase.from_("Reservation").update({"res_type": 4}).eq("res_id", res['res_id']).execute()
     except Exception as e:
         print(f"Error in mark_late_reservations: {e}")
-
-if __name__ == "__main__":
-    print("Running mark_late_reservations on backend startup...")
-    mark_late_reservations()
 

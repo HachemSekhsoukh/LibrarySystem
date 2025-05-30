@@ -19,10 +19,12 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import "../../CSS/Circulation/transactions.css";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
 
 
 const CatalogageAdministration = () => {
   const API_BASE_URL = "http://127.0.0.1:5000/";
+  const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const { t } = useTranslation(); // Get translation function
   const [resourceTypes, setResourceTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,10 @@ const CatalogageAdministration = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resourceTypeToDelete, setResourceTypeToDelete] = useState(null);
 
+  const canEdit = hasPrivilege("edit_catalogage_resource_types");
+  const canDelete = hasPrivilege("delete_catalogage_resource_types");
+  const canCreate = hasPrivilege("create_catalogage_resource_types");
+  
   useEffect(() => {
     fetchResourceTypes();
   }, []);
@@ -187,7 +193,9 @@ const CatalogageAdministration = () => {
             <Table 
               columns={columns} 
               data={resourceTypes} 
-              showActions={true} 
+              showActions={canEdit || canDelete} 
+              showEdit={canEdit} // Pass privilege-based control for edit
+              showDelete={canDelete} // Pass privilege-based control for delete
               title={t("resource_types")} 
               loading={loading}
               onEdit={handleEdit}
@@ -200,7 +208,8 @@ const CatalogageAdministration = () => {
                 resetForm();
                 setOpenPopup(true);
               }} 
-              label= {t("add_new_resource_type")} 
+              disabled={!canCreate}
+              label={t("add_new_resource_type")} 
               lightBackgrnd={false} 
               icon={<AddIcon />} 
               size="large" 
@@ -243,7 +252,7 @@ const CatalogageAdministration = () => {
               setOpenPopup(false);
             }}>{t("cancel")}</button>
             <button className="dialog-save-button" onClick={handleAddResourceType}>
-              {isEditing ? t('update') : t('save')}
+              {isEditing ? t("update") : t("save")}
             </button>
           </div>
         </div>
@@ -254,15 +263,15 @@ const CatalogageAdministration = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t("confirm_delete")}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the resource type "{resourceTypeToDelete?.name}"?
+            {t("sure_to_delete")} "{resourceTypeToDelete?.name}"?
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
-          <Button onClick={confirmDelete} label="Delete" lightBackgrnd={false} />
+          <Button onClick={() => setDeleteDialogOpen(false)} label={t("cancel")} lightBackgrnd={true} />
+          <Button onClick={confirmDelete} label={t("delete")} lightBackgrnd={false} />
         </DialogActions>
       </Dialog>
 

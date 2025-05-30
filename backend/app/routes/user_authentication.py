@@ -5,7 +5,7 @@ from app.database import (
     sign_up_student,
     login_student,
     get_student_by_email,
-    update_student_password,
+    update_student_password_db,
     get_student_password,
     update_student_by_email
 )
@@ -176,7 +176,7 @@ def update_student_password():
         return jsonify({"error": "Old password is incorrect."}), 400
 
     try:
-        update_student_password(current_user_email, new_password)
+        update_student_password_db(current_user_email, new_password)
         return jsonify({"success": "Password updated successfully."}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 500
