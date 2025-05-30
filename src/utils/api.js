@@ -805,61 +805,12 @@ export const fetchReaderHistory = async (userId) => {
 // Helper function to process history data
 const processHistoryData = (historyData) => {
     console.log("Processing history data:", historyData);
-    
-    // If the data is already in the correct format, return it directly
-    if (Array.isArray(historyData) && historyData.length > 0 && historyData[0].reservation_id) {
-        console.log("Data already in correct format, returning as is");
+    // Accept both reader and resource history formats
+    if (Array.isArray(historyData) && historyData.length > 0 && (historyData[0].document_title || historyData[0].borrower_name)) {
         return historyData;
     }
-
-    // Group by reservation ID
-    const groupedByReservation = historyData.reduce((acc, record) => {
-        if (!acc[record.h_res_id]) {
-            acc[record.h_res_id] = [];
-        }
-        acc[record.h_res_id].push(record);
-        return acc;
-    }, {});
-
-    console.log("Grouped by reservation:", groupedByReservation);
-
-    // Process each group
-    const processed = Object.values(groupedByReservation).map(group => {
-        // Sort by date
-        group.sort((a, b) => new Date(a.h_date) - new Date(b.h_date));
-
-        // Find the relevant records
-        const reservation = group.find(r => r.h_status === 0);
-        const borrow = group.find(r => r.h_status === 1);
-        const returnRecord = group.find(r => r.h_status === 2);
-        const lateRecord = group.find(r => r.h_status === 4);
-
-        const processedRecord = {
-            id: group[0].h_id,
-            reservation_id: group[0].h_res_id,
-            document_title: reservation?.Reservation?.Resource?.r_title || 'Unknown Resource',
-            reservation_date: reservation?.h_date || null,
-            borrow_date: borrow?.h_date || null,
-            due_date: borrow?.due_date || null,
-            return_date: returnRecord?.h_date || null,
-            status: getStatus(borrow, returnRecord, lateRecord),
-            is_late: lateRecord !== undefined
-        };
-
-        console.log("Processed record:", processedRecord);
-        return processedRecord;
-    });
-
-    console.log("Final processed data:", processed);
-    return processed;
-};
-
-// Helper function to determine the current status
-const getStatus = (borrow, returnRecord, lateRecord) => {
-    if (returnRecord) return 'Returned';
-    if (lateRecord) return 'Late';
-    if (borrow) return 'Borrowed';
-    return 'Reserved';
+    // Fallback: return empty array if not as expected
+    return [];
 };
 
 export const fetchResourceHistory = async (resourceId) => {

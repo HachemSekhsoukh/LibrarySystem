@@ -59,7 +59,7 @@ def add_new_reader():
 def add_new_user_type():
     """
     API endpoint to add a new user type.
-    Expects JSON data with 'u_type' and 'u_description'.
+    Expects JSON data with 'ut_name', 'ut_borrow', 'ut_books', and 'ut_renew'.
     """
     data = request.get_json()
     user_email = get_jwt_identity()
@@ -69,7 +69,7 @@ def add_new_user_type():
         return jsonify({'success': False, 'error': 'No data provided'}), 400
     
     # Check for required fields
-    required_fields = ['ut_name', 'ut_borrow']
+    required_fields = ['ut_name', 'ut_borrow', 'ut_books', 'ut_renew']
     missing_fields = [field for field in required_fields if field not in data or not data[field]]
     
     if missing_fields:
@@ -87,7 +87,7 @@ def add_new_user_type():
 def update_user_type_endpoint(user_type_id):
     """
     API endpoint to update a user type.
-    Expects JSON data with 'ut_name' and 'ut_borrow'.
+    Expects JSON data with 'ut_name', 'ut_borrow', 'ut_books', and 'ut_renew'.
     """
     data = request.get_json()
     
@@ -96,7 +96,7 @@ def update_user_type_endpoint(user_type_id):
         return jsonify({'success': False, 'error': 'No data provided'}), 400
     
     # Check for required fields
-    required_fields = ['ut_name', 'ut_borrow']
+    required_fields = ['ut_name', 'ut_borrow', 'ut_books', 'ut_renew']
     missing_fields = [field for field in required_fields if field not in data or not data[field]]
     
     if missing_fields:
