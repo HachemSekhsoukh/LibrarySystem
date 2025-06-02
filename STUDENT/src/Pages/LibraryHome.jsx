@@ -4,7 +4,7 @@ import { FaSearch, FaArrowRight, FaCircle, FaTimes } from 'react-icons/fa';
 import { useSpring, animated } from 'react-spring';
 import "../CSS/LibraryHome.css";
 import "../../src/CSS/Settings.css";
-import { fetchLatestResources, fetchPopularResources, searchResources, getUserInfo } from '../utils/api';
+import { fetchLatestResources, fetchPopularResources, searchResources, getUserInfo, submitSuggestion } from '../utils/api';
 import BookCard from '../components/BookCard'
 import BookSection from '../components/BookSection'
 import NavHeader from '../components/NavHeader';
@@ -232,36 +232,32 @@ const SearchResults = ({ results, closeSearch }) => {
 };
 
 const SuggestionForm = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    suggestion: ''
-  });
-  const [loading, setLoading] = useState(true);
+  const [suggestion, setSuggestion] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ text: '', type: '' });
   const { user } = useUser();
 
-  useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        name: user.name || '',
-        email: user.email || ''
-      }));
-    }
-    setLoading(false);
-  }, [user]);
-
   const handleSuggestionChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      suggestion: e.target.value
-    }));
+    setSuggestion(e.target.value);
   };
 
-  const getMailtoLink = () => {
-    const subject = `Library Suggestion from ${formData.name}`;
-    const body = `Name: ${formData.name}\nEmail: ${formData.email}\n\nSuggestion:\n${formData.suggestion}`;
-    return `mailto:youcefguer7@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!suggestion.trim()) {
+      setMessage({ text: 'Please enter your suggestion', type: 'error' });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await submitSuggestion(user.id, suggestion);
+      setMessage({ text: 'Suggestion submitted successfully!', type: 'success' });
+      setSuggestion('');
+    } catch (error) {
+      setMessage({ text: error.message || 'Failed to submit suggestion', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -271,37 +267,11 @@ const SuggestionForm = () => {
       
       <div className="suggestion-form">
         <div className="form-group">
-          <label htmlFor="name">Your Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            readOnly
-            placeholder="Loading..."
-            className="read-only-input"
-          />
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="email">Your Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            readOnly
-            placeholder="Loading..."
-            className="read-only-input"
-          />
-        </div>
-        
-        <div className="form-group">
           <label htmlFor="suggestion">Your Suggestion</label>
           <textarea
             id="suggestion"
             name="suggestion"
-            value={formData.suggestion}
+            value={suggestion}
             onChange={handleSuggestionChange}
             required
             placeholder="Share your ideas with us..."
@@ -309,13 +279,19 @@ const SuggestionForm = () => {
           />
         </div>
         
-        <a 
-          href={getMailtoLink()}
+        {message.text && (
+          <div className={`message ${message.type}`}>
+            {message.text}
+          </div>
+        )}
+        
+        <button 
+          onClick={handleSubmit}
           className="submit-button"
-          disabled={loading || !formData.suggestion.trim()}
+          disabled={loading || !suggestion.trim()}
         >
-          Send Suggestion via Email
-        </a>
+          {loading ? 'Submitting...' : 'Submit Suggestion'}
+        </button>
       </div>
     </section>
   );
