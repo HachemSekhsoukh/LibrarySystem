@@ -1,0 +1,19 @@
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+/* Apply font to all elements */
+* {
+  font-family: "Inter", sans-serif;
+  box-sizing: border-box; /* Optional but helps with consistent sizing */
+}
+
+/* Or apply it just to body and inherit to children */
+body {
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+}

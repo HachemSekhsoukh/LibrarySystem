@@ -1,0 +1,236 @@
+/* @font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+.navBarContainer {
+  font-family: "inter";
+  width: 20vw;
+  min-height: 100vh;
+  background-color: #0b584d;
+  border-radius: 0 10% 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+}
+
+.titleLogo {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  margin: 0;
+  margin-right: 10%;
+}
+
+.title {
+  font-size: 38px;
+  color: #ffffff;
+}
+
+.line {
+  width: 90%;
+  height: 1px;
+  margin: auto;
+  background-color: #ffffff;
+}
+
+.navItems {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.navItemActive {
+  margin-bottom: 1.5rem;
+}
+ */
+
+@import "../../styles/colors.css";
+
+@font-face {
+  font-family: "Inter";
+  src: url("/assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+.navBarContainer {
+  font-family: "Inter";
+  width: 15vw;
+  min-height: 100vh;
+  background-color: var(--primary-color);
+  border-radius: 0 50px 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.75);
+  position: relative;
+}
+.divider-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.titleLogo {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.titleLogo:hover {
+  opacity: 0.9;
+}
+
+.logo {
+  margin: 0;
+  width: 60%;
+  height: 50%;
+}
+
+.nav-bar-divider {
+  border: none;
+  width: 80%;
+  display: block;
+  height: 2px;
+  background: linear-gradient(to right, transparent, white, transparent);
+}
+
+.title {
+  font-size: 38px;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+}
+
+.navSectionTitle{
+  color: var(--white-color);
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+.line {
+  width: 90%;
+  height: 1px;
+  margin: auto;
+  background-color: #ffffff;
+  opacity: 0.2;
+}
+
+.navItems {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.navItem,
+.navItemActive {
+  text-decoration: none;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.35rem;
+  margin-top: 0.35rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.navItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.icon-box-active{
+  background-color: var(--primary-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 7px;
+  margin-right: 15px;
+}
+
+.icon-box-inactive{
+  background-color: var(--button-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 7px;
+  margin-right: 15px;
+}
+
+
+
+.navItemActive {
+  background-color: rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+}
+
+.navIcon {
+  width: 17px;  /* Adjust size as needed */
+  height: 17px;
+}
+
+
+.bottomNav {
+  padding: 1rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navLink,
+.navLinkActive {
+  text-decoration: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover,
+.logoutButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navLinkActive {
+  background-color: var(--button-color);
+  font-weight: 600;
+}
+
+.navLink span,
+.logoutButton span {
+  margin-left: 0.8rem;
+  font-weight: 500;
+}
+
+.logoutButton {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter";
+  font-size: 1rem;
+}
+
+.logout-icon{
+  margin-left: 8px;
+  margin-right: 10px;
+}
