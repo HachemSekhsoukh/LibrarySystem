@@ -5,7 +5,7 @@ This document describes the REST API endpoints for the Library Management System
 ## Base URL
 
 ```
-https://api.librarysystem.com/v1
+http://localhost:5000
 ```
 
 ## Authentication
@@ -114,7 +114,7 @@ Response:
             "author": "Author Name",
             "isbn": "ISBN123",
             "status": "available",
-            "created_at": "2024-01-01T00:00:00Z"
+            "created_at": "2025-05-14T00:00:00Z"
         }
     ],
     "total": 100,
@@ -380,6 +380,128 @@ Response:
 }
 ```
 
+### Comment Reports
+
+#### List Reports
+```
+GET /reports
+```
+
+Query Parameters:
+- `page` (optional): Page number
+- `limit` (optional): Items per page
+- `status` (optional): Filter by status (pending, resolved)
+
+Response:
+```json
+{
+    "items": [
+        {
+            "id": "uuid",
+            "comment": {
+                "id": "uuid",
+                "content": "Comment content",
+                "user": {
+                    "id": "uuid",
+                    "email": "user@example.com"
+                }
+            },
+            "reporter": {
+                "id": "uuid",
+                "email": "reporter@example.com"
+            },
+            "reason": "Inappropriate content",
+            "status": "pending",
+            "created_at": "2024-01-01T00:00:00Z"
+        }
+    ],
+    "total": 50,
+    "page": 1,
+    "limit": 10
+}
+```
+
+#### Create Report
+```
+POST /reports
+```
+
+Request Body:
+```json
+{
+    "comment_id": "uuid",
+    "reason": "Inappropriate content"
+}
+```
+
+Response:
+```json
+{
+    "id": "uuid",
+    "comment": {
+        "id": "uuid",
+        "content": "Comment content",
+        "user": {
+            "id": "uuid",
+            "email": "user@example.com"
+        }
+    },
+    "reporter": {
+        "id": "uuid",
+        "email": "reporter@example.com"
+    },
+    "reason": "Inappropriate content",
+    "status": "pending",
+    "created_at": "2024-01-01T00:00:00Z"
+}
+```
+
+#### Update Report Status
+```
+PUT /reports/{id}
+```
+
+Request Body:
+```json
+{
+    "status": "resolved"
+}
+```
+
+Response:
+```json
+{
+    "id": "uuid",
+    "comment": {
+        "id": "uuid",
+        "content": "Comment content",
+        "user": {
+            "id": "uuid",
+            "email": "user@example.com"
+        }
+    },
+    "reporter": {
+        "id": "uuid",
+        "email": "reporter@example.com"
+    },
+    "reason": "Inappropriate content",
+    "status": "resolved",
+    "updated_at": "2024-01-01T00:00:00Z"
+}
+```
+
+#### Delete Report
+```
+DELETE /reports/{id}
+```
+
+Response:
+```json
+{
+    "message": "Report deleted successfully"
+}
+```
+
 ## Rate Limiting
 
 The API implements rate limiting to prevent abuse:
@@ -407,6 +529,12 @@ The API supports webhooks for real-time notifications:
 - `borrowing.returned`
 - `user.created`
 - `user.updated`
+- `comment.created`
+- `comment.updated`
+- `comment.deleted`
+- `report.created`
+- `report.updated`
+- `report.deleted`
 
 ### Webhook Configuration
 
@@ -454,7 +582,7 @@ books = client.books.list(limit=10)
 borrowing = client.borrowings.create(
     book_id="uuid",
     user_id="uuid",
-    due_date="2024-02-01"
+    due_date="2025-06-14"
 )
 ```
 

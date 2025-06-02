@@ -47,12 +47,16 @@ The system consists of the following containers:
    - Book Catalog Component
    - Borrowing Management Component
    - Profile Management Component
+   - Comment Component
+   - Report Comment Component
 
 2. **Staff Interface**
    - Dashboard Component
    - Book Management Component
    - User Management Component
    - Report Generation Component
+   - Comment Moderation Component
+   - Report Management Component
 
 ### API Application Components
 
@@ -80,6 +84,11 @@ The system consists of the following containers:
    - Report Generation
    - Data Analytics
    - Export Functionality
+
+6. **Comment Service**
+   - Comment CRUD Operations
+   - Comment Moderation
+   - Report Management
 
 ## Code Diagram
 
@@ -176,6 +185,32 @@ CREATE TABLE borrowings (
     due_date TIMESTAMP WITH TIME ZONE NOT NULL,
     returned_at TIMESTAMP WITH TIME ZONE,
     status VARCHAR NOT NULL
+);
+```
+
+### Comments Table
+```sql
+CREATE TABLE comments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    book_id UUID REFERENCES books(id),
+    user_id UUID REFERENCES users(id),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE,
+    status VARCHAR NOT NULL DEFAULT 'active'
+);
+```
+
+### Comment Reports Table
+```sql
+CREATE TABLE comment_reports (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    comment_id UUID REFERENCES comments(id),
+    reporter_id UUID REFERENCES users(id),
+    reason TEXT NOT NULL,
+    status VARCHAR NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE
 );
 ```
 

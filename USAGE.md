@@ -40,6 +40,21 @@ This guide explains how to use the Library Management System for both students a
 2. View all your past and current borrowings
 3. Check due dates and any fines
 
+### 6. Comment Management
+
+#### Add a Comment
+1. Go to book details page
+2. Scroll to the comments section
+3. Enter your comment
+4. Click "Post Comment"
+
+#### Report a Comment
+1. Find the inappropriate comment
+2. Click the "Report" button
+3. Select the reason for reporting
+4. Add any additional details
+5. Click "Submit Report"
+
 ## Staff Interface
 
 ### 1. Login
@@ -125,6 +140,24 @@ This guide explains how to use the Library Management System for both students a
 2. Click "Export"
 3. Choose format (PDF/CSV)
 4. Download the file
+
+### 6. Comment Moderation
+
+#### View Reported Comments
+1. Click "Comment Reports" in the navigation menu
+2. View all reported comments
+3. Filter by status (pending, resolved)
+4. Sort by date or severity
+
+#### Handle Reports
+1. Click on a reported comment
+2. Review the comment content and report details
+3. Choose an action:
+   - Delete the comment
+   - Keep the comment
+   - Warn the user
+4. Add a resolution note
+5. Click "Resolve Report"
 
 ## Common Features
 

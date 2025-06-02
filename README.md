@@ -20,12 +20,16 @@ A modern library management system that helps manage books, students, and staff 
   - Borrow and return books
   - Track borrowing history
   - View due dates and fines
+  - Comment on books
+  - Report inappropriate comments
 
 - **Staff Features**
   - Manage book inventory
   - Process book borrowings and returns
   - Manage student accounts
   - Generate reports
+  - Moderate comments
+  - Handle comment reports
 
 ## Tech Stack
 

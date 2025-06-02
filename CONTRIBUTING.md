@@ -213,6 +213,23 @@ POST /api/borrowings
 PUT /api/borrowings/<id>
 ```
 
+#### Comments
+```
+GET /api/comments
+GET /api/comments/<id>
+POST /api/comments
+PUT /api/comments/<id>
+DELETE /api/comments/<id>
+```
+
+#### Comment Reports
+```
+GET /api/reports
+POST /api/reports
+PUT /api/reports/<id>
+DELETE /api/reports/<id>
+```
+
 ## Database Schema
 
 ### Users Table

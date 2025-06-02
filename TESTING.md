@@ -76,6 +76,24 @@ def test_book_creation():
     assert book.title == "Test Book"
     assert book.author == "Test Author"
     assert book.isbn == "1234567890"
+
+def test_comment_creation():
+    comment = Comment(
+        book_id="uuid",
+        user_id="uuid",
+        content="Test comment"
+    )
+    assert comment.content == "Test comment"
+    assert comment.status == "active"
+
+def test_report_creation():
+    report = CommentReport(
+        comment_id="uuid",
+        reporter_id="uuid",
+        reason="Inappropriate content"
+    )
+    assert report.reason == "Inappropriate content"
+    assert report.status == "pending"
 ```
 
 #### Integration Tests
@@ -97,6 +115,20 @@ def test_book_borrowing_flow():
     assert borrowing.status == "active"
     assert borrowing.user_id == user.id
     assert borrowing.book_id == book.id
+
+def test_comment_reporting_flow():
+    # Create test user
+    user = create_test_user()
+    
+    # Create test comment
+    comment = create_test_comment()
+    
+    # Create report
+    report = create_comment_report(comment.id, user.id)
+    
+    assert report.status == "pending"
+    assert report.comment_id == comment.id
+    assert report.reporter_id == user.id
 ```
 
 #### API Tests
@@ -129,6 +161,17 @@ describe('BookList', () => {
     expect(wrapper.find('.book-item')).toHaveLength(2);
   });
 });
+
+describe('CommentReport', () => {
+  it('should create a report', () => {
+    const report = {
+      comment_id: 'uuid',
+      reason: 'Inappropriate content'
+    };
+    const wrapper = shallow(<CommentReport report={report} />);
+    expect(wrapper.find('.report-reason')).toHaveText('Inappropriate content');
+  });
+});
 ```
 
 #### Integration Tests
@@ -150,6 +193,22 @@ describe('Book Borrowing', () => {
     
     // Verify borrowing
     expect(await getBorrowedBooks()).toContain(bookId);
+  });
+});
+
+describe('Comment Reporting', () => {
+  it('should allow user to report a comment', async () => {
+    // Login
+    await login(user);
+    
+    // Navigate to book details
+    await navigateToBook(bookId);
+    
+    // Report comment
+    await reportComment(commentId, 'Inappropriate content');
+    
+    // Verify report
+    expect(await getReportStatus(commentId)).toBe('pending');
   });
 });
 ```

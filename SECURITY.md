@@ -37,11 +37,11 @@ This document outlines the security measures and compliance requirements for the
 
 2. **Permission Matrix**
    ```
-   Role        | Books | Users | Reports | Settings
-   ------------|-------|-------|---------|----------
-   Student     | R     | -     | -       | -
-   Staff       | CRUD  | CRUD  | R       | R
-   Admin       | CRUD  | CRUD  | CRUD    | CRUD
+   Role        | Books | Users | Reports | Settings | Comments | Comment Reports
+   ------------|-------|-------|---------|----------|----------|----------------
+   Student     | R     | -     | -       | -        | CR       | C
+   Staff       | CRUD  | CRUD  | R       | R        | CRUD     | CRUD
+   Admin       | CRUD  | CRUD  | CRUD    | CRUD     | CRUD     | CRUD
    ```
 
 3. **Resource Access Control**
@@ -56,6 +56,8 @@ This document outlines the security measures and compliance requirements for the
    - Data in transit (TLS 1.3)
    - Password hashing (bcrypt)
    - API keys encryption
+   - Comment content sanitization
+   - Report reason validation
 
 2. **Data Backup**
    - Daily automated backups
@@ -68,6 +70,15 @@ This document outlines the security measures and compliance requirements for the
    - Transaction logs: 5 years
    - System logs: 1 year
    - Backup retention: 30 days
+   - Comment reports: 1 year
+   - Deleted comments: 30 days
+
+4. **Content Moderation**
+   - Automated content filtering
+   - Manual review process
+   - Report escalation
+   - User notification system
+   - Moderation audit logs
 
 ### Network Security
 
