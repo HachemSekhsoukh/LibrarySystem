@@ -51,7 +51,8 @@ const Readers = () => {
     u_phone: "", 
     u_password: "",
     u_status: 1, 
-    u_type: "" 
+    u_type: "",
+    u_rfid: ""
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [isEditing, setIsEditing] = useState(false);
@@ -64,20 +65,61 @@ const Readers = () => {
   const validateForm = () => {
     const errors = {};
   
+    // Name validation
     if (!newReader.u_name.trim()) errors.u_name = t("name_required");
-    if (!newReader.u_birthDate) errors.u_birthDate = t("birthdate_required");
+  
+    // Email validation
     if (!newReader.u_email) {
       errors.u_email = t("email_required");
     } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(newReader.u_email)) {
       errors.u_email = t("email_invalid");
     }
+  
+    // Phone validation
     if (!newReader.u_phone) {
       errors.u_phone = t("phone_required");
-    } else if (!/^\+?\d{7,15}$/.test(newReader.u_phone)) {
-      errors.u_phone = t("phone_invalid");
+    } else {
+      const phoneRegex = /^(05|06|07)\d{8}$/;
+      if (!phoneRegex.test(newReader.u_phone)) {
+        errors.u_phone = t("phone_invalid_format");
+      }
     }
-    if (!isEditing && !newReader.u_password) errors.u_password = t("password_required");
+  
+    // Password validation
+    if (!isEditing && !newReader.u_password) {
+      // For new users, password is required
+      errors.u_password = t("password_required");
+    } else if (newReader.u_password) {
+      // If password is provided (either new or edit), validate its strength
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(newReader.u_password)) {
+        errors.u_password = t("password_requirements");
+      }
+    }
+  
+    // Age validation (must be at least 15 years old)
+    if (!newReader.u_birthDate) {
+      errors.u_birthDate = t("birthdate_required");
+    } else {
+      const birthDate = new Date(newReader.u_birthDate);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      if (age < 15) {
+        errors.u_birthDate = t("age_requirement");
+      }
+    }
+  
+    // User type validation
     if (!newReader.u_type) errors.u_type = t("user_type_required");
+  
+    // RFID validation
+    if (!newReader.u_rfid) errors.u_rfid = t("rfid_required");
   
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -136,11 +178,21 @@ const Readers = () => {
   }, [verifyReaders]);
 
   const handleInputChange = (e) => {
-    setNewReader({ ...newReader, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewReader({ ...newReader, [name]: value });
+    
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleAutocompleteChange = (field, value) => {
     setNewReader({ ...newReader, [field]: value });
+    // Clear error when user selects a value
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleSnackbarClose = () => {
@@ -154,7 +206,8 @@ const Readers = () => {
       u_email: "", 
       u_phone: "", 
       u_password: "", 
-      u_type: "" 
+      u_type: "",
+      u_rfid: ""
     });
     setFormErrors({});
     setIsEditing(false);
@@ -165,14 +218,25 @@ const Readers = () => {
   const handleAddReader = async () => {
     console.log(t("starting_to_add_reader_with_data"), newReader);
     
+    // Validate form before submission
     if (!validateForm()) {
       console.log(t("form_validation_failed_with_errors"), formErrors);
-      setSnackbar({ open: true, message: t("please_fix_form_errors"), severity: "error" });
+      setSnackbar({ 
+        open: true, 
+        message: t("please_fix_form_errors"), 
+        severity: "error" 
+      });
       return;
     }
 
     try {
       const readerDataToSend = { ...newReader };
+      
+      // Format the birth date to YYYY-MM-DD
+      if (readerDataToSend.u_birthDate) {
+        const date = new Date(readerDataToSend.u_birthDate);
+        readerDataToSend.u_birthDate = date.toISOString().split('T')[0];
+      }
       
       // Ensure user type is properly formatted
       if (typeof readerDataToSend.u_type === 'object' && readerDataToSend.u_type !== null) {
@@ -183,6 +247,10 @@ const Readers = () => {
       
       let response;
       if (isEditing) {
+        // If editing and password is empty, remove it from the data
+        if (!readerDataToSend.u_password) {
+          delete readerDataToSend.u_password;
+        }
         response = await updateReader(currentReaderId, readerDataToSend);
       } else {
         response = await addReader(readerDataToSend);
@@ -203,7 +271,11 @@ const Readers = () => {
       setReaders(updatedData);
     } catch (error) {
       console.error(isEditing ? t("error_updating_reader") : t("error_adding_reader"), error);
-      setSnackbar({ open: true, message: error.message || t("error_saving_reader"), severity: "error" });
+      setSnackbar({ 
+        open: true, 
+        message: error.message || t("error_saving_reader"), 
+        severity: "error" 
+      });
     }
   };
 
@@ -325,7 +397,8 @@ const Readers = () => {
       u_email: reader.email,
       u_phone: reader.phone,
       u_password: "", // Don't populate password for security reasons
-      u_type: userType
+      u_type: userType,
+      u_rfid: reader.rfid // Set RFID directly from reader data
     });
     
     setIsEditing(true);
@@ -467,6 +540,7 @@ const Readers = () => {
           onChange={handleInputChange}
           error={!!formErrors.u_name}
           helperText={formErrors.u_name}
+          required
         />
       </div>
       <div className="form-group">
@@ -479,6 +553,8 @@ const Readers = () => {
           onChange={handleInputChange}
           error={!!formErrors.u_birthDate}
           helperText={formErrors.u_birthDate}
+          required
+          InputLabelProps={{ shrink: true }}
         />
       </div>
     </div>
@@ -494,6 +570,7 @@ const Readers = () => {
           onChange={handleInputChange}
           error={!!formErrors.u_email}
           helperText={formErrors.u_email}
+          required
         />
       </div>
       <div className="form-group">
@@ -506,6 +583,7 @@ const Readers = () => {
           onChange={handleInputChange}
           error={!!formErrors.u_phone}
           helperText={formErrors.u_phone}
+          required
         />
       </div>
     </div>
@@ -521,6 +599,7 @@ const Readers = () => {
           onChange={handleInputChange}
           error={!!formErrors.u_password}
           helperText={formErrors.u_password}
+          required={!isEditing}
         />
       </div>
       <div className="form-group">
@@ -529,10 +608,7 @@ const Readers = () => {
           fullWidth
           options={userTypes}
           value={newReader.u_type}
-          onChange={(event, newValue) => {
-            console.log(t("user_type_changed_to"), newValue);
-            handleAutocompleteChange("u_type", newValue);
-          }}
+          onChange={(event, newValue) => handleAutocompleteChange("u_type", newValue)}
           getOptionLabel={(option) => {
             if (!option) return '';
             if (typeof option === 'string') return option;
@@ -553,9 +629,25 @@ const Readers = () => {
               className="text-field"
               error={!!formErrors.u_type}
               helperText={formErrors.u_type}
+              required
             />
           )}
           className="dropdown-field"
+        />
+      </div>
+    </div>
+
+    <div className="form-row">
+      <div className="form-group">
+        <label>{t("rfid")}</label>
+        <TextField
+          fullWidth
+          name="u_rfid"
+          value={newReader.u_rfid}
+          onChange={handleInputChange}
+          error={!!formErrors.u_rfid}
+          helperText={formErrors.u_rfid}
+          required
         />
       </div>
     </div>

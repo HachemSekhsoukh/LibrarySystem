@@ -579,7 +579,8 @@ export const fetchReaders = async () => {
       email: reader.email,
       phone: reader.phone,
       type: reader.type,
-      status: reader.status
+      status: reader.status,
+      rfid: reader.rfid
     }));
   } catch (error) {
     console.error('Error fetching readers:', error);

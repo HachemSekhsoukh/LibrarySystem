@@ -215,7 +215,13 @@ const Administration = () => {
   };
 
   const handleChange = (e) => {
-    setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewStaff({ ...newStaff, [name]: value });
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSnackbarClose = (event, reason) => {
@@ -230,37 +236,66 @@ const Administration = () => {
     const validationErrors = {};
 
     // Name validation
-    if (!newStaff.name) validationErrors.name = t("name_required");
+    if (!newStaff.name?.trim()) {
+      validationErrors.name = t("name_required");
+    }
 
     // Email validation
     if (!newStaff.email) {
-        validationErrors.email = t("email_required");
-    } else if (!/\S+@\S+\.\S+/.test(newStaff.email)) {
-        validationErrors.email = t("email_invalid");
+      validationErrors.email = t("email_required");
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(newStaff.email)) {
+      validationErrors.email = t("email_invalid");
     }
 
     // Password validation
-    if (!newStaff.password) validationErrors.password = t("password_required");
+    if (!newStaff.id && !newStaff.password) {
+      // For new staff, password is required
+      validationErrors.password = t("password_required");
+    } else if (newStaff.password) {
+      // If password is provided (either new or edit), validate its strength
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(newStaff.password)) {
+        validationErrors.password = t("password_requirements");
+      }
+    }
 
-    // Phone number validation (only digits allowed)
+    // Phone validation
     if (!newStaff.phone) {
-        validationErrors.phone = t("phone_required");
-    } else if (!/^\d+$/.test(newStaff.phone)) {
-        validationErrors.phone = t("phone_invalid");
+      validationErrors.phone = t("phone_required");
+    } else {
+      const phoneRegex = /^(05|06|07)\d{8}$/;
+      if (!phoneRegex.test(newStaff.phone)) {
+        validationErrors.phone = t("phone_invalid_format");
+      }
     }
 
     // Address validation
-    if (!newStaff.address) validationErrors.address = t("address_required");
+    if (!newStaff.address?.trim()) {
+      validationErrors.address = t("address_required");
+    }
 
-    // Birthdate validation (in correct format, e.g., YYYY-MM-DD)
+    // Birthdate validation
     if (!newStaff.birthdate) {
-        validationErrors.birthdate = t("birthdate_required");
-    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(newStaff.birthdate)) {
-        validationErrors.birthdate = t("birthdate_invalid_format");
+      validationErrors.birthdate = t("birthdate_required");
+    } else {
+      const birthDate = new Date(newStaff.birthdate);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      if (age < 15) {
+        validationErrors.birthdate = t("age_requirement");
+      }
     }
 
     // Staff type validation
-    if (!newStaff.staff_type_id) validationErrors.staff_type_id = t("staff_type_required");
+    if (!newStaff.staff_type_id) {
+      validationErrors.staff_type_id = t("staff_type_required");
+    }
 
     setErrors(validationErrors);
     return Object.keys(validationErrors).length === 0;
@@ -271,7 +306,15 @@ const Administration = () => {
 
     setLoading(true);
     try {
-      const response = await addStaffMember(newStaff);
+      const staffDataToSend = { ...newStaff };
+      
+      // Format the birth date to YYYY-MM-DD
+      if (staffDataToSend.birthdate) {
+        const date = new Date(staffDataToSend.birthdate);
+        staffDataToSend.birthdate = date.toISOString().split('T')[0];
+      }
+
+      const response = await addStaffMember(staffDataToSend);
 
       if (response?.success) {
         setSnackbar({
@@ -333,8 +376,25 @@ const Administration = () => {
   const handleUpdateStaff = async () => {
     setLoading(true);
     try {
+      // Validate the form before submission
+      if (!validateEditForm(staffToEdit)) {
+        setSnackbar({
+          open: true,
+          message: t("please_fix_form_errors"),
+          severity: "error"
+        });
+        setLoading(false);
+        return;
+      }
+
       // Create a copy of the staff data to send
       const staffDataToUpdate = { ...staffToEdit };
+      
+      // Format the birth date to YYYY-MM-DD
+      if (staffDataToUpdate.birthdate) {
+        const date = new Date(staffDataToUpdate.birthdate);
+        staffDataToUpdate.birthdate = date.toISOString().split('T')[0];
+      }
       
       // If password is empty, remove it from the data
       if (!staffDataToUpdate.password) {
@@ -443,6 +503,72 @@ const Administration = () => {
       setDeleteDialogOpen(false);
       setItemToDelete(null);
     }
+  };
+
+  const validateEditForm = (staffData) => {
+    const validationErrors = {};
+
+    // Name validation
+    if (!staffData.name?.trim()) {
+      validationErrors.name = t("name_required");
+    }
+
+    // Email validation
+    if (!staffData.email) {
+      validationErrors.email = t("email_required");
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(staffData.email)) {
+      validationErrors.email = t("email_invalid");
+    }
+
+    // Password validation
+    if (staffData.password) {
+      // If password is provided during edit, validate its strength
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(staffData.password)) {
+        validationErrors.password = t("password_requirements");
+      }
+    }
+
+    // Phone validation
+    if (!staffData.phone) {
+      validationErrors.phone = t("phone_required");
+    } else {
+      const phoneRegex = /^(05|06|07)\d{8}$/;
+      if (!phoneRegex.test(staffData.phone)) {
+        validationErrors.phone = t("phone_invalid_format");
+      }
+    }
+
+    // Address validation
+    if (!staffData.address?.trim()) {
+      validationErrors.address = t("address_required");
+    }
+
+    // Birthdate validation
+    if (!staffData.birthdate) {
+      validationErrors.birthdate = t("birthdate_required");
+    } else {
+      const birthDate = new Date(staffData.birthdate);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      if (age < 15) {
+        validationErrors.birthdate = t("age_requirement");
+      }
+    }
+
+    // Staff type validation
+    if (!staffData.staff_type_id) {
+      validationErrors.staff_type_id = t("staff_type_required");
+    }
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
   };
 
   return (
@@ -622,6 +748,7 @@ const Administration = () => {
                 placeholder={t("enter_name")}
                 error={!!errors.name}
                 helperText={errors.name}
+                required
               />
             </div>
 
@@ -637,6 +764,7 @@ const Administration = () => {
                 placeholder={t("enter_email")}
                 error={!!errors.email}
                 helperText={errors.email}
+                required
               />
             </div>
           </div>
@@ -651,9 +779,11 @@ const Administration = () => {
                 onChange={handleChange}
                 variant="outlined"
                 fullWidth
+                type="password"
                 placeholder={t("password_placeholder")}
                 error={!!errors.password}
                 helperText={errors.password}
+                required
               />
             </div>
 
@@ -669,6 +799,7 @@ const Administration = () => {
                 placeholder={t("enter_phone_number")}
                 error={!!errors.phone}
                 helperText={errors.phone}
+                required
               />
             </div>
           </div>
@@ -686,6 +817,7 @@ const Administration = () => {
                 placeholder={t("enter_address")}
                 error={!!errors.address}
                 helperText={errors.address}
+                required
               />
             </div>
 
@@ -702,6 +834,7 @@ const Administration = () => {
                 InputLabelProps={{ shrink: true }}
                 error={!!errors.birthdate}
                 helperText={errors.birthdate}
+                required
               />
             </div>
           </div>
@@ -719,6 +852,7 @@ const Administration = () => {
               placeholder={t("select_staff_type")}
               error={!!errors.staff_type_id}
               helperText={errors.staff_type_id}
+              required
             >
               {staffTypesData.map((type) => (
                 <MenuItem key={type.id} value={type.id}>
@@ -754,10 +888,16 @@ const Administration = () => {
                 className="text-field"
                 name="name"
                 value={staffToEdit?.name || ""}
-                onChange={(e) => setStaffToEdit({...staffToEdit, name: e.target.value})}
+                onChange={(e) => {
+                  setStaffToEdit({...staffToEdit, name: e.target.value});
+                  if (errors.name) setErrors(prev => ({ ...prev, name: '' }));
+                }}
                 variant="outlined"
                 fullWidth
                 placeholder={t("enter_name")}
+                error={!!errors.name}
+                helperText={errors.name}
+                required
               />
             </div>
 
@@ -767,10 +907,16 @@ const Administration = () => {
                 className="text-field"
                 name="email"
                 value={staffToEdit?.email || ""}
-                onChange={(e) => setStaffToEdit({...staffToEdit, email: e.target.value})}
+                onChange={(e) => {
+                  setStaffToEdit({...staffToEdit, email: e.target.value});
+                  if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+                }}
                 variant="outlined"
                 fullWidth
                 placeholder={t("enter_email")}
+                error={!!errors.email}
+                helperText={errors.email}
+                required
               />
             </div>
           </div>
@@ -782,10 +928,16 @@ const Administration = () => {
                 className="text-field"
                 name="password"
                 value={staffToEdit?.password || ""}
-                onChange={(e) => setStaffToEdit({...staffToEdit, password: e.target.value})}
+                onChange={(e) => {
+                  setStaffToEdit({...staffToEdit, password: e.target.value});
+                  if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
+                }}
                 variant="outlined"
                 fullWidth
+                type="password"
                 placeholder={t("password_placeholder")}
+                error={!!errors.password}
+                helperText={errors.password}
               />
             </div>
 
@@ -795,10 +947,16 @@ const Administration = () => {
                 className="text-field"
                 name="phone"
                 value={staffToEdit?.phone || ""}
-                onChange={(e) => setStaffToEdit({...staffToEdit, phone: e.target.value})}
+                onChange={(e) => {
+                  setStaffToEdit({...staffToEdit, phone: e.target.value});
+                  if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
+                }}
                 variant="outlined"
                 fullWidth
                 placeholder={t("enter_phone_number")}
+                error={!!errors.phone}
+                helperText={errors.phone}
+                required
               />
             </div>
           </div>
@@ -810,10 +968,16 @@ const Administration = () => {
                 className="text-field"
                 name="address"
                 value={staffToEdit?.address || ""}
-                onChange={(e) => setStaffToEdit({...staffToEdit, address: e.target.value})}
+                onChange={(e) => {
+                  setStaffToEdit({...staffToEdit, address: e.target.value});
+                  if (errors.address) setErrors(prev => ({ ...prev, address: '' }));
+                }}
                 variant="outlined"
                 fullWidth
                 placeholder={t("enter_address")}
+                error={!!errors.address}
+                helperText={errors.address}
+                required
               />
             </div>
 
@@ -823,11 +987,17 @@ const Administration = () => {
                 className="text-field"
                 name="birthdate"
                 value={staffToEdit?.birthdate || ""}
-                onChange={(e) => setStaffToEdit({...staffToEdit, birthdate: e.target.value})}
+                onChange={(e) => {
+                  setStaffToEdit({...staffToEdit, birthdate: e.target.value});
+                  if (errors.birthdate) setErrors(prev => ({ ...prev, birthdate: '' }));
+                }}
                 variant="outlined"
                 fullWidth
                 type="date"
                 InputLabelProps={{ shrink: true }}
+                error={!!errors.birthdate}
+                helperText={errors.birthdate}
+                required
               />
             </div>
           </div>
@@ -839,10 +1009,16 @@ const Administration = () => {
               className="text-field"
               name="staff_type_id"
               value={staffToEdit?.staff_type_id || ""}
-              onChange={(e) => setStaffToEdit({...staffToEdit, staff_type_id: e.target.value})}
+              onChange={(e) => {
+                setStaffToEdit({...staffToEdit, staff_type_id: e.target.value});
+                if (errors.staff_type_id) setErrors(prev => ({ ...prev, staff_type_id: '' }));
+              }}
               variant="outlined"
               fullWidth
               placeholder={t("select_staff_type")}
+              error={!!errors.staff_type_id}
+              helperText={errors.staff_type_id}
+              required
             >
               {staffTypesData.map((type) => (
                 <MenuItem key={type.id} value={type.id}>

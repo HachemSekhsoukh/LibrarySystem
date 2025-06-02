@@ -23,7 +23,7 @@ def get_readers_by_status(status=1):
         user_response = (
             supabase
             .from_("User")
-            .select("u_id, u_name, u_email, u_birthDate, u_phone, User_type (ut_name), u_status")
+            .select("u_id, u_name, u_email, u_birthDate, u_phone, User_type (ut_name), u_status, u_rfid")
             .eq("u_status", status)
             .execute()
         )
@@ -35,7 +35,8 @@ def get_readers_by_status(status=1):
             'birthDate': user['u_birthDate'],
             'phone': user['u_phone'],
             'type': user['User_type']['ut_name'] if user.get('User_type') else 'No type',
-            'status': user['u_status']
+            'status': user['u_status'],
+            'rfid': user['u_rfid']
         } for user in user_response.data]
         
         return readers
@@ -186,8 +187,14 @@ def add_reader(user_email,reader_data):
             return {'success': False, 'error': "Invalid user type provided"}
 
         # Add user with the reader type
-        reader_data['u_password'] = generate_password_hash(reader_data['u_password'] )
+        reader_data['u_password'] = generate_password_hash(reader_data['u_password'])
         reader_data['u_type'] = reader_type_id  # Assign reader type ID
+        
+        # Check if RFID is unique
+        if reader_data.get('u_rfid'):
+            existing_rfid = supabase.from_("User").select("u_id").eq("u_rfid", reader_data['u_rfid']).execute()
+            if existing_rfid.data and len(existing_rfid.data) > 0:
+                return {'success': False, 'error': "RFID already exists"}
             
         response = supabase.from_("User").insert(reader_data).execute()
 
@@ -275,7 +282,7 @@ def get_resources():
     """
     try:
         response = supabase.from_("Resource").select(
-            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote,r_edition, r_resume, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type,cover_url, "
+            "r_id,r_inventoryNum, r_title, r_author, r_editor, r_ISBN, r_price, r_cote,r_edition, r_resume, r_receivingDate, r_status, r_num_of_borrows,r_observation,r_description,r_type,cover_url,r_rfid, "
             "Resource_type(rt_name)"
         ).execute()
         status_map = {
@@ -301,7 +308,8 @@ def get_resources():
             'description': resource['r_description'],
             'type_name': resource['Resource_type']['rt_name'] if resource.get('Resource_type') else None,
             'status_name': status_map.get(resource['r_status'], "Unknown"),
-            'image_url' :  resource['cover_url'],
+            'image_url': resource['cover_url'],
+            'rfid': resource['r_rfid']
         } for resource in response.data]
 
         return resources
@@ -396,6 +404,12 @@ def add_resource(user_email,resource_data):
     :param resource_data: Dictionary containing resource details.
     """
     try:
+        # Check if RFID is unique
+        if resource_data.get('r_rfid'):
+            existing_rfid = supabase.from_("Resource").select("r_id").eq("r_rfid", resource_data['r_rfid']).execute()
+            if existing_rfid.data and len(existing_rfid.data) > 0:
+                return {'success': False, 'error': "RFID already exists"}
+
         response = supabase.from_("Resource").insert(resource_data).execute()
 
         if response.data:
@@ -440,6 +454,12 @@ def update_resource(user_email,resource_id, resource_data):
     :param resource_data: Dictionary containing updated resource details.
     """
     try:
+        # Check if RFID is unique (excluding current resource)
+        if resource_data.get('r_rfid'):
+            existing_rfid = supabase.from_("Resource").select("r_id").eq("r_rfid", resource_data['r_rfid']).neq("r_id", resource_id).execute()
+            if existing_rfid.data and len(existing_rfid.data) > 0:
+                return {'success': False, 'error': "RFID already exists"}
+
         response = supabase.from_("Resource").update(resource_data).eq("r_id", resource_id).execute()
 
         if response.data:
@@ -1428,12 +1448,20 @@ def update_reader(user_email,reader_id, reader_data):
             return {'success': False, 'error': "Invalid user type provided"}
 
         # Assign reader type ID
-        reader_data['u_password'] = generate_password_hash(reader_data['u_password'] )
         reader_data['u_type'] = reader_type_id
         
-        # If password is empty, remove it from the update data
-        if 'u_password' in reader_data and not reader_data['u_password']:
-            del reader_data['u_password']
+        # If password is provided, hash it
+        if 'u_password' in reader_data and reader_data['u_password']:
+            reader_data['u_password'] = generate_password_hash(reader_data['u_password'])
+        else:
+            # Remove password from update if not provided
+            reader_data.pop('u_password', None)
+        
+        # Check if RFID is unique (excluding current user)
+        if reader_data.get('u_rfid'):
+            existing_rfid = supabase.from_("User").select("u_id").eq("u_rfid", reader_data['u_rfid']).neq("u_id", reader_id).execute()
+            if existing_rfid.data and len(existing_rfid.data) > 0:
+                return {'success': False, 'error': "RFID already exists"}
         
         # Update the reader in the database
         response = supabase.from_("User").update(reader_data).eq("u_id", reader_id).execute()
