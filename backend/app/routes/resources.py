@@ -8,6 +8,38 @@ from app.database import get_resources, add_resource, delete_resource, update_re
 import pandas as pd
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 import io
+import requests
+
+
+@app.route("/api/book-cover", methods=['GET'])
+def get_cover():
+    title = request.args.get("title")
+    author = request.args.get("author")
+    if not title:
+        return jsonify({"error": "Title parameter is required"}), 400
+    
+    try:
+        query = f"intitle:{title}"
+        if author:
+            query += f"+inauthor:{author}"
+        
+        res = requests.get(f"https://www.googleapis.com/books/v1/volumes?q={query}")
+        res.raise_for_status()
+        
+        data = res.json()
+        if not data.get("items"):
+            return jsonify({"thumbnail": None})
+        
+        item = data["items"][0]
+        image_links = item.get("volumeInfo", {}).get("imageLinks", {})
+        print(image_links)
+        
+        return jsonify({"thumbnail": image_links.get("thumbnail")})
+        
+    except requests.RequestException:
+        return jsonify({"thumbnail": None})
+    except Exception:
+        return jsonify({"thumbnail": None})
 
 @app.route('/api/resources', methods=['GET'])
 def resources():
