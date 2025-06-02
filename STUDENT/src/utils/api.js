@@ -25,6 +25,20 @@ export const fetchAllResources = async () => {
   }
 };
 
+export const fetchBookCover = async (title, author) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/book-cover?title=${title}&author=${author}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch book cover');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching book cover:', error);
+    return null;
+  }
+};
+
+
 export const fetchUserTypes = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/user-types`);

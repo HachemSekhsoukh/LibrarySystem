@@ -351,8 +351,13 @@
 
 .title{
   color: var(--primary-color);
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 
