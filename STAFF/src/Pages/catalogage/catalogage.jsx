@@ -46,7 +46,8 @@ const Catalogage = () => {
     receivingDate: "",
     status: 1,
     observation: "",
-    description: ""
+    description: "",
+    rfid: ""
   });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
   const [resourceTypes, setResourceTypes] = useState([]);
@@ -124,7 +125,8 @@ const Catalogage = () => {
       receivingDate: "",
       status: 1,
       observation: "",
-      description: ""
+      description: "",
+      rfid: ""
     });
     setIsEditing(false);
     setCurrentResourceId(null);
@@ -151,7 +153,8 @@ const Catalogage = () => {
         r_status: bookData.status,
         r_observation: bookData.observation,
         r_type: bookData.type,
-        r_description: bookData.description
+        r_description: bookData.description,
+        r_rfid: bookData.rfid
       };
   
       let result;
@@ -192,7 +195,8 @@ const Catalogage = () => {
       receivingDate: resource.receivingDate || "",
       status: resource.status,
       observation: resource.observation,
-      description: resource.description || ""
+      description: resource.description || "",
+      rfid: resource.rfid || ""
     });
     setIsEditing(true);
     setOpenPopup(true);

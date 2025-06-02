@@ -21,6 +21,20 @@ const AddResourceForm = ({ bookData, handleChange, resourceTypes }) => {
                 />
             </Grid>
 
+            {/* RFID */}
+            <Grid item xs={6}>
+                <TextField
+                    className="custom-textfield"
+                    label={t("rfid")}
+                    name="rfid"
+                    value={bookData.rfid}
+                    onChange={handleChange}
+                    variant="outlined"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                />
+            </Grid>
+
             {/* Document Type */}
             <Grid item xs={6}>
                 <TextField
