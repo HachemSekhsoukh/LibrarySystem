@@ -1,119 +1,163 @@
 # Library Management System
 
-A modern library management system that helps manage books, students, and staff members efficiently. The system provides separate interfaces for students and staff members, with role-based access control and comprehensive book management features.
+A modern, full-stack library management system that helps manage library resources and users efficiently. The system provides separate React applications for readers and staff, with role-based access control, comprehensive resource management, analytics, and multilingual support.
+
+![Library System](STAFF/public/assets/images/logo.png)
 
 ## Key Features
 
 - **User Management**
-  - Separate interfaces for students and staff
+  - Separate React applications for readers and staff
   - Secure authentication and authorization
   - Role-based access control
 
-- **Book Management**
-  - Book catalog and inventory
-  - Book borrowing and return system
-  - Book status tracking
-  - Search and filter capabilities
+- **Resource Management**
+  - Resource catalog and inventory
+  - Borrowing and return system
+  - Resource status tracking
+  - Advanced search and filter capabilities
 
-- **Student Features**
-  - View available books
-  - Borrow and return books
+- **Reader Features**
+  - Browse catalog with modern UI
+  - Borrow and return resources
   - Track borrowing history
   - View due dates and fines
-  - Comment on books
-  - Report inappropriate comments
 
 - **Staff Features**
-  - Manage book inventory
-  - Process book borrowings and returns
-  - Manage student accounts
-  - Generate reports
-  - Moderate comments
-  - Handle comment reports
+  - Interactive dashboard with analytics
+  - Complete inventory management
+  - Process borrowings and returns
+  - Track late returns with notifications
+  - Manage reader accounts
+  - Generate statistical reports
 
-## Tech Stack
+- **Advanced Features**
+  - Multilingual support (English/French)
+  - Analytics dashboard with charts
+  - Email notifications for due dates
+  - Responsive design for mobile access
 
-### Backend
-- Python 3.x
-- Flask (Web Framework)
-- Flask-JWT-Extended (Authentication)
-- Supabase (Database)
-- Flask-CORS (Cross-Origin Resource Sharing)
+## Documentation
 
-### Frontend
-- HTML5
-- CSS3
-- JavaScript
-- Bootstrap (UI Framework)
+This project's documentation is organized into the following sections:
 
-## Installation & Usage
+- [**Getting Started**](#getting-started): Quick installation and setup
+- [**User Guide**](USAGE.md): Instructions for using the system
+- [**API Reference**](API.md): Comprehensive API documentation
+- [**Security**](SECURITY.md): Security policies and practices
 
-1. Clone the repository:
-```bash
+## Technology Stack
+
+- **Frontend**: 
+  - React with Vite build tool
+  - CSS Modules for styling
+  - Chart.js for analytics visualization
+  - i18next for internationalization (EN/FR)
+
+- **Backend**: 
+  - Python 3.9+ with Flask framework
+  - RESTful API architecture
+  - SQL database with ORM
+  - JWT authentication
+  - Email notification service
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v16+)
+- Python (v3.9+)
+- npm or yarn
+- SQL database instance
+
+### Quick Setup
+
+#### Backend
+
+```powershell
+# Clone repository & navigate to project
 git clone https://github.com/yourusername/LibrarySystem.git
 cd LibrarySystem
-```
 
-2. Set up the backend:
-```bash
+# Set up Python virtual environment
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+.\venv\Scripts\activate
 pip install -r requirements.txt
-```
 
-3. Configure environment variables:
-Create a `.env` file in the backend directory with the following variables:
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
-JWT_SECRET_KEY=your_jwt_secret
-```
-
-4. Run the backend server:
-```bash
+# Run backend server
 python run.py
 ```
 
-5. Access the application:
-- Student Interface: Open `STUDENT/index.html` in your browser
-- Staff Interface: Open `STAFF/index.html` in your browser
+#### Staff Application
+
+```powershell
+cd STAFF
+npm install
+npm run dev
+```
+
+#### Reader Application
+
+```powershell
+cd STUDENT
+npm install
+npm run dev
+```
+
 
 ## Project Structure
 
+The project uses a clean architecture with separate frontend applications and a shared backend:
+
 ```
 LibrarySystem/
-├── backend/
-│   ├── app/
-│   ├── requirements.txt
-│   └── run.py
-├── STUDENT/
-│   └── index.html
-├── STAFF/
-│   └── index.html
-└── README.md
+├── backend/                  # Flask backend
+│   ├── app/                  # Main application package
+│   │   ├── database.py       # Database configuration
+│   │   ├── email_service.py  # Email notifications
+│   │   └── routes/           # API endpoints by resource
+│   ├── requirements.txt      # Python dependencies
+│   └── run.py                # Application entry point
+├── STAFF/                    # Staff frontend (React)
+│   ├── public/               # Static assets
+│   └── src/                  # Source code
+│       ├── components/       # UI components
+│       ├── CSS/              # Styling
+│       ├── Layouts/          # Page layouts
+│       ├── locales/          # Translation files (EN/FR)
+│       └── Pages/            # Application views
+└── STUDENT/                  # Reader frontend (React)
+    ├── package.json          # Node dependencies
+    ├── public/               # Static assets
+    └── src/                  # Source code
+        ├── components/       # UI components
+        ├── CSS/              # Styling
+        ├── Pages/            # Application views
+        └── utils/            # Utility functions
 ```
 
-## License
+## Core Features
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Analytics Dashboard
+The staff interface includes a comprehensive analytics dashboard with:
+- Monthly borrowing statistics
+- Resource type distribution
+- Late returns tracking
+- Active reader metrics
 
-## Contributing
+### Internationalization
+Both interfaces support multiple languages:
+- English (default)
+- French
+- Easily extensible to other languages
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Security
+- Role-based access control
+- Secure JWT authentication
+- Data encryption
+- Input validation and sanitization
+- CORS protection
+- SQL injection prevention
 
-## Security
 
-- All API endpoints are protected with JWT authentication
-- Passwords are securely hashed
-- CORS is properly configured
-- Input validation is implemented
-- SQL injection prevention measures are in place
 
-## Support
-
-For support, please open an issue in the GitHub repository or contact the development team. 

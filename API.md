@@ -1,6 +1,21 @@
 # API Documentation
 
-This document describes the REST API endpoints for the Library Management System.
+This document provides a comprehensive reference for the REST API endpoints used in the Library Management System.
+
+## API Overview
+
+The API is organized into logical resource groups:
+
+| Resource Group | Description |
+|---------------|-------------|
+| `/auth` | Authentication and user management |
+| `/resources` | Library resource management |
+| `/resource_types` | Resource categorization and types |
+| `/readers` | Reader profile management |
+| `/transactions` | Borrowing and return operations |
+| `/late_returns` | Management of overdue resources |
+| `/statistics` | Analytics and reporting |
+| `/logs` | System activity logs |
 
 ## Base URL
 
@@ -14,6 +29,32 @@ All API endpoints require JWT authentication. Include the token in the Authoriza
 
 ```
 Authorization: Bearer <your_jwt_token>
+```
+
+### Obtaining a Token
+
+```
+POST /api/auth/login
+```
+
+Request Body:
+```json
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
+```
+
+Response:
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": "123",
+        "email": "user@example.com",
+        "role": "reader"
+    }
+}
 ```
 
 ## Error Handling
@@ -39,6 +80,20 @@ Error Response Format:
 ```
 
 ## Endpoints
+
+The API is organized into the following resource groups:
+
+| Resource Group | Description |
+|---------------|-------------|
+| `/auth` | Authentication and user management |
+| `/resources` | Library resource management |
+| `/resource_types` | Resource categorization and types |
+| `/readers` | Reader profile management |
+| `/transactions` | Borrowing and return operations |
+| `/late_returns` | Management of overdue resources |
+| `/statistics` | Analytics and reporting |
+| `/logs` | System activity logs |
+| `/staff` | Staff-specific operations |
 
 ### Authentication
 
@@ -98,16 +153,15 @@ GET /books
 ```
 
 Query Parameters:
-- `page` (optional): Page number (default: 1)
-- `limit` (optional): Items per page (default: 10)
-- `search` (optional): Search term
-- `category` (optional): Book category
+- `title`(optional): Book Title
+- `Author Name`(optional): Author Name
 - `status` (optional): Book status
+- `isbn` (optional): Book isbn
 
 Response:
 ```json
 {
-    "items": [
+    "items": 
         {
             "id": "uuid",
             "title": "Book Title",
@@ -116,10 +170,6 @@ Response:
             "status": "available",
             "created_at": "2025-05-14T00:00:00Z"
         }
-    ],
-    "total": 100,
-    "page": 1,
-    "limit": 10
 }
 ```
 
@@ -151,7 +201,6 @@ Request Body:
     "title": "Book Title",
     "author": "Author Name",
     "isbn": "ISBN123",
-    "category": "Fiction"
 }
 ```
 
@@ -215,7 +264,6 @@ GET /borrowings
 
 Query Parameters:
 - `page` (optional): Page number
-- `limit` (optional): Items per page
 - `user_id` (optional): Filter by user
 - `status` (optional): Filter by status
 
@@ -239,9 +287,6 @@ Response:
             "status": "active"
         }
     ],
-    "total": 50,
-    "page": 1,
-    "limit": 10
 }
 ```
 
@@ -559,36 +604,3 @@ Response:
     "created_at": "2024-01-01T00:00:00Z"
 }
 ```
-
-## SDKs
-
-Official SDKs are available for:
-
-- Python
-- JavaScript
-- Java
-- Ruby
-
-Example usage with Python SDK:
-```python
-from library_system import Client
-
-client = Client(api_key="your_api_key")
-
-# List books
-books = client.books.list(limit=10)
-
-# Create a borrowing
-borrowing = client.borrowings.create(
-    book_id="uuid",
-    user_id="uuid",
-    due_date="2025-06-14"
-)
-```
-
-## Support
-
-For API support:
-- Email: api-support@librarysystem.com
-- Documentation: https://docs.librarysystem.com
-- Status Page: https://status.librarysystem.com 
