@@ -100,6 +100,28 @@ CREATE TABLE borrowings (
     returned_at TIMESTAMP WITH TIME ZONE,
     status VARCHAR NOT NULL
 );
+
+-- Comments table
+CREATE TABLE comments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    book_id UUID REFERENCES books(id),
+    user_id UUID REFERENCES users(id),
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE,
+    status VARCHAR NOT NULL DEFAULT 'active'
+);
+
+-- Comment Reports table
+CREATE TABLE comment_reports (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    comment_id UUID REFERENCES comments(id),
+    reporter_id UUID REFERENCES users(id),
+    reason TEXT NOT NULL,
+    status VARCHAR NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE
+);
 ```
 
 ## Running the Application

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Comment reporting system
+  - Report creation for inappropriate comments
+  - Report management interface for staff
+  - Report status tracking
+  - Report deletion functionality
 - Initial project setup
 - Basic authentication system
 - Book management features
@@ -20,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Usage guide
 - Developer guide
 
-## [1.0.0] - 2024-01-01
+## [1.0.0] - 2025-05-30
 
 ### Added
 - Complete library management system
@@ -49,7 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SQL injection prevention
 - Rate limiting implementation
 
-## [0.1.0] - 2023-12-01
+## [0.1.0] - 2025-05-14
 
 ### Added
 - Project initialization
