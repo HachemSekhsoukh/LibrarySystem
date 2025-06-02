@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ReCAPTCHA from "react-google-recaptcha";
 import logo from "/assets/images/logo2.png";
 import "../CSS/UserLogin.css";
-import { loginStudent, getUserInfo } from '../utils/api';
+import { loginStudent, getUserInfo,fetchLoginAttempts, updateLoginAttempts } from '../utils/api';
 import { useUser } from '../utils/userContext';
 
 const UserLogin = () => {
@@ -41,15 +41,60 @@ const UserLogin = () => {
     }
 
     setIsLoading(true);
+    let loginAttempts = null;
+    
     try {
-      // First login the user
+      // Check login attempts first
+      loginAttempts = await fetchLoginAttempts(formData.email);
+      console.log("loginAttempts top top");
+      console.log(loginAttempts);
+      
+      if (loginAttempts) {
+        const now = new Date();
+        
+        // If there's a blocked_until timestamp, check if we're still blocked
+        if (loginAttempts.blocked_until) {
+          const blockedUntil = new Date(loginAttempts.blocked_until);
+          console.log("blockedUntil");
+          console.log(blockedUntil);
+          console.log("now");
+          console.log(now);
+          console.log("now < blockedUntil");
+          console.log(now < blockedUntil);
+          if (now < blockedUntil) {
+            setError(`Too many login attempts. Please try again after ${blockedUntil}`);
+            setIsLoading(false);
+            return;
+          } else {
+            // If block has expired, reset the attempt count
+            await updateLoginAttempts(formData.email, 0, null);
+            loginAttempts.login_attempt_count = 0;
+          }
+        }
+
+        // Check if we've reached 5 attempts in the current hour
+        if (loginAttempts.login_attempt_count >= 5) {
+          // Set blocked_until to 1 hour from now
+          const blockedUntil = new Date(now.getTime() + 60 * 60 * 1000);
+          // Format as ISO string with timezone for timestamptz
+          const blockedUntilISO = blockedUntil.toISOString();
+          console.log("blockedUntil ISO:", blockedUntilISO);
+          await updateLoginAttempts(formData.email, loginAttempts.login_attempt_count, blockedUntilISO);
+          setError(`Too many login attempts. Please try again after ${blockedUntil}`);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Proceed with login if attempts are within limits
       const loginResponse = await loginStudent(formData.email, formData.password);
       
       if (loginResponse && loginResponse.success) {
+        // Reset login attempts on successful login
+        await updateLoginAttempts(formData.email, 0, null);
+        
         // Then fetch complete user info
         const userData = await getUserInfo();
-        console.log("userData after login");
-        console.log(userData);
         if (userData) {
           // Set the complete user data in context
           setUser(userData);
@@ -62,12 +107,21 @@ const UserLogin = () => {
           setError('Failed to fetch user information');
         }
       } else {
+        // Increment login attempts on failed login
+
+        const newAttemptCount = (loginAttempts?.login_attempt_count || 0) + 1;
+
+        await updateLoginAttempts(formData.email, newAttemptCount, null);
         setError(loginResponse?.error || 'Invalid credentials');
         // Reset CAPTCHA on failed login
         recaptchaRef.current?.reset();
         setCaptchaValue(null);
       }
     } catch (err) {
+      console.error('Login error:', err);
+      // Increment login attempts on error
+      const newAttemptCount = (loginAttempts?.login_attempt_count || 0) + 1;
+      await updateLoginAttempts(formData.email, newAttemptCount, null);
       setError('Something went wrong. Please try again.');
       // Reset CAPTCHA on error
       recaptchaRef.current?.reset();
