@@ -2124,3 +2124,37 @@ def delete_suggestion(suggestion_id):
     except Exception as e:
         print('Error in delete_suggestion:', e)
         return {'success': False, 'error': str(e)}
+
+def report_comment(reporter_id, comment_id, reason):
+    try:
+        # Insert into comment_report table
+        result = supabase.table('comment_report').insert({
+            'reporter_id': reporter_id,
+            'comment_id': comment_id,
+            'reason': reason,
+            'date': datetime.now().isoformat()
+        }).execute()
+        
+        if result.error:
+            raise Exception(result.error.message)
+            
+        return {'success': True, 'message': 'Comment reported successfully'}
+    except Exception as e:
+        print(f"Error reporting comment: {str(e)}")
+        return {'success': False, 'error': str(e)}
+
+def delete_report(report_id):
+    """
+    Delete a report from the database by its ID.
+    :param report_id: The ID of the report to delete.
+    """
+    try:
+        response = supabase.from_("comment_report").delete().eq("id", report_id).execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Report deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Report not found or could not be deleted'}
+    except Exception as e:
+        print(f"Error deleting report: {e}")
+        return {'success': False, 'error': str(e)}

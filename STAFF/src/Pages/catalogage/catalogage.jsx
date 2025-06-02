@@ -23,7 +23,8 @@ import {
   fetchResourceHistory, 
   fetchResourceComments, 
   fetchCommentReports,
-  deleteComment
+  deleteComment,
+  deleteReport
 } from '../../utils/api';
 
 const Catalogage = () => {
@@ -339,6 +340,27 @@ const Catalogage = () => {
     } finally {
       setDeleteCommentDialogOpen(false);
       setCommentToDelete(null);
+    }
+  };
+
+  const handleDeleteReport = async (reportId) => {
+    try {
+      await deleteReport(reportId);
+      setSnackbar({
+        open: true,
+        message: 'Report deleted successfully',
+        severity: 'success'
+      });
+      
+      // Refresh reports
+      const reports = await fetchCommentReports(selectedResource.id);
+      setReportedComments(reports.reports || []);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'Failed to delete report',
+        severity: 'error'
+      });
     }
   };
 
@@ -710,11 +732,21 @@ const Catalogage = () => {
                     mb: 1, 
                     border: '1px solid #e0e0e0', 
                     borderRadius: 1,
-                    backgroundColor: '#f9f9f9'
+                    backgroundColor: '#f9f9f9',
+                    position: 'relative'
                   }}>
-                    <Typography variant="subtitle2" color="error">
-                      Report #{index + 1}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <Typography variant="subtitle2" color="error">
+                        Report #{index + 1}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteReport(report.id)}
+                        sx={{ color: 'error.main' }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                     <Typography variant="body2">
                       Reason: {report.reason}
                     </Typography>

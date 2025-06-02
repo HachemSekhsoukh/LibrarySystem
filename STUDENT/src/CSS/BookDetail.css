@@ -881,3 +881,30 @@
     opacity: 0;
   }
 }
+
+.report-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-form label {
+  font-weight: 500;
+  color: #333;
+}
+
+.report-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.report-form textarea:focus {
+  outline: none;
+  border-color: #005198;
+  box-shadow: 0 0 0 2px rgba(0, 81, 152, 0.1);
+}

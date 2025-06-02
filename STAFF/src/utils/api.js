@@ -198,19 +198,19 @@ export const loginUser = async (email, password) => {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password })
     });
 
+    const data = await response.json();
+    
     if (!response.ok) {
-      throw new Error('Invalid email or password');
+      throw new Error(data.error || 'Login failed');
     }
 
-    const data = await response.json();
-    console.log('Login successful:', data);
     return data;
   } catch (error) {
     console.error('Login error:', error);
-    return null;
+    throw error;
   }
 };
 
@@ -1242,4 +1242,20 @@ export const deleteSuggestion = async (suggestionId) => {
         console.error('Error in deleteSuggestion:', error);
         throw error;
     }
+};
+
+export const deleteReport = async (reportId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/reports/${reportId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete report');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting report:', error);
+    throw error;
+  }
 };
