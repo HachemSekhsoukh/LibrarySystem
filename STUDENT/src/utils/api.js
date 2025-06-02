@@ -62,13 +62,16 @@ export const createComment = async (commentData) => {
 
 export const fetchComments = async (resourceId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/comments/${resourceId}`);
-    console.log('resource');
-    console.log(response)
+    const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/comments`, {
+      credentials: 'include',
+    });
+    
     if (!response.ok) {
       throw new Error('Failed to fetch comments');
     }
-    return await response.json();
+    
+    const data = await response.json();
+    return data.comments || [];
   } catch (error) {
     console.error('Error fetching comments:', error);
     return [];

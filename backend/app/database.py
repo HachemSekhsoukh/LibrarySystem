@@ -1968,16 +1968,16 @@ def get_comments(resource_id):
     try:
         response = supabase \
             .from_('Rating') \
-            .select('rat_id','comment','rating','rat_date','user_id', 'User(u_name)') \
+            .select('rat_id, comment, rating, rat_date, user_id, User(u_name)') \
             .eq('res_id', resource_id) \
             .execute()
         
         if not response.data:
             return []
-        return response
-    except Exception as e :
-        print(f"Error adding comment: {e}")
-        return {'success': False, 'error': str(e)}
+        return response.data  # Return just the data array
+    except Exception as e:
+        print(f"Error getting comments: {e}")
+        return []
 
 def mark_late_reservations():
     """
@@ -2011,4 +2011,24 @@ def mark_late_reservations():
                 supabase.from_("Reservation").update({"res_type": 4}).eq("res_id", res['res_id']).execute()
     except Exception as e:
         print(f"Error in mark_late_reservations: {e}")
+
+def delete_comment(comment_id):
+    """
+    Delete a comment from the Rating table
+    """
+    try:
+        # Delete the comment
+        response = supabase \
+            .from_('Rating') \
+            .delete() \
+            .eq('rat_id', comment_id) \
+            .execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Comment deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Failed to delete comment'}
+    except Exception as e:
+        print('Error in delete_comment:', e)
+        return {'success': False, 'error': str(e)}
 
