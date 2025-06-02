@@ -1315,7 +1315,7 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
     try:
         # Fetch current reservation
         current = supabase.from_("Reservation").select(
-            "res_type, res_user_id, res_resource_id, "
+            "res_type, res_user_id, res_resource_id, res_date, "
             "User(u_email, u_name), "
             "Resource(r_title)"
         ).eq("res_id", reservation_id).single().execute().data
@@ -1324,6 +1324,21 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
             return {'success': False, 'error': 'Reservation not found'}
             
         current_type = current['res_type']
+        
+        # Map string transaction types to numeric values
+        type_map = {
+            "Borrow": 1,
+            "Return": 2,
+            "Renew_1": 3,
+            "Late": 4,
+            "Renew_2": 5
+        }
+        
+        # Convert string transaction type to numeric value
+        new_type = type_map.get(transaction_type)
+        if new_type is None:
+            return {'success': False, 'error': 'Invalid transaction type'}
+            
         # Allowed transitions
         allowed = {
             0: [1],  # Reservation (if 0) → Borrow
@@ -1332,12 +1347,13 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
             5: [2, 4],     # Renew_2 → Return, Late
             4: [2],        # Late → Return
         }
-        type_map = {"Borrow": 1, "Return": 2, "Renew_1": 3, "Late": 4, "Renew_2": 5}
-        new_type = type_map.get(transaction_type, 1)
+        
         if current_type not in allowed or new_type not in allowed[current_type]:
             return {'success': False, 'error': 'Invalid status transition'}
 
         print(f"\nUpdating reservation {reservation_id}")
+        print(f"Current type: {current_type}")
+        print(f"New type: {new_type}")
         print(f"Transaction type: {transaction_type}")
         
         # Map transaction types to status codes if provided
@@ -1350,14 +1366,7 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
             update_data['res_resource_id'] = resource_id
             
         if transaction_type is not None:
-            type_map = {
-                "Borrow": 1,
-                "Return": 2,
-                "Renew_1": 3,
-                "Late": 4,
-                "Renew_2": 5
-            }
-            update_data['res_type'] = type_map.get(transaction_type, 1)
+            update_data['res_type'] = new_type
             print(f"Mapped transaction type to: {update_data['res_type']}")
         
         # Only update if we have data to update
@@ -1373,56 +1382,65 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
         print("Update response:", response.data)
         
         if response.data:
-            # If the new type is "Return" (2), delete the reservation
-            if transaction_type == "Return":
-                print(f"Attempting to delete reservation {reservation_id}")
-                delete_response = supabase.from_("Reservation").delete().eq("res_id", reservation_id).execute()
-                print("Delete response:", delete_response)
-                
-                if delete_response.data is not None:  # Changed condition to check for None
-                    print("Successfully deleted reservation")
-                    return {
-                        'success': True,
-                        'message': 'Reservation marked as returned and deleted successfully'
-                    }
-                else:
-                    print("Failed to delete reservation")
-                    return {
-                        'success': False,
-                        'error': 'Failed to delete returned reservation'
-                    }
-            
-            # If the new type is "Late" (4), send email notification
+            # If the transaction is being marked as late, send an email notification
             if transaction_type == "Late":
-                # Get transaction details for email
-                transaction = get_transaction_details(reservation_id)
-                if transaction and transaction.get('user_email') and transaction.get('user_name'):
-                    from ..email_service import send_late_return_email
-                    email_result = send_late_return_email(
-                        transaction['user_email'],
-                        transaction['user_name'],
-                        transaction['title'],
-                        transaction['due_date'].split('T')[0],
-                        transaction.get('days_late', 0)
-                    )
-                    
-                    if email_result['success']:
-                        print(f"Email notification sent to {transaction['user_email']}")
-                    else:
-                        print(f"Failed to send email notification to {transaction['user_email']}: {email_result['message']}")
+                # Get user type info for due date calculation
+                user = supabase.from_("User").select("u_type, User_type(ut_borrow, ut_renew)").eq("u_id", current['res_user_id']).single().execute().data
+                ut_borrow = user['User_type']['ut_borrow'] if user and user.get('User_type') else 0
+                ut_renew = user['User_type']['ut_renew'] if user and user.get('User_type') else 0
+                
+                # Get resource type info
+                resource = supabase.from_("Resource").select("r_type, Resource_type(rt_borrow)").eq("r_id", current['res_resource_id']).single().execute().data
+                rt_borrow = resource.get('Resource_type', {}).get('rt_borrow') if resource else None
+                borrow_limit = rt_borrow if rt_borrow and rt_borrow > 1 else ut_borrow
+                
+                # Calculate due date
+                from datetime import datetime, timedelta
+                borrow_date = datetime.fromisoformat(current['res_date'].replace('Z', '+00:00'))
+                now = datetime.now(borrow_date.tzinfo)
+                
+                if current_type == 1:  # Borrow
+                    due_date = borrow_date + timedelta(days=borrow_limit)
+                elif current_type == 3:  # Renew_1
+                    due_date = borrow_date + timedelta(days=borrow_limit + ut_renew)
+                elif current_type == 5:  # Renew_2
+                    due_date = borrow_date + timedelta(days=borrow_limit + 2 * ut_renew)
+                else:
+                    due_date = borrow_date + timedelta(days=borrow_limit)
+                
+                # Calculate days late
+                days_late = (now - due_date).days
+                
+                # Send email notification
+                from app.email_service import send_late_return_email
+                email_result = send_late_return_email(
+                    current['User']['u_email'],
+                    current['User']['u_name'],
+                    current['Resource']['r_title'],
+                    due_date.strftime('%Y-%m-%d'),
+                    days_late
+                )
+                
+                if email_result['success']:
+                    print(f"Email notification sent to {current['User']['u_email']}")
+                    # Log the email sending
+                    add_log("system", f"sent late return notice to {current['User']['u_email']} for book '{current['Resource']['r_title']}'")
+                else:
+                    print(f"Failed to send email notification to {current['User']['u_email']}: {email_result['message']}")
             
+            # Log the update
+            add_log(current['User']['u_email'], f"updated transaction {reservation_id} to type: {transaction_type}")
             return {
                 'success': True,
-                'reservation': response.data[0],
-                'message': 'Reservation updated successfully'
+                'reservation': response.data[0]
             }
         else:
             return {
                 'success': False,
-                'error': 'Reservation not found or could not be updated'
+                'error': 'Failed to update reservation'
             }
     except Exception as e:
-        print(f"Error updating reservation: {e}")
+        print(f"Error updating reservation: {str(e)}")
         return {
             'success': False,
             'error': str(e)
@@ -2104,29 +2122,22 @@ def mark_late_reservations():
                     # Calculate days late for the email
                     days_late = (now - due_date).days
                     
-                    # Prepare email data
-                    recipient_data = {
-                        'email': res['User']['u_email'],
-                        'name': res['User']['u_name'],
-                        'book_title': res['Resource']['r_title'],
-                        'due_date': due_date.strftime('%Y-%m-%d'),
-                        'days_late': days_late
-                    }
-                    
                     # Send email notification
-                    from ..email_service import send_late_return_email
+                    from app.email_service import send_late_return_email
                     email_result = send_late_return_email(
-                        recipient_data['email'],
-                        recipient_data['name'],
-                        recipient_data['book_title'],
-                        recipient_data['due_date'],
-                        recipient_data['days_late']
+                        res['User']['u_email'],
+                        res['User']['u_name'],
+                        res['Resource']['r_title'],
+                        due_date.strftime('%Y-%m-%d'),
+                        days_late
                     )
                     
                     if email_result['success']:
-                        print(f"Email notification sent to {recipient_data['email']}")
+                        print(f"Email notification sent to {res['User']['u_email']}")
+                        # Log the email sending
+                        add_log("system", f"sent late return notice to {res['User']['u_email']} for book '{res['Resource']['r_title']}'")
                     else:
-                        print(f"Failed to send email notification to {recipient_data['email']}: {email_result['message']}")
+                        print(f"Failed to send email notification to {res['User']['u_email']}: {email_result['message']}")
                 
     except Exception as e:
         print(f"Error in mark_late_reservations: {e}")
