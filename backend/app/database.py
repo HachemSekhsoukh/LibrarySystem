@@ -997,6 +997,21 @@ def get_user_password(email):
         print(f"Error fetching user password by email: {e}")
         return None
 
+def get_login_attempts_db(email):
+    response = supabase.from_("User").select("login_attempt_count, blocked_until").eq("u_email", email).execute()
+    print("response");
+    print(response);
+    if response.data and len(response.data) > 0:
+        return response.data[0]
+    return None
+
+def update_login_attempts_db(email, login_attempt_count, blocked_until):
+    print("blocked")
+    print(blocked_until);
+    
+    response = supabase.from_("User").update({"login_attempt_count": login_attempt_count, "blocked_until": blocked_until}).eq("u_email", email).execute()
+    return response.data
+
 def get_student_password(email):
     """
     Fetch the student's password from the Supabase database using their email.

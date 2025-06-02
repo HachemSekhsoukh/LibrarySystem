@@ -7,7 +7,9 @@ from app.database import (
     get_student_by_email,
     update_student_password_db,
     get_student_password,
-    update_student_by_email
+    update_student_by_email,
+    get_login_attempts_db,
+    update_login_attempts_db
 )
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -84,10 +86,34 @@ def student_logout():
     )
     return resp
 
+
+@app.route('/api/student/login-attempts', methods=['GET'])
+def get_login_attempts():
+    print("get_login_attempts")
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+        
+    response = get_login_attempts_db(email)
+    if response:
+        return jsonify({'login_attempt_count': response['login_attempt_count'], 'blocked_until': response['blocked_until']}), 200
+    return jsonify({'error': 'failed to get login attempts'}), 500
+
+
+@app.route('/api/student/login-attempts', methods=['POST'])
+def update_login_attempts():
+    data = request.get_json()
+    print("data");
+    print(data);
+    response = update_login_attempts_db(data['email'], data['login_attempt_count'], data['blocked_until'])
+    if response:
+        return jsonify({'message': 'Login attempts updated successfully'}), 200
+    return jsonify({'error': 'failed to update login attempts'}), 500
+    
+
 @app.route('/api/student/user/me', methods=['GET'])
 @jwt_required()
 def get_student_info():
-    print("get_student_info")
     access_token = request.cookies.get('access_token_cookie')
     if not access_token:
         return jsonify({"error": "Missing token in cookies"}), 401

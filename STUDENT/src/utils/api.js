@@ -25,6 +25,46 @@ export const fetchAllResources = async () => {
   }
 };
 
+export const fetchLoginAttempts = async (email) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/student/login-attempts?email=${encodeURIComponent(email)}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch login attempts');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching login attempts:', error);
+    return null;
+  }
+}
+
+export const updateLoginAttempts = async (email, login_attempt_count, blocked_until) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/student/login-attempts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        login_attempt_count,
+        blocked_until
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server responded with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error('Error updating login attempts:', error);
+    return null;
+  }
+};
+
 export const fetchBookCover = async (title, author) => {
   try {
     const response = await fetch(`${API_BASE_URL}/book-cover?title=${title}&author=${author}`);
@@ -259,7 +299,6 @@ export const loginUser = async (email, password) => {
     }
 
     const data = await response.json();
-    console.log('Login successful:', data);
     return data;
   } catch (error) {
     console.error('Login error:', error);
@@ -287,7 +326,6 @@ export const signupUser = async (userData) => {
     }
 
     const data = await response.json();
-    console.log('Signup successful:', data);
     return data;
   } catch (error) {
     console.error('Signup error:', error);
