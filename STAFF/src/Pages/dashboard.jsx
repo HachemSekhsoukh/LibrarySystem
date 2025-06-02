@@ -9,9 +9,125 @@ import {
   fetchTransactions,
   fetchMonthlyBorrows,
   fetchMostBorrowedBooks, // Importing the function
+  getSuggestions,
+  deleteSuggestion,
 } from '../utils/api';
 
 import React, { useEffect, useState } from 'react';
+import { Box, Typography, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+
+const SuggestionsTable = () => {
+    const [suggestions, setSuggestions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [selectedSuggestion, setSelectedSuggestion] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        fetchSuggestions();
+    }, []);
+
+    const fetchSuggestions = async () => {
+        try {
+            setLoading(true);
+            const data = await getSuggestions();
+            setSuggestions(data || []);
+            setError(null);
+        } catch (err) {
+            setError('Failed to fetch suggestions');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (suggestionId) => {
+        try {
+            await deleteSuggestion(suggestionId);
+            setSnackbar({ open: true, message: 'Suggestion deleted successfully', severity: 'success' });
+            fetchSuggestions();
+        } catch (err) {
+            setSnackbar({ open: true, message: 'Failed to delete suggestion', severity: 'error' });
+            console.error(err);
+        }
+    };
+
+    const handleEdit = (suggestion) => {
+        setSelectedSuggestion(suggestion);
+        setEditDialogOpen(true);
+    };
+
+    const handleSendEmail = () => {
+        if (selectedSuggestion) {
+            const mailtoLink = `mailto:${selectedSuggestion.user_email}?subject=Response to your suggestion&body=Dear ${selectedSuggestion.user_name},%0A%0AThank you for your suggestion: "${selectedSuggestion.content}"%0A%0ABest regards,`;
+            window.location.href = mailtoLink;
+            setEditDialogOpen(false);
+        }
+    };
+
+    const columns = [
+        { label: t("user_name"), key: "user_name" },
+        { label: t("content"), key: "content" },
+        { label: t("date"), key: "date" },
+    ];
+
+    const formatData = (suggestions) => {
+        return suggestions.map(suggestion => ({
+            ...suggestion,
+            date: new Date(suggestion.date).toLocaleDateString()
+        }));
+    };
+
+    return (
+        <Box sx={{ mt: 4 }}>
+            <div className="recent-transactions-container">
+                <Table 
+                    columns={columns} 
+                    data={formatData(suggestions)} 
+                    showActions={true}
+                    title={t("user_suggestions")}
+                    loading={loading}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+            </div>
+
+            <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+                <DialogTitle>Respond to Suggestion</DialogTitle>
+                <DialogContent>
+                    {selectedSuggestion && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography variant="subtitle1">From: {selectedSuggestion.user_name}</Typography>
+                            <Typography variant="subtitle1">Email: {selectedSuggestion.user_email}</Typography>
+                            <Typography variant="subtitle1" sx={{ mt: 2 }}>Suggestion:</Typography>
+                            <Typography>{selectedSuggestion.content}</Typography>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleSendEmail} color="primary">
+                        Send Email Response
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+                <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+        </Box>
+    );
+};
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -101,7 +217,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="dashboard-page">
+    <Box sx={{ p: 3 }}>
       {/* Stat Cards */}
       <div className="stat-cards-container">
         {loadingStats ? <div className="loader" /> : (
@@ -129,7 +245,9 @@ const Dashboard = () => {
       <div id="most-borrowed-section" className="recent-transactions-container">
       {loadingMostBorrowed ? <div className="loader" /> : <Table columns={columns2} data={mostBorrowed} showActions={false} title={t("most_borrowed_books")} loading={loadingMostBorrowed} />}
       </div>
-    </div>
+
+      <SuggestionsTable />
+    </Box>
   );
 };
 

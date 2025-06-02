@@ -2032,3 +2032,95 @@ def delete_comment(comment_id):
         print('Error in delete_comment:', e)
         return {'success': False, 'error': str(e)}
 
+def add_suggestion(user_id, content):
+    """
+    Add a new suggestion to the Suggestions table
+    """
+    try:
+        response = supabase.table('Suggestions').insert({
+            'sug_user_id': user_id,
+            'sug_content': content,
+            'sug_date': datetime.now().isoformat()
+        }).execute()
+        
+        if response.data:
+            return {
+                'success': True,
+                'message': 'Suggestion added successfully'
+            }
+        else:
+            return {
+                'success': False,
+                'error': 'Failed to add suggestion'
+            }
+    except Exception as e:
+        print(f"Error in add_suggestion: {str(e)}")
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+def fetch_all_suggestions():
+    """
+    Get all suggestions with user names from the Suggestions table
+    """
+    try:
+        # First get all suggestions
+        response = supabase \
+            .from_('Suggestions') \
+            .select('sug_id, sug_content, sug_date, sug_user_id') \
+            .order('sug_date', desc=True) \
+            .execute()
+        
+        if not response.data:
+            return []
+            
+        suggestions = []
+        for suggestion in response.data:
+            try:
+                # Get user details separately
+                user_response = supabase \
+                    .from_('User') \
+                    .select('u_name, u_email') \
+                    .eq('u_id', suggestion['sug_user_id']) \
+                    .single() \
+                    .execute()
+                
+                user_data = user_response.data if user_response.data else None
+                
+                suggestion_data = {
+                    'id': suggestion['sug_id'],
+                    'content': suggestion['sug_content'],
+                    'date': suggestion['sug_date'],
+                    'user_id': suggestion['sug_user_id'],
+                    'user_name': user_data['u_name'] if user_data else 'Unknown',
+                    'user_email': user_data['u_email'] if user_data else 'Unknown'
+                }
+                suggestions.append(suggestion_data)
+            except Exception as e:
+                print(f"Error processing suggestion {suggestion.get('sug_id')}: {e}")
+                continue
+        
+        return suggestions
+    except Exception as e:
+        print(f"Error getting suggestions: {e}")
+        return []
+
+def delete_suggestion(suggestion_id):
+    """
+    Delete a suggestion from the Suggestions table
+    """
+    try:
+        response = supabase \
+            .from_('Suggestions') \
+            .delete() \
+            .eq('sug_id', suggestion_id) \
+            .execute()
+
+        if response.data:
+            return {'success': True, 'message': 'Suggestion deleted successfully'}
+        else:
+            return {'success': False, 'error': 'Failed to delete suggestion'}
+    except Exception as e:
+        print('Error in delete_suggestion:', e)
+        return {'success': False, 'error': str(e)}

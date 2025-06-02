@@ -1201,3 +1201,45 @@ export const deleteComment = async (commentId) => {
     throw error;
   }
 };
+
+export const getSuggestions = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/suggestions`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch suggestions');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error in getSuggestions:', error);
+        throw error;
+    }
+};
+
+export const deleteSuggestion = async (suggestionId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/suggestions/${suggestionId}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete suggestion');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error in deleteSuggestion:', error);
+        throw error;
+    }
+};

@@ -1,7 +1,7 @@
 from flask import jsonify, request
 import supabase
 from app import app
-from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type, get_reader_history, get_transactions
+from app.database import add_reader, delete_reader, get_readers_by_status, get_user_types, add_user_type, add_resource_type, update_reader_status_in_db,update_user_type, update_reader,delete_user_type, get_reader_history, get_transactions, add_suggestion, fetch_all_suggestions, delete_suggestion
 from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
 
 @app.route('/api/readers', methods=['GET'])
@@ -193,5 +193,68 @@ def get_history():
 
     except Exception as e:
         print(f"Error in get_history route: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/suggestions', methods=['POST'])
+@jwt_required()
+def create_suggestion():
+    """
+    API endpoint to create a new suggestion
+    """
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        required_fields = ['userId', 'content']
+        missing_fields = [field for field in required_fields if field not in data or not data[field]]
+        
+        if missing_fields:
+            return jsonify({
+                'success': False, 
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+
+        result = add_suggestion(data['userId'], data['content'])
+        
+        if result['success']:
+            return jsonify(result), 201
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        print(f"Error in create_suggestion: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/suggestions', methods=['GET'])
+@jwt_required()
+def get_all_suggestions():
+    """
+    API endpoint to get all suggestions
+    """
+    try:
+        suggestions = fetch_all_suggestions()
+        if not isinstance(suggestions, list):
+            print(f"Error: fetch_all_suggestions returned non-list type: {type(suggestions)}")
+            return jsonify({'error': 'Invalid response format'}), 500
+        return jsonify(suggestions), 200
+    except Exception as e:
+        print(f"Error in get_all_suggestions route: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/suggestions/<int:suggestion_id>', methods=['DELETE'])
+@jwt_required()
+def delete_suggestion_endpoint(suggestion_id):
+    """
+    API endpoint to delete a suggestion
+    """
+    try:
+        result = delete_suggestion(suggestion_id)
+        if result['success']:
+            return jsonify(result), 200
+        return jsonify(result), 400
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 

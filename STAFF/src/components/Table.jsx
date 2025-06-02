@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 const Table = ({ 
   columns, 
-  data, 
+  data = [], 
   showActions = false, 
   title, 
   onRowSelect, 
@@ -17,7 +17,8 @@ const Table = ({
   onEdit, 
   onDelete, 
   showEdit = true, 
-  showDelete = true 
+  showDelete = true,
+  loading = false
 }) => {
   const [searchText, setSearchText] = useState("");
   const { t } = useTranslation();
@@ -65,7 +66,7 @@ const Table = ({
               {showDelete && (
                 <button
                   className={`delete-btn ${!showEdit && !handleViewDetails ? "full-width" : ""}`}
-                  onClick={() => onDelete && onDelete(row)}
+                  onClick={() => onDelete && onDelete(row.id)}
                 >
                   <DeleteIcon style={{ fontSize: "20px", color: "#D32F2F" }} />
                 </button>
@@ -79,6 +80,7 @@ const Table = ({
       button: true,
     });
   }
+
   // Filter data based on search text
   const filteredData = data.filter((row) =>
     Object.values(row).some((value) =>
@@ -158,6 +160,8 @@ const Table = ({
           pagination
           highlightOnHover
           striped={false}
+          progressPending={loading}
+          progressComponent={<div className="loader" />}
         />
       </div>
     </div>

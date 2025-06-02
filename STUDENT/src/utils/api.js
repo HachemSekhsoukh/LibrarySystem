@@ -684,3 +684,29 @@ export const fetchMostBorrowedBooks = async () => {
     return [];
   }
 };
+
+export const submitSuggestion = async (userId, content) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/suggestions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        userId,
+        content
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to submit suggestion');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error submitting suggestion:', error);
+    throw error;
+  }
+};
