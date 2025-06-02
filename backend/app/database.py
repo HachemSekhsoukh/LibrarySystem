@@ -1314,9 +1314,15 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
     """
     try:
         # Fetch current reservation
-        current = supabase.from_("Reservation").select("res_type").eq("res_id", reservation_id).single().execute().data
+        current = supabase.from_("Reservation").select(
+            "res_type, res_user_id, res_resource_id, "
+            "User(u_email, u_name), "
+            "Resource(r_title)"
+        ).eq("res_id", reservation_id).single().execute().data
+        
         if not current:
             return {'success': False, 'error': 'Reservation not found'}
+            
         current_type = current['res_type']
         # Allowed transitions
         allowed = {
@@ -1385,6 +1391,25 @@ def update_reservation(reservation_id, user_id=None, resource_id=None, transacti
                         'success': False,
                         'error': 'Failed to delete returned reservation'
                     }
+            
+            # If the new type is "Late" (4), send email notification
+            if transaction_type == "Late":
+                # Get transaction details for email
+                transaction = get_transaction_details(reservation_id)
+                if transaction and transaction.get('user_email') and transaction.get('user_name'):
+                    from ..email_service import send_late_return_email
+                    email_result = send_late_return_email(
+                        transaction['user_email'],
+                        transaction['user_name'],
+                        transaction['title'],
+                        transaction['due_date'].split('T')[0],
+                        transaction.get('days_late', 0)
+                    )
+                    
+                    if email_result['success']:
+                        print(f"Email notification sent to {transaction['user_email']}")
+                    else:
+                        print(f"Failed to send email notification to {transaction['user_email']}: {email_result['message']}")
             
             return {
                 'success': True,
@@ -1865,22 +1890,25 @@ def get_transaction_details(transaction_id):
     try:
         response = supabase.from_("Reservation").select(
             "res_id, res_type, res_date, res_user_id, "
-            "Resource(r_id, r_title)"
+            "Resource(r_id, r_title), "
+            "User(u_id, u_name, u_email)"
         ).eq("res_id", transaction_id).execute()
 
         if not response.data or len(response.data) == 0:
+            print(f"No transaction found for ID: {transaction_id}")
             return None
             
         transaction = response.data[0]
         
         # Get the user's type to determine borrow limit
         user_response = supabase.from_("User") \
-            .select("u_type, User_type(ut_borrow)") \
+            .select("u_type, User_type(ut_borrow, ut_renew)") \
             .eq("u_id", transaction["res_user_id"]) \
             .single() \
             .execute()
         
         user_type_borrow_limit = user_response.data.get('User_type', {}).get('ut_borrow') if user_response.data else None
+        user_type_renew_limit = user_response.data.get('User_type', {}).get('ut_renew') if user_response.data else None
         
         # Get the resource's type to determine borrow limit
         resource_response = supabase.from_("Resource") \
@@ -1897,17 +1925,32 @@ def get_transaction_details(transaction_id):
         # Calculate due date based on reservation date and borrow limit
         from datetime import datetime, timedelta
         res_date = datetime.fromisoformat(transaction["res_date"].replace('Z', '+00:00'))
-        due_date = res_date + timedelta(days=borrow_limit)
+        
+        # Calculate due date based on transaction type
+        if transaction["res_type"] == 1:  # Borrow
+            due_date = res_date + timedelta(days=borrow_limit)
+        elif transaction["res_type"] == 3:  # Renew_1
+            due_date = res_date + timedelta(days=borrow_limit + user_type_renew_limit)
+        elif transaction["res_type"] == 5:  # Renew_2
+            due_date = res_date + timedelta(days=borrow_limit + 2 * user_type_renew_limit)
+        else:
+            due_date = res_date + timedelta(days=borrow_limit)
+            
+        print(f"Transaction {transaction_id} details:")
+        print(f"Reservation date: {res_date}")
+        print(f"Due date: {due_date}")
+        print(f"Transaction type: {transaction['res_type']}")
         
         return {
-            'id': transaction['res_id'],
             'user_id': transaction['res_user_id'],
             'title': transaction['Resource']['r_title'],
-            'due_date': due_date.isoformat()
+            'due_date': due_date.isoformat(),
+            'user_email': transaction['User']['u_email'],
+            'user_name': transaction['User']['u_name'],
+            'is_late': transaction['res_type'] == 4  # Check if transaction is marked as late
         }
-        
     except Exception as e:
-        print(f"Error fetching transaction details: {e}")
+        print(f"Error in get_transaction_details: {str(e)}")
         return None
 
 def get_user_details(user_id):
@@ -2011,32 +2054,80 @@ def mark_late_reservations():
     """
     This function checks all active reservations and sets their status to 'Late' if the due date is passed.
     Should be run daily (e.g., via cron or scheduler).
+    Also sends email notifications to users when their reservations are marked as late.
     """
     try:
         active_statuses = [1, 3, 5]  # 1: Borrow, 3: Renew_1, 5: Renew_2
-        reservations = supabase.from_("Reservation").select("res_id, res_user_id, res_resource_id, res_type, res_date").in_("res_type", active_statuses).execute()
+        reservations = supabase.from_("Reservation").select(
+            "res_id, res_user_id, res_resource_id, res_type, res_date, "
+            "User(u_email, u_name), "
+            "Resource(r_title)"
+        ).in_("res_type", active_statuses).execute()
+        
         for res in reservations.data:
             user_id = res['res_user_id']
             res_type = res['res_type']
             res_date = res['res_date']
+            
+            # Get user type info
             user = supabase.from_("User").select("u_type, User_type(ut_borrow, ut_renew)").eq("u_id", user_id).single().execute().data
             ut_borrow = user['User_type']['ut_borrow'] if user and user.get('User_type') else 0
             ut_renew = user['User_type']['ut_renew'] if user and user.get('User_type') else 0
+            
+            # Get resource type info
             resource = supabase.from_("Resource").select("r_type, Resource_type(rt_borrow)").eq("r_id", res['res_resource_id']).single().execute().data
             rt_borrow = resource.get('Resource_type', {}).get('rt_borrow') if resource else None
             borrow_limit = rt_borrow if rt_borrow and rt_borrow > 1 else ut_borrow
+            
+            # Calculate due date
             from datetime import datetime, timedelta
             borrow_date = datetime.fromisoformat(res_date.replace('Z', '+00:00'))
-            if res_type == 1:
+            now = datetime.now(borrow_date.tzinfo)  # Use same timezone as borrow_date
+            
+            if res_type == 1:  # Borrow
                 due_date = borrow_date + timedelta(days=borrow_limit)
-            elif res_type == 3:
+            elif res_type == 3:  # Renew_1
                 due_date = borrow_date + timedelta(days=borrow_limit + ut_renew)
-            elif res_type == 5:
+            elif res_type == 5:  # Renew_2
                 due_date = borrow_date + timedelta(days=borrow_limit + 2 * ut_renew)
             else:
                 continue
-            if datetime.now() > due_date:
-                supabase.from_("Reservation").update({"res_type": 4}).eq("res_id", res['res_id']).execute()
+                
+            # Check if the item is late
+            if now > due_date:
+                print(f"Marking reservation {res['res_id']} as late. Due date: {due_date}, Current time: {now}")
+                
+                # Update reservation status to late
+                update_response = supabase.from_("Reservation").update({"res_type": 4}).eq("res_id", res['res_id']).execute()
+                
+                if update_response.data:
+                    # Calculate days late for the email
+                    days_late = (now - due_date).days
+                    
+                    # Prepare email data
+                    recipient_data = {
+                        'email': res['User']['u_email'],
+                        'name': res['User']['u_name'],
+                        'book_title': res['Resource']['r_title'],
+                        'due_date': due_date.strftime('%Y-%m-%d'),
+                        'days_late': days_late
+                    }
+                    
+                    # Send email notification
+                    from ..email_service import send_late_return_email
+                    email_result = send_late_return_email(
+                        recipient_data['email'],
+                        recipient_data['name'],
+                        recipient_data['book_title'],
+                        recipient_data['due_date'],
+                        recipient_data['days_late']
+                    )
+                    
+                    if email_result['success']:
+                        print(f"Email notification sent to {recipient_data['email']}")
+                    else:
+                        print(f"Failed to send email notification to {recipient_data['email']}: {email_result['message']}")
+                
     except Exception as e:
         print(f"Error in mark_late_reservations: {e}")
 

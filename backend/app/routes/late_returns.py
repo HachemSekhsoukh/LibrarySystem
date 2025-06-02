@@ -31,34 +31,34 @@ def send_late_notices():
         # Get transaction details
         transaction = get_transaction_details(transaction_id)
         if not transaction:
+            print(f"No transaction details found for ID: {transaction_id}")
             continue
             
-        # Get user details
-        user = get_user_details(transaction.get('user_id'))
-        if not user or not user.get('u_email'):
+        # Skip if no email or name
+        if not transaction.get('user_email') or not transaction.get('user_name'):
+            print(f"No email or name found for transaction ID: {transaction_id}")
             continue
             
-        # Calculate days late
-        due_date = transaction.get('due_date')
-        if not due_date:
+        # Skip if not marked as late
+        if not transaction.get('is_late'):
+            print(f"Transaction ID {transaction_id} is not marked as late")
             continue
             
         # Format the due date for display
+        due_date = transaction.get('due_date')
         formatted_due_date = due_date.split('T')[0] if 'T' in due_date else due_date
         
-        # Calculate days late
+        # Calculate days late for display purposes only
         try:
             due_date_obj = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
             days_late = (datetime.now() - due_date_obj).days
-        except:
-            days_late = 0
-            
-        if days_late <= 0:
-            continue
+        except Exception as e:
+            print(f"Error calculating days late for transaction ID {transaction_id}: {str(e)}")
+            days_late = 0  # Default to 0 if calculation fails
             
         recipients_data.append({
-            'email': user.get('u_email'),
-            'name': user.get('u_name'),
+            'email': transaction['user_email'],
+            'name': transaction['user_name'],
             'book_title': transaction.get('title', 'Unknown Book'),
             'due_date': formatted_due_date,
             'days_late': days_late
