@@ -4,7 +4,7 @@ Routes related to resources (books and other library items)
 
 from flask import jsonify, request
 from app import app
-from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history, add_comment, get_comments, add_report, delete_comment, supabase
+from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history, add_comment, get_comments, add_report, delete_comment, supabase, delete_report
 import pandas as pd
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import io
@@ -350,3 +350,46 @@ def delete_comment_endpoint(comment_id):
             'success': False,
             'error': str(e)
         }), 500
+
+@app.route('/api/comments/report', methods=['POST', 'OPTIONS'])
+@jwt_required()
+def report_comment_route():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    try:
+        data = request.get_json()
+        reporter_id = data.get('reporter_id')
+        comment_id = data.get('comment_id')
+        reason = data.get('reason')
+
+        if not all([reporter_id, comment_id, reason]):
+            print(f"Missing required fields: reporter_id={reporter_id}, comment_id={comment_id}, reason={reason}")
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        result = add_report({
+            'reporter_id': reporter_id,
+            'comment_id': comment_id,
+            'reason': reason
+        })
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"Error in report_comment_route: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/reports/<int:report_id>', methods=['DELETE', 'OPTIONS'])
+@jwt_required()
+def delete_report_endpoint(report_id):
+    """
+    API endpoint to delete a report by ID.
+    """
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    try:
+        user_email = get_jwt_identity()
+        result = delete_report(report_id)
+        return jsonify(result), (200 if result.get('success') else 400)
+    except Exception as e:
+        print(f"Error deleting report: {str(e)}")
+        return jsonify({'error': str(e)}), 500

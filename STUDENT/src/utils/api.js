@@ -78,8 +78,6 @@ export const fetchComments = async (resourceId) => {
   }
 };
 
-
-
 /**
  * Fetches resources from the API with a limit
  * @param {number} limit - Maximum number of resources to fetch
@@ -707,6 +705,33 @@ export const submitSuggestion = async (userId, content) => {
     return await response.json();
   } catch (error) {
     console.error('Error submitting suggestion:', error);
+    throw error;
+  }
+};
+
+export const reportComment = async (reporterId, commentId, reason) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/comments/report`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        reporter_id: reporterId,
+        comment_id: commentId,
+        reason: reason
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to report comment');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error reporting comment:', error);
     throw error;
   }
 };
