@@ -4,9 +4,9 @@ Routes related to resources (books and other library items)
 
 from flask import jsonify, request
 from app import app
-from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history,add_comment,get_comments,add_report
+from app.database import get_resources, add_resource, delete_resource, update_resource, get_resource_history, add_comment, get_comments, add_report, delete_comment, supabase
 import pandas as pd
-from flask_jwt_extended import create_access_token,jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 import io
 
 @app.route('/api/resources', methods=['GET'])
@@ -303,3 +303,50 @@ def create_report():
     except Exception as e:
         print(' error in report comment route')
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/comments/<int:resource_id>/reports', methods=['GET'])
+@jwt_required()
+def get_comment_reports(resource_id):
+    """
+    API endpoint to get reports for comments on a specific resource
+    """
+    try:
+        # Get all comments for the resource
+        comments = get_comments(resource_id)
+        if not comments:
+            return jsonify({'reports': []}), 200
+
+        # Get all reports for these comments
+        comment_ids = [comment['rat_id'] for comment in comments]
+        response = supabase \
+            .from_('comment_report') \
+            .select('*') \
+            .in_('comment_id', comment_ids) \
+            .execute()
+
+        return jsonify({
+            'success': True,
+            'reports': response.data or []
+        }), 200
+    except Exception as e:
+        print(f"Error in get_comment_reports: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/comments/<int:comment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_comment_endpoint(comment_id):
+    """
+    API endpoint to delete a comment
+    """
+    try:
+        result = delete_comment(comment_id)
+        return jsonify(result), (200 if result['success'] else 400)
+    except Exception as e:
+        print(f"Error in delete_comment_endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

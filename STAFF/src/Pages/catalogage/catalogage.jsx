@@ -4,7 +4,7 @@ import Button from '../../components/Button';
 import Popup from "../../components/Popup";
 import "../../CSS/form.css";
 import "./resource_form";
-import { TextField, MenuItem, Grid, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Typography, TableHead, TableBody, TableRow, TableCell, Chip, Tabs, Tab, Box } from "@mui/material";
+import { TextField, MenuItem, Grid, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Typography, TableHead, TableBody, TableRow, TableCell, Chip, Tabs, Tab, Box, IconButton } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -13,10 +13,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddResourceForm from "./resource_form";
 import { useTranslation } from 'react-i18next';
 import { useAuth } from "../../utils/privilegeContext"; // Import the AuthProvider
-import { fetchResources, fetchResourceTypes, addResourceType, updateResourceType, deleteResourceType, fetchResourceHistory, fetchResourceComments } from '../../utils/api';
+import { 
+  fetchResources, 
+  fetchResourceTypes, 
+  addResource, 
+  updateResource, 
+  deleteResource, 
+  importResources,
+  fetchResourceHistory, 
+  fetchResourceComments, 
+  fetchCommentReports,
+  deleteComment
+} from '../../utils/api';
 
 const Catalogage = () => {
-  const API_BASE_URL = "http://127.0.0.1:5000/";
   const { hasPrivilege } = useAuth(); // Use the AuthProvider to check privileges
   const { t } = useTranslation();
   const [openPopup, setOpenPopup] = useState(false);
@@ -54,32 +64,28 @@ const Catalogage = () => {
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [reportedComments, setReportedComments] = useState([]);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [selectedComment, setSelectedComment] = useState(null);
+  const [deleteCommentDialogOpen, setDeleteCommentDialogOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
 
   const canEdit = hasPrivilege("edit_catalogage_books");
   const canDelete = hasPrivilege("delete_catalogage_books");
   const canCreate = hasPrivilege("create_catalogage_books");
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}api/resource-types`, {credentials: 'include'})
-      .then(res => res.json())
+    fetchResourceTypes()
       .then(data => {
         setResourceTypes(data);
       })
       .catch(error => console.error("API Error:", error));
   }, []);
 
-  useEffect(() => {
-    fetchResources();
-  }, []);
-  
-  const fetchResources = async () => {
+  const loadResources = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}api/resources`, {credentials: 'include'});
-      if (!response.ok) {
-        throw new Error("Failed to fetch resources");
-      }
-      const data = await response.json();
+      const data = await fetchResources();
       setResources(data || []);
     } catch (error) {
       console.error("API Error:", error);
@@ -89,6 +95,10 @@ const Catalogage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadResources();
+  }, []);
 
   const handleChange = (e) => {
     setBookData({ ...bookData, [e.target.name]: e.target.value });
@@ -143,29 +153,13 @@ const Catalogage = () => {
         r_description: bookData.description
       };
   
-      let response;
+      let result;
       if (isEditing) {
-        response = await fetch(`${API_BASE_URL}api/resources/${currentResourceId}`, { 
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: 'include',
-          body: JSON.stringify(formattedData),
-        });
+        result = await updateResource(currentResourceId, formattedData);
       } else {
-        response = await fetch(`${API_BASE_URL}api/resources`, { 
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: 'include',
-          body: JSON.stringify(formattedData),
-        });
+        result = await addResource(formattedData);
       }
   
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP ${response.status}`);
-      }
-  
-      const result = await response.json();
       setSnackbar({ 
         open: true, 
         message: isEditing ? "Resource updated successfully!" : "Resource added successfully!", 
@@ -173,9 +167,8 @@ const Catalogage = () => {
       });
       setOpenPopup(false);
       
-      // Reset form data
       resetForm();
-      fetchResources();
+      loadResources();
     } catch (error) {
       console.error("Error saving resource:", error);
       setSnackbar({ open: true, message: `Failed to save resource: ${error.message}`, severity: "error" });
@@ -211,17 +204,7 @@ const Catalogage = () => {
 
   const confirmDelete = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}api/resources/${resourceToDelete.id}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error ${response.status}`);
-      }
-      
-      const result = await response.json();
+      const result = await deleteResource(resourceToDelete.id);
       
       if (result.success) {
         setSnackbar({
@@ -229,7 +212,7 @@ const Catalogage = () => {
           message: "Resource deleted successfully!",
           severity: "success"
         });
-        fetchResources();
+        loadResources();
       } else {
         throw new Error(result.error || "Failed to delete resource");
       }
@@ -260,31 +243,19 @@ const Catalogage = () => {
     }
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
 
     try {
-      const response = await fetch(`${API_BASE_URL}api/resources/import`, {
-        method: 'POST',
-        credentials: 'include',
-        body: formData
+      const result = await importResources(file);
+
+      setSnackbar({
+        open: true,
+        message: result.message,
+        severity: result.errors ? "warning" : "success"
       });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setSnackbar({
-          open: true,
-          message: result.message,
-          severity: result.errors ? "warning" : "success"
-        });
-        if (result.errors) {
-          console.error("Import errors:", result.errors);
-        }
-        fetchResources();
-      } else {
-        throw new Error(result.error || 'Failed to import file');
+      if (result.errors) {
+        console.error("Import errors:", result.errors);
       }
+      loadResources();
     } catch (error) {
       setSnackbar({
         open: true,
@@ -307,24 +278,67 @@ const Catalogage = () => {
       setLoadingComments(true);
       
       // Fetch both history and comments in parallel
-      const [historyData, commentsData] = await Promise.all([
+      const [history, comments, reports] = await Promise.all([
         fetchResourceHistory(resource.id),
-        fetchResourceComments(resource.id)
+        fetchResourceComments(resource.id),
+        fetchCommentReports(resource.id)
       ]);
       
-      setHistory(historyData);
-      setComments(commentsData.comments || []);
+      console.log('Resource History:', history);
+      console.log('Resource Comments:', comments);
+      console.log('Comment Reports:', reports);
+      
+      setHistory(history);
+      // The API returns { success: true, comments: [...] }
+      setComments(comments.success ? comments.comments : []);
+      setReportedComments(reports.reports || []);
+      
+      setHistoryDialogOpen(true);
     } catch (error) {
       console.error('Error fetching resource details:', error);
-      setSnackbar({ 
-        open: true, 
-        message: 'Failed to fetch resource details', 
-        severity: 'error' 
+      setSnackbar({
+        open: true,
+        message: 'Failed to fetch resource details',
+        severity: 'error'
       });
     } finally {
       setLoadingTransactions(false);
       setLoadingComments(false);
-      setHistoryDialogOpen(true);
+    }
+  };
+
+  const handleViewReports = (comment) => {
+    setSelectedComment(comment);
+    setReportDialogOpen(true);
+  };
+
+  const handleDeleteComment = async () => {
+    try {
+      await deleteComment(commentToDelete.rat_id);
+
+      setSnackbar({
+        open: true,
+        message: 'Comment deleted successfully',
+        severity: 'success'
+      });
+
+      // Refresh comments
+      const [comments, reports] = await Promise.all([
+        fetchResourceComments(selectedResource.id),
+        fetchCommentReports(selectedResource.id)
+      ]);
+      setComments(comments.success ? comments.comments : []);
+      setReportedComments(reports.reports || []);
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to delete comment',
+        severity: 'error'
+      });
+    } finally {
+      setDeleteCommentDialogOpen(false);
+      setCommentToDelete(null);
     }
   };
 
@@ -588,40 +602,150 @@ const Catalogage = () => {
                 </Typography>
               ) : (
                 <Box sx={{ mt: 2 }}>
-                  {comments.map((comment, index) => (
-                    <Box key={index} sx={{ 
-                      p: 2, 
-                      mb: 2, 
-                      border: '1px solid #e0e0e0', 
-                      borderRadius: 1,
-                      backgroundColor: '#f9f9f9'
-                    }}>
-                      <Typography variant="subtitle1" gutterBottom>
-                        {comment.user_name || 'Anonymous User'}
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} style={{ 
-                            color: i < comment.rating ? '#ffd700' : '#e0e0e0',
-                            fontSize: '1.2rem'
-                          }}>
-                            ★
-                          </span>
-                        ))}
-                      </Box>
-                      <Typography variant="body1">
-                        {comment.comment}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {new Date(comment.created_at).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  ))}
+                  {/* Sort comments to show reported ones first */}
+                  {[...comments]
+                    .sort((a, b) => {
+                      const aReported = reportedComments.some(r => r.comment_id === a.rat_id);
+                      const bReported = reportedComments.some(r => r.comment_id === b.rat_id);
+                      return bReported - aReported;
+                    })
+                    .map((comment) => {
+                      const isReported = reportedComments.some(r => r.comment_id === comment.rat_id);
+                      const reportCount = reportedComments.filter(r => r.comment_id === comment.rat_id).length;
+                      
+                      return (
+                        <Box key={comment.rat_id} sx={{ 
+                          p: 2, 
+                          mb: 2, 
+                          border: '1px solid #e0e0e0', 
+                          borderRadius: 1,
+                          backgroundColor: isReported ? '#fff3f3' : '#f9f9f9',
+                          position: 'relative'
+                        }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <Typography variant="subtitle1" gutterBottom>
+                              {comment.User?.u_name || 'Anonymous User'}
+                            </Typography>
+                            <Box>
+                              {isReported && (
+                                <Chip
+                                  label={`${reportCount} Report${reportCount > 1 ? 's' : ''}`}
+                                  color="error"
+                                  size="small"
+                                  onClick={() => handleViewReports(comment)}
+                                  sx={{ mr: 1 }}
+                                />
+                              )}
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  setCommentToDelete(comment);
+                                  setDeleteCommentDialogOpen(true);
+                                }}
+                                sx={{ color: 'error.main' }}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                            {[...Array(5)].map((_, i) => (
+                              <span key={i} style={{ 
+                                color: i < comment.rating ? '#ffd700' : '#e0e0e0',
+                                fontSize: '1.2rem'
+                              }}>
+                                ★
+                              </span>
+                            ))}
+                          </Box>
+                          <Typography variant="body1">
+                            {comment.comment}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {new Date(comment.rat_date).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
                 </Box>
               )}
             </>
           )}
         </DialogContent>
+      </Dialog>
+
+      {/* Add Report Dialog */}
+      <Dialog
+        open={reportDialogOpen}
+        onClose={() => setReportDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          Reports for Comment
+          <button 
+            className="close-button"
+            onClick={() => setReportDialogOpen(false)}
+          >
+            &times;
+          </button>
+        </DialogTitle>
+        <DialogContent>
+          {selectedComment && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Comment by: {selectedComment.User?.u_name || 'Anonymous User'}
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {selectedComment.comment}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                Reports ({reportedComments.filter(r => r.comment_id === selectedComment.rat_id).length})
+              </Typography>
+              {reportedComments
+                .filter(r => r.comment_id === selectedComment.rat_id)
+                .map((report, index) => (
+                  <Box key={index} sx={{ 
+                    p: 2, 
+                    mb: 1, 
+                    border: '1px solid #e0e0e0', 
+                    borderRadius: 1,
+                    backgroundColor: '#f9f9f9'
+                  }}>
+                    <Typography variant="subtitle2" color="error">
+                      Report #{index + 1}
+                    </Typography>
+                    <Typography variant="body2">
+                      Reason: {report.reason}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Reported on: {new Date(report.created_at).toLocaleDateString()}
+                    </Typography>
+                  </Box>
+                ))}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setReportDialogOpen(false)} label="Close" lightBackgrnd={true} />
+        </DialogActions>
+      </Dialog>
+
+      {/* Add Delete Comment Dialog */}
+      <Dialog
+        open={deleteCommentDialogOpen}
+        onClose={() => setDeleteCommentDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete this comment?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteCommentDialogOpen(false)} label="Cancel" lightBackgrnd={true} />
+          <Button onClick={handleDeleteComment} label="Delete" lightBackgrnd={false} />
+        </DialogActions>
       </Dialog>
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleSnackbarClose}>

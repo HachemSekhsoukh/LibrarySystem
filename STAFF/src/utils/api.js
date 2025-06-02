@@ -815,18 +815,13 @@ const processHistoryData = (historyData) => {
 
 export const fetchResourceHistory = async (resourceId) => {
   try {
-    const url = `${API_BASE_URL}/resource-history?resource_id=${resourceId}`;
-    const response = await fetch(url, { credentials: 'include' });
-    
+    const response = await fetch(`${API_BASE_URL}/resource-history?resource_id=${resourceId}`, {
+      credentials: 'include'
+    });
     if (!response.ok) {
-      throw new Error(`Failed to fetch resource history: ${response.status} ${response.statusText}`);
+      throw new Error('Failed to fetch resource history');
     }
-    
-    const historyData = await response.json();
-    if (historyData.error) {
-      throw new Error(historyData.error);
-    }
-    return processHistoryData(historyData);
+    return await response.json();
   } catch (error) {
     console.error('Error fetching resource history:', error);
     throw error;
@@ -1085,23 +1080,124 @@ export const sendLateNotices = async (transactionIds) => {
 export const fetchResourceComments = async (resourceId) => {
   try {
     const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/comments`, {
-      method: 'GET',
       credentials: 'include'
     });
-    
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch resource comments');
+      throw new Error('Failed to fetch resource comments');
     }
-    
-    const data = await response.json();
-    if (!data.success) {
-      throw new Error(data.error || 'Failed to fetch resource comments');
-    }
-    
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Error fetching resource comments:', error);
+    throw error;
+  }
+};
+
+export const fetchCommentReports = async (resourceId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/comments/${resourceId}/reports`, {
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch comment reports');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching comment reports:', error);
+    throw error;
+  }
+};
+
+export const addResource = async (resourceData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resources`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(resourceData)
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to add resource');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding resource:', error);
+    throw error;
+  }
+};
+
+export const updateResource = async (resourceId, resourceData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resources/${resourceId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(resourceData)
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update resource');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating resource:', error);
+    throw error;
+  }
+};
+
+export const deleteResource = async (resourceId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/resources/${resourceId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to delete resource');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting resource:', error);
+    throw error;
+  }
+};
+
+export const importResources = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/resources/import`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to import resources');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error importing resources:', error);
+    throw error;
+  }
+};
+
+export const deleteComment = async (commentId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete comment');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting comment:', error);
     throw error;
   }
 };
