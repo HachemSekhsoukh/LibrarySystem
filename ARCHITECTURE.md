@@ -17,16 +17,19 @@ The Library Management System is a web-based application that helps manage libra
 
 The system consists of the following containers:
 
-1. **Web Application**
-   - Student Interface (HTML/CSS/JavaScript)
-   - Staff Interface (HTML/CSS/JavaScript)
-   - Single Page Application
+1. **Web Applications**
+   - Student Interface (React/Vite)
+   - Staff Interface (React/Vite)
+   - Modern Single Page Applications
+   - i18n Internationalization (English/French)
+   - Analytics Dashboard with Chart.js
 
 2. **API Application**
    - Python Flask Application
-   - RESTful API
+   - RESTful API Architecture
    - Authentication Service
    - Business Logic
+   - Email Notification Service
 
 3. **Database**
    - Supabase (PostgreSQL)
@@ -239,36 +242,6 @@ CREATE TABLE comment_reports (
 - XSS protection
 - CSRF protection
 
-## Deployment Architecture
-
-### Development Environment
-
-- Local development server
-- Development database
-- Development configuration
-
-### Staging Environment
-
-- Staging server
-- Staging database
-- Staging configuration
-- Automated testing
-
-### Production Environment
-
-- Production server
-- Production database
-- Production configuration
-- Monitoring and logging
-
-## Monitoring and Logging
-
-### Application Monitoring
-
-- Error tracking
-- Performance monitoring
-- User activity tracking
-- System health checks
 
 ### Logging
 
@@ -277,57 +250,12 @@ CREATE TABLE comment_reports (
 - Access logs
 - Audit logs
 
-## Backup and Recovery
-
-### Database Backup
-
-- Daily automated backups
-- Point-in-time recovery
-- Backup verification
-
-### System Recovery
-
-- Disaster recovery plan
-- System restoration procedures
-- Data recovery procedures
-
-## Performance Considerations
-
-### Caching Strategy
-
-- API response caching
-- Static asset caching
-- Database query caching
-
-### Optimization
-
-- Database indexing
-- Query optimization
-- Asset optimization
-- Code optimization
-
-## Scalability
-
-### Horizontal Scaling
-
-- Load balancing
-- Multiple instances
-- Database replication
-
-### Vertical Scaling
-
-- Resource allocation
-- Performance tuning
-- Capacity planning
 
 ## Integration Points
 
 ### External Systems
 
 - Email service
-- SMS service
-- Payment gateway
-- Analytics service
 
 ### APIs
 
@@ -344,13 +272,6 @@ CREATE TABLE comment_reports (
 - Branching strategy
 - Code review process
 - Release management
-
-### CI/CD Pipeline
-
-- Automated testing
-- Code quality checks
-- Deployment automation
-- Environment management
 
 ## Future Considerations
 

@@ -1,14 +1,24 @@
-# Usage Guide
+# User Guide
 
-This guide explains how to use the Library Management System for both students and staff members.
+This comprehensive guide explains how to use the Library Management System for both readers and staff members.
 
-## Student Interface
+## System Overview
 
-### 1. Login
+The Library Management System consists of two separate interfaces:
 
-1. Open the student interface (`STUDENT/index.html`)
+1. **Reader Interface** - For library patrons to browse and borrow resources
+2. **Staff Interface** - For library staff to manage resources, readers, and analytics
+
+Both interfaces are available as web applications that can be accessed through any modern web browser.
+
+## Reader Interface
+
+### 1. Getting Started
+
+1. Access the reader interface in your web browser
 2. Enter your email and password
 3. Click "Login"
+4. New users can click "Sign Up" to create an account
 
 ### 2. Browse Books
 
@@ -57,11 +67,29 @@ This guide explains how to use the Library Management System for both students a
 
 ## Staff Interface
 
-### 1. Login
+### 1. Getting Started
 
-1. Open the staff interface (`STAFF/index.html`)
+1. Access the staff interface in your web browser
 2. Enter your staff email and password
 3. Click "Login"
+4. You will be directed to the interactive dashboard
+
+### 2. Dashboard
+
+The dashboard provides a comprehensive overview of library activity:
+
+![Staff Dashboard](STAFF/public/assets/images/dashboard.png)
+
+- **Top Section**: Key performance indicators and summary metrics
+- **Charts Section**: Visual representation of borrowing activities
+- **Recent Activities**: Latest transactions and system events
+
+#### Key Features:
+- Monthly borrowing trends
+- Resource type distribution
+- Late returns tracking
+- Active reader metrics
+- Language selection (top right)
 
 ### 2. Book Management
 
@@ -86,7 +114,24 @@ This guide explains how to use the Library Management System for both students a
 2. Click the "Delete" button
 3. Confirm the deletion
 
-### 3. Student Management
+### 3. Analytics Dashboard
+
+1. Click on the "Dashboard" link in the navigation menu
+2. View key metrics and statistics:
+   - Monthly borrows chart
+   - Resource type distribution
+   - Late returns statistics
+   - Active readers metrics
+3. Filter statistics by date range
+4. Export reports as needed
+
+### 4. Language Settings
+
+1. Click on the language toggle in the top menu
+2. Select your preferred language (English or French)
+3. The interface will update immediately with the selected language
+
+### 5. Student Management
 
 #### View Student List
 1. Click "Students" in the navigation menu
@@ -179,35 +224,3 @@ This guide explains how to use the Library Management System for both students a
 3. Update your information
 4. Change password
 5. Click "Save"
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Can't Log In**
-   - Check your email and password
-   - Ensure caps lock is off
-   - Contact staff if locked out
-
-2. **Book Not Available**
-   - Check if the book is already borrowed
-   - Look for alternative copies
-   - Place a hold if available
-
-3. **Return Issues**
-   - Ensure the book is in good condition
-   - Check for any fines
-   - Contact staff for assistance
-
-4. **System Errors**
-   - Refresh the page
-   - Clear browser cache
-   - Try a different browser
-   - Contact technical support
-
-## Getting Help
-
-- For technical issues: Contact the IT support team
-- For account issues: Contact the library staff
-- For general inquiries: Use the help desk
-- Emergency support: Call the library hotline 

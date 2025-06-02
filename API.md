@@ -1,6 +1,21 @@
 # API Documentation
 
-This document describes the REST API endpoints for the Library Management System.
+This document provides a comprehensive reference for the REST API endpoints used in the Library Management System.
+
+## API Overview
+
+The API is organized into logical resource groups:
+
+| Resource Group | Description |
+|---------------|-------------|
+| `/auth` | Authentication and user management |
+| `/resources` | Library resource management |
+| `/resource_types` | Resource categorization and types |
+| `/readers` | Reader profile management |
+| `/transactions` | Borrowing and return operations |
+| `/late_returns` | Management of overdue resources |
+| `/statistics` | Analytics and reporting |
+| `/logs` | System activity logs |
 
 ## Base URL
 
@@ -14,6 +29,32 @@ All API endpoints require JWT authentication. Include the token in the Authoriza
 
 ```
 Authorization: Bearer <your_jwt_token>
+```
+
+### Obtaining a Token
+
+```
+POST /api/auth/login
+```
+
+Request Body:
+```json
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
+```
+
+Response:
+```json
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+        "id": "123",
+        "email": "user@example.com",
+        "role": "reader"
+    }
+}
 ```
 
 ## Error Handling
@@ -39,6 +80,20 @@ Error Response Format:
 ```
 
 ## Endpoints
+
+The API is organized into the following resource groups:
+
+| Resource Group | Description |
+|---------------|-------------|
+| `/auth` | Authentication and user management |
+| `/resources` | Library resource management |
+| `/resource_types` | Resource categorization and types |
+| `/readers` | Reader profile management |
+| `/transactions` | Borrowing and return operations |
+| `/late_returns` | Management of overdue resources |
+| `/statistics` | Analytics and reporting |
+| `/logs` | System activity logs |
+| `/staff` | Staff-specific operations |
 
 ### Authentication
 
